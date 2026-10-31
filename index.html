@@ -43,6 +43,24 @@ ol{margin:6px 0 0;padding-left:20px}ol li{margin:4px 0}
 .todo{color:var(--acc);font-weight:600}
 details summary{color:var(--mut);font-size:14px;margin-top:12px}
 #toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-size:15px;opacity:0;transition:opacity .3s;pointer-events:none;max-width:90vw;text-align:center}
+#crossBox.nofig .vx{margin-top:0;padding-top:0;border-top:0}
+.xp-h{display:flex;justify-content:space-between;align-items:baseline;font-weight:650;margin-bottom:4px}
+.xp{display:flex;gap:12px;align-items:center;width:100%;text-align:left;padding:12px 4px;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent}
+.xp:last-child{border-bottom:0}.xp svg{flex:none}
+.xp-t{flex:1;display:flex;flex-direction:column}.xp-t b{font-weight:650}.xp-t span{font-size:13px;color:var(--mut)}
+.xp-s{font-size:12px;color:var(--mut);white-space:nowrap}.xp-s.ok{color:var(--ok);font-weight:650}
+.modal{position:fixed;inset:0;background:#f4f3ef;z-index:20;overflow:auto}
+.modal .m-in{max-width:520px;margin:0 auto;padding:18px 14px 30px}
+.m-t{font-size:22px;font-weight:700}.m-s{color:var(--mut);margin:6px 0 12px}
+#drawCv{width:100%;aspect-ratio:16/10;display:block;border-radius:14px;background:#fcfcfb;border:1px solid var(--line);touch-action:none}
+.steps{margin:10px 0 0;padding-left:20px}.steps li{margin:6px 0}
+#fix{position:fixed;inset:0;background:#000;z-index:30;display:flex;align-items:center;justify-content:center;flex-direction:column}
+#fix .disc{width:58vmin;height:58vmin;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center}
+#fix .disc i{width:10px;height:10px;border-radius:50%;background:#e01b1b;display:block}
+#fix .cnt{color:#777;font-size:15px;margin-top:22px;font-variant-numeric:tabular-nums}
+.choice button{display:block;width:100%;text-align:left;margin-top:8px;padding:14px}
+#cmp{width:100%;height:auto;display:block;margin-top:10px}
+input[type=range]{width:100%;margin-top:14px}
 #flash{position:fixed;inset:0;background:var(--ok);opacity:0;pointer-events:none;transition:opacity .35s}
 </style>
 </head>
@@ -92,7 +110,14 @@ details summary{color:var(--mut);font-size:14px;margin-top:12px}
     <label class="chk"><input type="checkbox" id="photoChk" checked>commencer par une photo</label>
   </section>
 
-  <section class="card hide" id="vaultCard"><div id="vaultBox"></div></section>
+  <section class="card" id="xpCard">
+    <div class="xp-h"><span>Trois petites expériences</span><span class="small">1 min chacune</span></div>
+    <button class="xp" data-xp="partage"><svg width="34" height="34" viewBox="0 0 34 34"><path d="M3 29A26 26 0 0 1 31 29" fill="none" stroke="#1d3f86" stroke-width="2"/><path d="M17 29L8 12M17 29L17 4M17 29L27 13" stroke="#477fcb" stroke-width="1.6" stroke-dasharray="2 2.5"/><circle cx="17" cy="29" r="2.4"/></svg><span class="xp-t"><b>Partage le ciel</b><span>Vise le milieu entre l'horizon et le point juste au-dessus de ta tête.</span></span><span class="xp-s" id="st-partage"></span></button>
+    <button class="xp" data-xp="dessin"><svg width="34" height="34" viewBox="0 0 34 34"><path d="M2 28C6 14 12 9 17 9S28 14 32 28" fill="none" stroke="#1d3f86" stroke-width="2" stroke-linecap="round"/><path d="M1 29H33" stroke="#8e8a7c"/><path d="M24 4l5 5-9 9-6 1 1-6z" fill="#e2622b"/></svg><span class="xp-t"><b>Dessine ton ciel</b><span>Trace au doigt la forme du ciel telle que tu la sens.</span></span><span class="xp-s" id="st-dessin"></span></button>
+    <button class="xp" data-xp="tache"><svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="13" fill="#0b0b0b"/><circle cx="17" cy="17" r="8" fill="#fff"/><circle cx="17" cy="17" r="1.8" fill="#e01b1b"/></svg><span class="xp-t"><b>La tache dans le ciel</b><span>Une illusion d'optique pour comparer l'horizon et le haut du ciel.</span></span><span class="xp-s" id="st-tache"></span></button>
+  </section>
+
+  <section class="card hide" id="vaultCard"><div id="vaultBox"></div><div id="crossBox"></div></section>
 
   <section class="card" id="listCard">
     <div id="list"></div>
@@ -101,10 +126,22 @@ details summary{color:var(--mut);font-size:14px;margin-top:12px}
       <div class="row"><button id="calibBtn">Tester ma précision</button><button id="copy">Copier</button><button id="clear">Tout effacer</button></div>
       <div class="small" id="calibRes" style="margin-top:8px"></div>
       <div class="small" style="margin-top:8px">Participant : <b id="pseudoShow"></b> · <a href="#" id="pseudoEdit">modifier</a></div>
+      <label class="small" style="display:flex;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" id="voiceChk" checked> Consignes lues à voix haute pendant la visée</label>
     </details>
   </section>
   <input type="file" id="photoIn" accept="image/*" capture="environment" hidden>
 </main>
+
+<div id="drawModal" class="modal hide"><div class="m-in">
+  <div class="m-t">Dessine ton ciel</div>
+  <div class="m-s">Imagine que tu es le petit personnage. Trace au doigt la forme du ciel au-dessus de toi, d'un bord de l'horizon à l'autre, telle que tu la ressens. Il n'y a pas de bonne réponse.</div>
+  <canvas id="drawCv"></canvas>
+  <div class="small" id="drawMsg" style="margin-top:8px;min-height:18px"></div>
+  <div class="row"><button id="drawClear">Effacer</button><button class="pri" id="drawOk" disabled>Valider</button><button class="ghost" id="drawCancel">Annuler</button></div>
+</div></div>
+
+<div id="tacheModal" class="modal hide"><div class="m-in" id="tacheIn"></div></div>
+<div id="fix" class="hide"><div class="disc"><i></i></div><div class="cnt" id="fixCnt"></div></div>
 <!--VAULT--><script>
 /* Vault : modèle et dessin de la voûte perçue d'une personne.
    Points : [{x: distance horizontale (m), y: hauteur de la voûte au-dessus du sol (m)}] */
@@ -164,8 +201,8 @@ const Vault=(()=>{
     let peak={x:0,y:zen}; for(let k=0;k<=200;k++){ const x=bl.x*k/200, y=F(x); if(y>peak.y) peak={x,y}; }
     let shape, title, line;
     if(spread<.3){ shape="plafond"; title="Un plafond presque plat"; line=`à environ ${hgt(med(ys))} au-dessus du sol, quelle que soit la distance.`; closes=false; xEnd=bl.x*1.25; }
-    else if(closes){ const r=xEnd/peak.y; shape="dome"; title=r>2.5?"Un dôme très aplati":"Un dôme";
-      line=(r>2.5?`environ ${fr(r)} fois plus large que haut, `:"")+`qui rejoint l'horizon vers ${dist(xEnd)}.`; }
+    else if(closes){ const r=xEnd/zen; shape="dome"; title=r>2.5?"Un dôme très aplati":"Un dôme";
+      line=`${r>1.3?`environ ${fr(r,r<10?1:0)} fois plus loin à l'horizon qu'au-dessus de toi : `:""}il rejoint l'horizon vers ${dist(xEnd)}.`; }
     else if(bl.y>b0.y*1.3){ shape="entonnoir"; title="Une voûte qui s'élève au loin"; line=`plus haute vers l'horizon (${hgt(bl.y)} à ${dist(bl.x)}) qu'au-dessus de toi (≈ ${hgt(zen)}).`; }
     else { shape="irreguliere"; title="Une voûte irrégulière"; line=`entre ${hgt(Math.min(...ys))} et ${hgt(Math.max(...ys))} selon la distance.`; }
     return {ok:true,n:P.length,pts:P,bins,f:F,zen,xEnd,closes,peak,far:bl,near:b0,shape,title,line};
@@ -181,9 +218,9 @@ const Vault=(()=>{
 
   let uid=0;
   function svg(M,opt={}){
-    const W=680, pad=26, id="v"+(++uid), real=opt.real===true;
-    const X=M.xEnd*1.06, sx=(W/2-pad)/X;
-    const top=Math.max(M.peak.y,M.zen);
+    const W=680, pad=26, id="v"+(++uid), real=opt.real===true, O=opt.overlay&&opt.overlay.ok?opt.overlay:null;
+    const X=Math.max(M.xEnd,O?O.xEnd:0)*1.06, sx=(W/2-pad)/X;
+    const top=Math.max(M.peak.y,M.zen,O?O.peak.y:0,O?O.zen:0);
     const room=230;                                   // hauteur de dessin disponible en mode « forme »
     const sy=real?sx:Math.min(room*.78/top, sx*40);
     const domePx=top*sy;
@@ -219,6 +256,18 @@ const Vault=(()=>{
     for(const p of M.pts){ if(p.x>X) continue; const u=px(p.x), v=Math.max(56,py(Math.min(p.y,top*1.8)));
       if(!many) s+=`<line x1="${u.toFixed(1)}" x2="${u.toFixed(1)}" y1="${yG}" y2="${v.toFixed(1)}" stroke="#fff" stroke-opacity=".45"/>`;
       s+=`<circle cx="${u.toFixed(1)}" cy="${v.toFixed(1)}" r="${many?2.3:3.2}" fill="#fff" stroke="#10306c" stroke-width="1" opacity="${many?.75:.95}"/>`; }
+    if(O){
+      const OC="#e2622b", xo=[]; for(let k=0;k<=N;k++) xo.push(O.xEnd*k/N);
+      const sg=(a,b)=>{ const r=xo.filter(x=>x>=a-1e-9&&x<=b+1e-9).map(x=>[px(x),py(O.f(x))]); return r.length>1?"M"+r.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join("L"):""; };
+      const so=sg(O.bins[0].x,O.far.x), da=sg(0,O.bins[0].x), db=sg(O.far.x,O.xEnd);
+      const st=`stroke="${OC}" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"`;
+      for(const d of [so,mir(so)]) if(d) s+=`<path d="${d}" ${st}/>`;
+      for(const d of [da,mir(da),db,mir(db)]) if(d) s+=`<path d="${d}" ${st} stroke-dasharray="1.5 6" stroke-opacity=".8"/>`;
+      for(const p of O.pts){ if(p.x>X) continue; s+=`<circle cx="${(2*xC-px(p.x)).toFixed(1)}" cy="${Math.max(56,py(Math.min(p.y,top*1.8))).toFixed(1)}" r="2.6" fill="#fff" stroke="${OC}" stroke-width="1.2"/>`; }
+      const L=opt.labels||["sur écran","en extérieur"];
+      s+=`<g font-size="12" font-weight="600"><rect x="12" y="12" width="14" height="10" rx="2" fill="#477fcb"/><text x="32" y="21">${L[0]}</text><line x1="12" x2="26" y1="35" y2="35" stroke="${OC}" stroke-width="3"/><text x="32" y="39">${L[1]}</text></g>`;
+      s+=`<text x="${W-12}" y="21" font-size="11" fill="#6b6a65" text-anchor="end">points bleus à droite, orange à gauche</text>`;
+    }
     // observateur
     s+=`<g transform="translate(${xC},${yG})" fill="#0b0b0b"><circle cx="0" cy="-17" r="3.6"/><path d="M-3.4,-12.5h6.8l1.2,8h-2.2l-.8,4.5h-3.2l-.8-4.5h-2.2z"/></g>`;
     // échelle au sol
@@ -229,13 +278,15 @@ const Vault=(()=>{
     const lab=(x,y,t,a="middle")=>`<text x="${x.toFixed(1)}" y="${y}" font-size="13" font-weight="650" fill="#0b0b0b" text-anchor="${a}" paint-order="stroke" stroke="#f4f3ef" stroke-width="4" stroke-linejoin="round">${t}</text>`;
     const lead=(x1,y1,x2,y2)=>`<path d="M${x1.toFixed(1)},${y1.toFixed(1)}L${x2.toFixed(1)},${y2.toFixed(1)}" stroke="#0b0b0b" stroke-opacity=".45" stroke-width="1"/><circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="2.6" fill="#0b0b0b"/>`;
     const rowA=20, rowB=40, inside=topY-14>rowA+8;
+    if(!O){
     s+=lead(xC,inside?topY-12:rowA+6,xC,topY)+lab(xC,inside?topY-16:rowA,"≈ "+hgt(M.zen)+" au-dessus de toi");
     const fu=px(M.far.x), fv=py(M.far.y), fx=Math.min(W-10,Math.max(fu,xC+150));
     s+=lead(fx,rowB+5,fu,fv)+lab(fx,rowB,hgt(M.far.y)+" à "+dist(M.far.x),fx>W-120?"end":"middle");
     if(M.shape!=="plafond"&&M.peak.x>M.far.x*.15&&M.peak.x<M.far.x*.85&&M.peak.y>M.zen*1.1){ const u=2*xC-px(M.peak.x), v=py(M.peak.y), lx=Math.max(10,Math.min(u,xC-150)); s+=lead(lx,rowB+5,u,v)+lab(lx,rowB,"au plus haut "+hgt(M.peak.y)+" vers "+dist(M.peak.x),lx<120?"start":"middle"); }
-    if(M.closes){ const u=2*xC-px(M.xEnd); s+=`<text x="${Math.max(8,u).toFixed(1)}" y="${yG+18}" font-size="11" fill="#6b6a65" text-anchor="${u<60?"start":"middle"}">horizon ≈ ${dist(M.xEnd)}</text>`; }
+    }
+    if(M.closes&&!O){ const u=2*xC-px(M.xEnd); s+=`<text x="${Math.max(8,u).toFixed(1)}" y="${yG+18}" font-size="11" fill="#6b6a65" text-anchor="${u<60?"start":"middle"}">horizon ≈ ${dist(M.xEnd)}</text>`; }
     const ratio=sy/sx, f1=real?"vraies proportions · tirets : coupole parfaite de même hauteur":ratio>1.5?"hauteurs agrandies ×"+Math.round(ratio)+" pour voir la forme":ratio<.67?"hauteurs réduites pour tenir dans le cadre":"proportions proches du réel";
-    s+=`<text x="8" y="${H-8}" font-size="10.5" fill="#76756f">${M.n} repère${M.n>1?"s":""} · pointillés : extrapolé</text><text x="${W-8}" y="${H-8}" font-size="10.5" fill="#76756f" text-anchor="end">${f1}</text>`;
+    s+=`<text x="8" y="${H-8}" font-size="10.5" fill="#76756f">${O?M.n+" + "+O.n+" repères":M.n+" repère"+(M.n>1?"s":"")} · pointillés : extrapolé</text><text x="${W-8}" y="${H-8}" font-size="10.5" fill="#76756f" text-anchor="end">${f1}</text>`;
     return s+`</svg>`;
   }
 
@@ -254,12 +305,53 @@ const Vault=(()=>{
     };
     paint(); return M;
   }
+  function compare(el,ptsA,ptsB,o={}){
+    const A=model(ptsA), B=model(ptsB), L=o.labels||["sur écran","en extérieur"];
+    const vv=t=>o.vous?t.replace(/de toi\b/g,"de vous").replace(/\bta voûte/g,"votre voûte"):t;
+    if(!A.ok||!B.ok){ el.innerHTML=`<div class="vlt-empty">Pour comparer, il faut assez de repères des deux côtés (au moins 3, à deux distances différentes) : ${A.ok?"":L[0]+" "+A.n+" repère(s)"}${!A.ok&&!B.ok?", ":""}${B.ok?"":L[1]+" "+B.n+" repère(s)"}.</div>`; return; }
+    let real=false;
+    const row=(k,a,b)=>`<div><span>${k}</span><b>${a}</b><i>${b}</i></div>`;
+    const paint=()=>{
+      el.innerHTML=vv(`<div class="vlt-title">${A.title===B.title?A.title+", des deux côtés":"Deux voûtes différentes"}</div>
+      <div class="vlt-line"><b style="color:#2d5fa8">${L[0]}</b> : ${A.title.toLowerCase()}. <b style="color:#c4501d">${L[1]}</b> : ${B.title.toLowerCase()}.</div>
+      <div class="vlt-fig">${svg(A,{real,overlay:B,labels:L})}</div>
+      <div class="vlt-seg"><button data-r="0" class="${real?"":"on"}">Forme</button><button data-r="1" class="${real?"on":""}">Vraies proportions</button></div>
+      <div class="vlt-tiles vlt-cmp">${row("Au-dessus de toi","≈ "+hgt(A.zen),"≈ "+hgt(B.zen))}${row("Au loin",hgt(A.far.y)+" à "+dist(A.far.x),hgt(B.far.y)+" à "+dist(B.far.x))}${row("Rejoint l'horizon",A.closes?"vers "+dist(A.xEnd):"non",B.closes?"vers "+dist(B.xEnd):"non")}${row("Repères",String(A.n),String(B.n))}</div>`);
+      el.querySelectorAll(".vlt-seg button").forEach(b=>b.onclick=()=>{ real=b.dataset.r==="1"; paint(); });
+    };
+    paint();
+  }
+  /* ---- croisement des mesures : « combien de fois plus loin à l'horizon qu'au-dessus de toi » ---- */
+  // voûte en demi-ellipse : demi-largeur 1, hauteur k. Élévation du point situé à la fraction « frac » de l'arc.
+  function elevOf(k,frac){
+    const S=t=>{ let s=0; const n=120, h=t/n; for(let i=0;i<=n;i++){ const u=i*h, w=i===0||i===n?1:(i%2?4:2); s+=w*Math.sqrt(Math.sin(u)**2+k*k*Math.cos(u)**2); } return s*h/3; };
+    const tot=S(Math.PI/2); let lo=0, hi=Math.PI/2;
+    for(let it=0;it<40;it++){ const m=(lo+hi)/2; if(S(m)<frac*tot) lo=m; else hi=m; }
+    const t=(lo+hi)/2; return Math.atan(k*Math.tan(t))*180/Math.PI;
+  }
+  function kFrom(el,frac){ if(!(el>0&&el<90)) return null; let lo=Math.log(.02), hi=Math.log(50); for(let it=0;it<50;it++){ const m=(lo+hi)/2; if(elevOf(Math.exp(m),frac)<el) lo=m; else hi=m; } return Math.exp((lo+hi)/2); }
+  // élévations visées (milieu, quart bas, quart haut) -> rapport distance à l'horizon / hauteur au zénith
+  function ratioFromSplit(d){ const ks=[]; if(d.half!=null) ks.push(kFrom(d.half,.5)); if(d.low!=null) ks.push(kFrom(d.low,.25)); if(d.high!=null) ks.push(kFrom(d.high,.75)); const v=ks.filter(k=>k>0); if(!v.length) return null; return 1/med(v); }
+  function ratioOfModel(M){ return M&&M.ok&&M.closes?M.xEnd/M.zen:null; }
+  // items : [{k: libellé, r: rapport ou null, note: texte si absent}]
+  function crossHtml(items,o={}){
+    if(!items.some(i=>i.r!=null)) return "";
+    const L=v=>Math.log(Math.max(1,Math.min(v,16)))/Math.log(16)*100;
+    const row=i=>`<div class="vx-r"><span class="vx-k">${i.k}</span><span class="vx-b">${i.r!=null?`<i style="width:${Math.max(2,L(i.r)).toFixed(1)}%"></i>`:""}</span><b class="vx-v">${i.r!=null?"×"+fr(i.r,i.r<10?1:0):`<em>${i.note||"à faire"}</em>`}</b></div>`;
+    const t=`<div class="vx"><div class="vx-h">Combien de fois plus loin à l'horizon qu'au-dessus de toi ?</div>${items.map(row).join("")}<div class="vx-n">×1 : une coupole parfaite, aussi loin partout. Plus le nombre est grand, plus le ciel paraît aplati.</div></div>`;
+    return o.vous?t.replace(/de toi\b/g,"de vous"):t;
+  }
   const css=`.vlt-title{font-size:20px;font-weight:700;letter-spacing:-.01em}.vlt-line{color:#52514e;margin:2px 0 10px}
 .vlt-fig{border-radius:14px;overflow:hidden;background:#f4f3ef}
 .vlt-seg{display:flex;gap:6px;margin:10px 0}.vlt-seg button{flex:1;font:inherit;font-size:13px;padding:7px 6px;border:1px solid #dcdbd5;background:#fff;color:#0b0b0b;border-radius:9px}.vlt-seg button.on{background:#0b0b0b;color:#fff;border-color:#0b0b0b}
 .vlt-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}.vlt-tiles div{background:#fff;border:1px solid #e4e3de;border-radius:10px;padding:8px 10px}.vlt-tiles span{display:block;font-size:12px;color:#6b6a65}.vlt-tiles b{font-size:17px}
-.vlt-empty{color:#6b6a65;font-size:14px}`;
-  return {model,svg,stats,card,css};
+.vlt-empty{color:#6b6a65;font-size:14px}
+.vx{margin-top:14px;padding-top:12px;border-top:1px solid #e4e3de}.vx-h{font-weight:650;font-size:15px;margin-bottom:8px}
+.vx-r{display:grid;grid-template-columns:118px 1fr 56px;gap:8px;align-items:center;margin:7px 0;font-size:14px}.vx-k{color:#52514e}
+.vx-b{height:10px;background:#eceae4;border-radius:6px;overflow:hidden}.vx-b i{display:block;height:100%;background:linear-gradient(90deg,#9cc0ea,#1d3f86);border-radius:6px}
+.vx-v{text-align:right;font-variant-numeric:tabular-nums}.vx-v em{font-style:normal;font-weight:400;color:#9a9993;font-size:12px}.vx-n{font-size:12px;color:#76756f;margin-top:6px}
+.vlt-cmp b{color:#2d5fa8;font-size:16px}.vlt-cmp i{display:block;font-style:normal;font-weight:700;color:#c4501d;font-size:16px}`;
+  return {model,svg,stats,card,compare,css,elevOf,kFrom,ratioFromSplit,ratioOfModel,crossHtml};
 })();
 
 </script><!--/VAULT-->
@@ -393,8 +485,9 @@ function waitStill({grace=800,hold=1200,cond=()=>true,rearmFrom=null}){
     },60);
   });
 }
-function showStep(num,txt,hint){ $("#stepPanel").classList.remove("hide"); $("#home").classList.add("hide"); $("#idPanel").classList.add("hide"); $("#intro").classList.add("hide"); $("#stepNum").textContent=num; $("#stepTxt").textContent=txt; if(hint) $("#stepHint").textContent=hint; $("#holdBar").style.width="0"; }
-function hideStep(){ $("#stepPanel").classList.add("hide"); $("#home").classList.remove("hide"); }
+function say(t){ try{ if(store.voice===false||!window.speechSynthesis) return; speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang="fr-FR"; u.rate=1.05; speechSynthesis.speak(u); }catch(e){} }
+function showStep(num,txt,hint){ say(txt); $("#xpCard").classList.add("hide"); $("#stepPanel").classList.remove("hide"); $("#home").classList.add("hide"); $("#idPanel").classList.add("hide"); $("#intro").classList.add("hide"); $("#stepNum").textContent=num; $("#stepTxt").textContent=txt; if(hint) $("#stepHint").textContent=hint; $("#holdBar").style.width="0"; }
+function hideStep(){ $("#stepPanel").classList.add("hide"); $("#home").classList.remove("hide"); $("#xpCard").classList.remove("hide"); }
 $("#cancelStep").onclick=()=>{ if(run){ run.cancel=true; if(run.rec) idbDel(run.rec.i); } run=null; hideStep(); };
 
 /* ---------- nouveau repère ---------- */
@@ -522,10 +615,127 @@ function pickAt(la,lo){
 
 /* ---------- ta voûte ---------- */
 try{ document.head.insertAdjacentHTML("beforeend","<style>"+Vault.css+"</style>"); }catch(e){}
+store.tasks=store.tasks||[];
+const lastTask=k=>{ const a=store.tasks.filter(t=>t.kind===k); return a[a.length-1]||null; };
 function renderVault(){
   const pts=store.recs.filter(r=>r.target&&r.y>0).map(r=>({x:r.target.d,y:r.y}));
-  $("#vaultCard").classList.toggle("hide",!store.recs.length);
-  if(store.recs.length) Vault.card($("#vaultBox"),pts,{emptyText:"Ta voûte se dessinera ici dès que tu auras identifié au moins 3 repères, proches et lointains."});
+  const any=store.recs.length||store.tasks.length;
+  $("#vaultCard").classList.toggle("hide",!any);
+  let M=null;
+  if(store.recs.length) M=Vault.card($("#vaultBox"),pts,{emptyText:"Ta voûte se dessinera ici dès que tu auras identifié au moins 3 repères, proches et lointains."}); else $("#vaultBox").innerHTML="";
+  const tp=lastTask("partage"), td=lastTask("dessin"), tt=lastTask("tache"), rm=Vault.ratioOfModel(M);
+  $("#crossBox").classList.toggle("nofig",!store.recs.length);
+  $("#crossBox").innerHTML=Vault.crossHtml([
+    {k:"Repères",r:rm,note:M&&M.ok?"sans fin":"à compléter"},
+    {k:"Ciel partagé",r:tp?tp.ratio:null},
+    {k:"Dessin",r:td?td.ratio:null},
+    {k:"Tache",r:tt?tt.ratio:null,note:tt&&tt.ratio==null?"pas de tache vue":"à faire"}]);
+  for(const k of ["partage","dessin","tache"]){ const t=lastTask(k), e=$("#st-"+k); if(!e) continue; e.textContent=t?"fait ✓":"à faire"; e.className="xp-s"+(t?" ok":""); }
+}
+function saveTask(kind,data,ratio){
+  const n=store.tasks.reduce((m,t)=>Math.max(m,+String(t.id).split("-")[1]||0),0)+1;
+  const now=new Date(), g=gps?{...gps}:null, sun=g?sunPos(now,g.lat,g.lon):null;
+  const t={id:"tache-"+n,kind,t:now.toISOString(),gps:g,sun,light:sun?lightOf(sun.el):null,data,ratio:ratio!=null?+ratio.toFixed(3):null,dirty:true};
+  store.tasks.push(t); persist(); syncSoon(); render(); return t;
+}
+$$(".xp").forEach(b=>b.onclick=()=>{ const k=b.dataset.xp; if(k==="partage") partage(); else if(k==="dessin") openDraw(); else openTache(); });
+
+/* ---------- expérience 1 : partager le ciel ---------- */
+async function partage(){
+  if(run) return; askPerm(); initAudio(); wake();
+  run={cancel:false};
+  showStep("Partage le ciel · 1 sur 3","Vise le milieu du ciel","À mi-chemin entre l'horizon et le point juste au-dessus de ta tête. Bras tendu, bord du haut du téléphone vers ce point. Tiens immobile : bip.");
+  const a=await waitStill({grace:900,hold:1300,cond:el=>el>4&&el<86}); if(!a) return; beep(1); vib(180); flash();
+  showStep("Partage le ciel · 2 sur 3","Coupe la partie basse en deux","Vise le milieu entre l'horizon et le point que tu viens de viser. Tiens immobile : bip.");
+  const b=await waitStill({grace:500,hold:1300,cond:el=>el>1&&el<a.el-2}); if(!b) return; beep(1); vib(180); flash();
+  showStep("Partage le ciel · 3 sur 3","Coupe la partie haute en deux","Vise le milieu entre le point du milieu et le dessus de ta tête. Tiens immobile : bip.");
+  const c=await waitStill({grace:500,hold:1300,cond:el=>el>a.el+2&&el<89.5}); if(!c) return;
+  run=null; hideStep(); beep(3,700); vib([120,80,120,80,300]); flash(); say("C'est fini, merci.");
+  const d={half:a.el,low:b.el,high:c.el,az:a.az,sd:[a.sd,b.sd,c.sd]}, r=Vault.ratioFromSplit(d);
+  saveTask("partage",d,r);
+  toast(`Ton milieu du ciel est à ${fmt(a.el,0)}° (45° pour une coupole parfaite).`,4500);
+}
+
+/* ---------- expérience 2 : dessiner son ciel ---------- */
+let drawPts=[], drawing=false;
+function cvSetup(){
+  const cv=$("#drawCv"), r=cv.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
+  cv.width=Math.round(r.width*dpr); cv.height=Math.round(r.height*dpr); const x=cv.getContext("2d"); x.setTransform(dpr,0,0,dpr,0,0); return {cv,x,W:r.width,H:r.height};
+}
+function drawScene(){
+  const {x,W,H}=cvSetup(), yG=H*.86, xc=W/2;
+  x.clearRect(0,0,W,H);
+  const g=x.createLinearGradient(0,yG,0,H); g.addColorStop(0,"#d8d1ba"); g.addColorStop(1,"#f2efe6"); x.fillStyle=g; x.fillRect(0,yG,W,H-yG);
+  x.strokeStyle="#8e8a7c"; x.lineWidth=1; x.beginPath(); x.moveTo(0,yG); x.lineTo(W,yG); x.stroke();
+  x.fillStyle="#0b0b0b"; x.beginPath(); x.arc(xc,yG-17,3.6,0,7); x.fill(); x.fillRect(xc-3.4,yG-12.5,6.8,12.5);
+  x.fillStyle="#9a9993"; x.font="12px system-ui"; x.textAlign="left"; x.fillText("horizon",8,yG-6); x.textAlign="right"; x.fillText("horizon",W-8,yG-6);
+  if(drawPts.length>1){ x.strokeStyle="#1d3f86"; x.lineWidth=3; x.lineCap="round"; x.lineJoin="round"; x.beginPath(); drawPts.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])); x.stroke(); }
+  return {W,H,yG,xc};
+}
+function drawEval(){
+  const {W,yG,xc}=drawScene(), half=W/2;
+  if(drawPts.length<8) return null;
+  const xs=drawPts.map(p=>p[0]);
+  if(Math.min(...xs)>xc-half*.2||Math.max(...xs)<xc+half*.2) return {err:"Trace d'un côté à l'autre, en passant au-dessus du personnage."};
+  let best=null; for(const p of drawPts){ const d=Math.abs(p[0]-xc); if(!best||d<best.d) best={d,y:p[1]}; }
+  const h0=(yG-best.y)/half; if(h0<.02) return {err:"Le trait doit passer au-dessus du personnage."};
+  const ends=[drawPts[0],drawPts[drawPts.length-1]].map(p=>Math.abs(p[0]-xc)/half), w=(ends[0]+ends[1])/2;
+  const poly=drawPts.filter((p,i)=>i%Math.max(1,Math.floor(drawPts.length/48))===0).map(p=>[+((p[0]-xc)/half).toFixed(3),+((yG-p[1])/half).toFixed(3)]);
+  return {h0,w,ratio:w/h0,poly};
+}
+function openDraw(){ drawPts=[]; $("#drawModal").classList.remove("hide"); $("#drawOk").disabled=true; $("#drawMsg").textContent=""; requestAnimationFrame(drawScene); }
+(()=>{
+  const cv=$("#drawCv");
+  const pos=e=>{ const r=cv.getBoundingClientRect(); return [e.clientX-r.left,e.clientY-r.top]; };
+  cv.addEventListener("pointerdown",e=>{ drawing=true; drawPts=[pos(e)]; try{cv.setPointerCapture(e.pointerId);}catch(_){} drawScene(); });
+  cv.addEventListener("pointermove",e=>{ if(!drawing) return; drawPts.push(pos(e)); drawScene(); });
+  const end=()=>{ if(!drawing) return; drawing=false; const r=drawEval(); $("#drawOk").disabled=!(r&&!r.err); $("#drawMsg").textContent=r&&r.err?r.err:r?"Tu peux valider, ou effacer pour recommencer.":""; };
+  cv.addEventListener("pointerup",end); cv.addEventListener("pointercancel",end);
+  $("#drawClear").onclick=()=>{ drawPts=[]; drawScene(); $("#drawOk").disabled=true; $("#drawMsg").textContent=""; };
+  $("#drawCancel").onclick=()=>$("#drawModal").classList.add("hide");
+  $("#drawOk").onclick=()=>{ const r=drawEval(); if(!r||r.err) return; $("#drawModal").classList.add("hide"); saveTask("dessin",{h0:+r.h0.toFixed(3),w:+r.w.toFixed(3),poly:r.poly},r.ratio); toast(`Ton ciel dessiné est ${fmt(r.ratio,1)} fois plus loin à l'horizon qu'au-dessus de toi.`,4500); };
+  window.addEventListener("resize",()=>{ if(!$("#drawModal").classList.contains("hide")) drawScene(); });
+})();
+
+/* ---------- expérience 3 : la tache dans le ciel (image rémanente, loi d'Emmert) ---------- */
+let tacheAns=null;
+function tacheView(v){
+  const box=$("#tacheIn");
+  if(v==="intro") box.innerHTML=`<div class="m-t">La tache dans le ciel</div>
+    <div class="m-s">Une illusion d'optique : la même tache paraît plus ou moins grande selon l'endroit du ciel où tu la regardes. Ça mesure à quelle distance ton cerveau place le ciel.</div>
+    <ol class="steps"><li>Mets la luminosité de l'écran au maximum. Il faut du ciel de jour, bleu ou uniformément gris.</li><li>Fixe le point rouge pendant 20 secondes, sans bouger les yeux.</li><li>Au bip, regarde le ciel juste au-dessus de l'horizon : une tache sombre apparaît.</li><li>Lève aussitôt les yeux haut dans le ciel et compare sa taille.</li></ol>
+    <div class="row"><button class="pri" id="tGo">Commencer</button><button class="ghost" id="tNo">Annuler</button></div>`;
+  if(v==="q") box.innerHTML=`<div class="m-t">Où la tache paraissait-elle la plus grande ?</div>
+    <div class="choice"><button data-a="horizon">Près de l'horizon</button><button data-a="pareil">Pareil partout</button><button data-a="haut">En haut du ciel</button><button data-a="rien">Je n'ai pas vu de tache</button></div>
+    <div class="row"><button class="ghost" id="tAgain">Recommencer</button></div>`;
+  if(v==="size") box.innerHTML=`<div class="m-t">Environ combien de fois plus grande ?</div>
+    <div class="m-s">Fais glisser jusqu'à ce que le dessin ressemble à ce que tu as vu.</div>
+    <svg id="cmp" viewBox="0 0 340 170"></svg>
+    <input type="range" id="tR" min="1.1" max="3" step="0.1" value="1.5">
+    <div class="row"><button class="pri" id="tOk">Valider</button><button class="ghost" id="tAgain">Recommencer</button></div>`;
+  const on=(id,f)=>{ const e=$("#"+id); if(e) e.onclick=f; };
+  on("tNo",()=>$("#tacheModal").classList.add("hide"));
+  on("tGo",fixation);
+  on("tAgain",()=>tacheView("intro"));
+  $$("#tacheIn .choice button").forEach(b=>b.onclick=()=>{ tacheAns=b.dataset.a;
+    if(tacheAns==="pareil"){ finishTache(1); } else if(tacheAns==="rien"){ finishTache(null); } else { tacheView("size"); drawCmp(); } });
+  const r=$("#tR"); if(r){ r.oninput=drawCmp; on("tOk",()=>{ const v=+r.value; finishTache(tacheAns==="horizon"?v:1/v); }); }
+}
+function drawCmp(){
+  const v=+$("#tR").value, big=tacheAns==="horizon", base=26, rH=big?base*v:base, rT=big?base:base*v;
+  $("#cmp").innerHTML=`<rect width="340" height="170" rx="12" fill="#dbe7f3"/><text x="85" y="160" font-size="12" text-anchor="middle" fill="#52514e">près de l'horizon</text><text x="255" y="160" font-size="12" text-anchor="middle" fill="#52514e">en haut du ciel</text><circle cx="85" cy="78" r="${Math.min(rH,66)}" fill="#2b3a4a" opacity=".75"/><circle cx="255" cy="78" r="${Math.min(rT,66)}" fill="#2b3a4a" opacity=".75"/><text x="170" y="22" font-size="14" font-weight="700" text-anchor="middle" fill="#0b0b0b">×${fmt(v,1)}</text>`;
+}
+function openTache(){ initAudio(); $("#tacheModal").classList.remove("hide"); tacheView("intro"); }
+function fixation(){
+  initAudio(); wake(); const f=$("#fix"); f.classList.remove("hide");
+  try{ f.requestFullscreen&&f.requestFullscreen().catch(()=>{}); }catch(e){}
+  let n=20; $("#fixCnt").textContent="Fixe le point rouge · "+n;
+  const iv=setInterval(()=>{ n--; $("#fixCnt").textContent="Fixe le point rouge · "+n; if(n<=0){ clearInterval(iv); beep(2,900); vib([200,100,200]); say("Regarde le ciel juste au-dessus de l'horizon, puis lève les yeux."); f.classList.add("hide"); try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(e){} tacheView("q"); } },1000);
+}
+function finishTache(ratio){
+  $("#tacheModal").classList.add("hide");
+  saveTask("tache",{answer:tacheAns},ratio);
+  toast(ratio==null?"Pas de tache : réessaie avec un ciel plus lumineux et l'écran au maximum.":ratio===1?"Même taille partout : pour toi, le ciel est aussi loin partout.":`La tache paraissait ${fmt(Math.max(ratio,1/ratio),1)} fois plus grande ${ratio>1?"près de l'horizon":"en haut"}.`,4500);
 }
 
 /* ---------- liste ---------- */
@@ -562,7 +772,7 @@ $("#calibBtn").onclick=async()=>{
 function showCalib(){ const c=store.calib[store.calib.length-1]; $("#calibRes").textContent=c?`Dernier test : précision ±${fmt(c.sd,2)}°, décalage moyen ${fmt(c.mean,2)}° (5 visées de l'horizon).`:""; }
 
 /* ---------- export ---------- */
-function exportText(){ return JSON.stringify({app:"visee.v2",exportedAt:new Date().toISOString(),dev:{ua:navigator.userAgent},recs:store.recs.map(r=>{const o={...r}; delete o._c; delete o.dirty; delete o.photoSent; return o;}),calib:store.calib}); }
+function exportText(){ return JSON.stringify({app:"visee.v2",exportedAt:new Date().toISOString(),dev:{ua:navigator.userAgent},recs:store.recs.map(r=>{const o={...r}; delete o._c; delete o.dirty; delete o.photoSent; return o;}),calib:store.calib,tasks:store.tasks}); }
 $("#share").onclick=async()=>{
   const t=exportText();
   try{
@@ -574,7 +784,7 @@ $("#share").onclick=async()=>{
   try{ await navigator.clipboard.writeText(t); toast("Résultats copiés : colle-les dans le chat."); }catch(e){ toast("Partage indisponible."); }
 };
 $("#copy").onclick=async()=>{ try{ await navigator.clipboard.writeText(exportText()); toast("Copié."); }catch(e){ toast("Copie refusée."); } };
-$("#clear").onclick=()=>{ const b=$("#clear"); if(b.dataset.arm){ store.recs=[]; store.calib=[]; persist(); idbClear(); render(); showCalib(); b.textContent="Tout effacer"; delete b.dataset.arm; } else { b.dataset.arm=1; b.textContent="Confirmer"; setTimeout(()=>{ delete b.dataset.arm; b.textContent="Tout effacer"; },3000); } };
+$("#clear").onclick=()=>{ const b=$("#clear"); if(b.dataset.arm){ store.recs=[]; store.calib=[]; store.tasks=[]; persist(); idbClear(); render(); showCalib(); b.textContent="Tout effacer"; delete b.dataset.arm; } else { b.dataset.arm=1; b.textContent="Confirmer"; setTimeout(()=>{ delete b.dataset.arm; b.textContent="Tout effacer"; },3000); } };
 
 /* ---------- envoi automatique ---------- */
 // adresse et clé d'envoi : données une fois par un lien d'installation (#setup=...), gardées sur l'appareil
@@ -602,13 +812,14 @@ async function sync(){
       r.dirty=false; r.synced=true; if(photo) r.photoSent=true; persist();
     }
     for(const c of store.calib.filter(x=>!x.synced)){ await post({type:"calib",calib:c}); c.synced=true; persist(); }
+    for(const t of (store.tasks||[]).filter(x=>x.dirty)){ const o={...t}; delete o.dirty; await post({type:"rec",rec:{i:t.id,t:t.t,gps:t.gps,sun:t.sun,light:t.light,target:{kind:"mesure : "+t.kind},task:t.kind,data:t.data,ratio:t.ratio}}); t.dirty=false; persist(); }
     lastSyncOk=true;
   }catch(e){ lastSyncOk=false; }
   syncing=false; render();
 }
 function syncStatus(){
   if(!ENDPOINT) return; $("#dWrap").classList.remove("hide");
-  const n=store.recs.filter(x=>x.dirty).length+store.calib.filter(x=>!x.synced).length+store.delQ.length;
+  const n=store.recs.filter(x=>x.dirty).length+store.calib.filter(x=>!x.synced).length+store.delQ.length+(store.tasks||[]).filter(x=>x.dirty).length;
   $("#dD").className="dot "+(n?"bad":"ok"); $("#dTxt").textContent=n?(navigator.onLine?n+" à envoyer":"hors ligne, "+n+" à envoyer"):"tout est enregistré";
 }
 setInterval(sync,20000); window.addEventListener("online",syncSoon);
@@ -622,6 +833,7 @@ $("#pseudoEdit").onclick=e=>{ e.preventDefault(); store.introSeen=false; $("#int
 if(!store.introSeen){ $("#intro").classList.remove("hide"); $("#pseudoIn").value=store.pseudo||""; }
 $("#introOk").onclick=()=>{ const v=$("#pseudoIn").value.trim().slice(0,40); if(v) store.pseudo=v; store.introSeen=true; persist(); showPseudo(); $("#intro").classList.add("hide"); };
 showPseudo();
+$("#voiceChk").checked=store.voice!==false; $("#voiceChk").onchange=e=>{ store.voice=e.target.checked; persist(); };
 render(); showCalib();
 </script>
 </body>
