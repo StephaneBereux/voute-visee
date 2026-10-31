@@ -2,146 +2,230 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1b33">
 <title>Visée de la voûte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
-:root{--bg:#f4f3ef;--card:#fcfcfb;--line:#dcdbd5;--ink:#0b0b0b;--mut:#6b6a65;--acc:#2a78d6;--ok:#1baf7a;--warn:#b4560f}
-*{box-sizing:border-box}
-body{margin:0;font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
-main{max-width:520px;margin:0 auto;padding:12px 12px 40px}
-h1{font-size:19px;margin:2px 0}
-.small{font-size:13px;color:var(--mut)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0}
-.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
-button{font:inherit;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;padding:10px 12px}
-button.pri{background:var(--acc);color:#fff;border-color:var(--acc)}
-button.big{width:100%;padding:26px 12px;font-size:24px;font-weight:650;border-radius:16px}
-button.ghost{background:transparent;border-color:transparent;color:var(--mut);padding:8px}
-.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#bbb;margin:0 5px 0 0}
-.dot.ok{background:var(--ok)}.dot.bad{background:var(--warn)}
+:root{
+  --night:#0f1b33; --dusk:#2c4c86; --haze:#bfd6ee; --gold:#f3b23c; --gold-ink:#3a2700;
+  --paper:#f5f7fa; --ink:#16223a; --mute:#66728a; --line:#dce2ea; --ok:#2e9e6b;
+  --cond:"Barlow Condensed","Arial Narrow",system-ui,sans-serif; --text:"Barlow",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--night)}
+body{font:17px/1.45 var(--text);color:var(--ink);-webkit-user-select:none;user-select:none}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .hide{display:none!important}
-.chk{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:10px;font-size:14px;color:var(--mut)}
-.chk input{width:20px;height:20px}
-ol{margin:6px 0 0;padding-left:20px}ol li{margin:4px 0}
-#stepPanel{text-align:center;padding:22px 14px}
-.stepnum{font-size:14px;color:var(--mut);letter-spacing:.04em;text-transform:uppercase}
-.steptxt{font-size:22px;font-weight:650;margin:6px 0 10px;line-height:1.25}
-.livel{font-size:44px;font-weight:700;font-variant-numeric:tabular-nums}
-.bar{height:10px;background:var(--line);border-radius:6px;overflow:hidden;margin:12px 0 4px}
-.bar i{display:block;height:100%;width:0;background:var(--ok);transition:width .08s linear}
-.cand{display:block;width:100%;text-align:left;margin-top:8px;padding:12px}
-.cand b{font-weight:650}
-.seg{display:flex;gap:6px}.seg button{flex:1;padding:9px 4px;font-size:14px}
-.seg button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
-#map{height:300px;border-radius:10px;margin-top:10px}
-.item{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
-.item:last-child{border-bottom:0}
-.item img{width:52px;height:52px;object-fit:cover;border-radius:8px;flex:none;background:var(--line)}
-.item .tx{flex:1;min-width:0}
-.item .h{font-size:17px;font-weight:650}
-.todo{color:var(--acc);font-weight:600}
-details summary{color:var(--mut);font-size:14px;margin-top:12px}
-#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-size:15px;opacity:0;transition:opacity .3s;pointer-events:none;max-width:90vw;text-align:center}
-#crossBox.nofig .vx{margin-top:0;padding-top:0;border-top:0}
-.xp-h{display:flex;justify-content:space-between;align-items:baseline;font-weight:650;margin-bottom:4px}
-.xp{display:flex;gap:12px;align-items:center;width:100%;text-align:left;padding:12px 4px;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent}
-.xp:last-child{border-bottom:0}.xp svg{flex:none}
-.xp-t{flex:1;display:flex;flex-direction:column}.xp-t b{font-weight:650}.xp-t span{font-size:13px;color:var(--mut)}
-.xp-s{font-size:12px;color:var(--mut);white-space:nowrap}.xp-s.ok{color:var(--ok);font-weight:650}
-.modal{position:fixed;inset:0;background:#f4f3ef;z-index:20;overflow:auto}
-.modal .m-in{max-width:520px;margin:0 auto;padding:18px 14px 30px}
-.m-t{font-size:22px;font-weight:700}.m-s{color:var(--mut);margin:6px 0 12px}
-#drawCv{width:100%;aspect-ratio:16/10;display:block;border-radius:14px;background:#fcfcfb;border:1px solid var(--line);touch-action:none}
-.steps{margin:10px 0 0;padding-left:20px}.steps li{margin:6px 0}
-#fix{position:fixed;inset:0;background:#000;z-index:30;display:flex;align-items:center;justify-content:center;flex-direction:column}
-#fix .disc{width:58vmin;height:58vmin;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center}
-#fix .disc i{width:10px;height:10px;border-radius:50%;background:#e01b1b;display:block}
-#fix .cnt{color:#777;font-size:15px;margin-top:22px;font-variant-numeric:tabular-nums}
-.choice button{display:block;width:100%;text-align:left;margin-top:8px;padding:14px}
-#cmp{width:100%;height:auto;display:block;margin-top:10px}
-input[type=range]{width:100%;margin-top:14px}
-#flash{position:fixed;inset:0;background:var(--ok);opacity:0;pointer-events:none;transition:opacity .35s}
+.sky{background:radial-gradient(120% 70% at 50% 100%,#3a5f9e 0%,rgba(58,95,158,0) 60%),linear-gradient(180deg,#0b1428 0%,#13244a 55%,#2c4c86 100%);color:#eef3fa;position:relative;overflow:hidden}
+.stars{position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(1px 1px at 12% 18%,#fff8 50%,transparent 51%),radial-gradient(1px 1px at 33% 9%,#fff6 50%,transparent 51%),radial-gradient(1.4px 1.4px at 58% 22%,#fff9 50%,transparent 51%),radial-gradient(1px 1px at 77% 12%,#fff6 50%,transparent 51%),radial-gradient(1px 1px at 88% 30%,#fff5 50%,transparent 51%),radial-gradient(1.2px 1.2px at 22% 36%,#fff5 50%,transparent 51%),radial-gradient(1px 1px at 66% 40%,#fff4 50%,transparent 51%),radial-gradient(1px 1px at 46% 6%,#fff7 50%,transparent 51%)}
+
+/* ---------- accueil ---------- */
+#hdr{padding:calc(14px + env(safe-area-inset-top)) 18px 46px}
+.top{display:flex;justify-content:space-between;align-items:center;position:relative}
+.brand{font:600 21px/1 var(--cond);letter-spacing:.01em}
+.status{display:flex;gap:10px;font-size:13px;color:#a9bcd8}
+.status i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#6b7a95;margin-right:5px;vertical-align:1px}
+.status i.ok{background:#59d39a}.status i.bad{background:#e9a03b}
+#vaultHdr{margin:14px -6px 0;position:relative}
+#vaultHdr svg{display:block}
+.empty-dome{display:block;width:100%;height:auto}
+#hdrTitle{font:700 30px/1.08 var(--cond);margin:6px 0 2px;position:relative}
+#hdrLine{color:#c9d8ec;font-size:16px;position:relative;max-width:34em}
+#propBtn{position:relative;margin-top:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#dfe8f5;border-radius:999px;padding:5px 12px;font-size:14px}
+.sheet{background:var(--paper);border-radius:26px 26px 0 0;margin-top:-26px;position:relative;padding:22px 18px calc(40px + env(safe-area-inset-bottom));min-height:60vh}
+.wrap{max-width:560px;margin:0 auto}
+.go{display:flex;align-items:center;justify-content:space-between;width:100%;border:0;border-radius:20px;background:var(--gold);color:var(--gold-ink);padding:20px 22px;text-align:left;box-shadow:0 6px 20px rgba(243,178,60,.35)}
+.go b{font:700 27px/1.05 var(--cond);display:block}
+.go span{font-size:14.5px;opacity:.82}
+.go svg{flex:none}
+.switch{display:flex;align-items:center;gap:10px;margin:12px 4px 0;font-size:15px;color:var(--mute)}
+.switch input{appearance:none;width:42px;height:24px;border-radius:12px;background:#c9d1dc;position:relative;margin:0;transition:background .2s}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s}
+.switch input:checked{background:var(--dusk)}.switch input:checked::after{left:21px}
+h2{font:600 22px/1.2 var(--cond);margin:30px 0 6px;color:var(--ink)}
+.sub{font-size:14.5px;color:var(--mute);margin:-2px 0 8px}
+.row{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:14px 2px}
+.row:last-child{border-bottom:0}
+.row .ic{flex:none;width:44px;height:44px;border-radius:14px;background:#e7edf5;display:flex;align-items:center;justify-content:center}
+.row .tx{flex:1;min-width:0}
+.row .tx b{display:block;font-weight:600;font-size:17px}
+.row .tx span{display:block;font-size:14.5px;color:var(--mute);line-height:1.35}
+.row .st{font-size:13.5px;color:var(--mute);white-space:nowrap}
+.row .st.done{color:var(--ok);font-weight:600}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px;margin-top:6px}
+.stats div span{display:block;font-size:13.5px;color:var(--mute)}
+.stats div b{font:600 25px/1.1 var(--cond)}
+.rec{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.rec:last-child{border-bottom:0}
+.rec img,.rec .ph{width:54px;height:54px;border-radius:12px;object-fit:cover;flex:none;background:#e7edf5}
+.rec .tx{flex:1;min-width:0}
+.rec .tx b{font:600 23px/1.1 var(--cond);display:block}
+.rec .tx span{display:block;font-size:14.5px;color:var(--mute)}
+.rec .todo{color:var(--dusk);font-weight:600}
+.rec .x{background:none;border:0;color:#9aa5b7;font-size:14px;padding:8px}
+.empty{color:var(--mute);font-size:15px;padding:6px 0}
+.btn2{border:1px solid var(--line);background:#fff;border-radius:14px;padding:12px 16px;font-weight:500}
+.btn2.wide{width:100%}
+details.set{margin-top:26px;border-top:1px solid var(--line);padding-top:12px}
+details.set summary{cursor:pointer;color:var(--mute);font-size:15px;list-style:none}
+details.set summary::-webkit-details-marker{display:none}
+details.set .in{display:flex;flex-direction:column;gap:12px;margin-top:12px;font-size:15px}
+details.set .acts{display:flex;gap:8px;flex-wrap:wrap}
+details.set a{color:var(--dusk)}
+.vx{margin-top:22px!important;padding-top:0!important;border-top:0!important}
+.vx-h{font:600 20px/1.2 var(--cond)!important}
+.vx-b i{background:linear-gradient(90deg,#9cb9e0,var(--dusk))!important}
+.vx-r{font-size:15px!important;grid-template-columns:108px 1fr 72px!important}
+.vx-v em{font-size:13px!important}
+
+/* ---------- écrans plein cadre ---------- */
+.full{position:fixed;inset:0;z-index:20;overflow:auto;display:flex;flex-direction:column}
+.full .in{max-width:560px;width:100%;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom));flex:1;display:flex;flex-direction:column}
+.light{background:var(--paper);color:var(--ink)}
+.bar{display:flex;justify-content:space-between;align-items:center;font-size:14.5px}
+.close{background:none;border:0;font-size:15px;padding:8px 0 8px 12px;color:inherit;opacity:.8}
+.big{font:700 36px/1.05 var(--cond);margin:18px 0 8px}
+.hint{font-size:17px;line-height:1.45;color:#c9d8ec;max-width:30em}
+.light .hint{color:var(--mute)}
+#gauge{width:100%;max-width:400px;margin:auto auto 0;display:block}
+#mState{text-align:center;font:600 21px/1.2 var(--cond);min-height:26px;margin:6px 0 4px;color:var(--haze)}
+#mState.ok{color:#7ee0ac}
+.hold{height:8px;border-radius:5px;background:rgba(255,255,255,.12);overflow:hidden;margin:10px auto 0;max-width:400px;width:100%}
+.hold i{display:block;height:100%;width:0;background:var(--gold);border-radius:5px;transition:width .08s linear}
+.foot{text-align:center;color:#8fa3c2;font-size:14px;margin-top:14px}
+.btn{border:0;border-radius:16px;padding:16px 18px;font-weight:600;font-size:17px}
+.btn.gold{background:var(--gold);color:var(--gold-ink)}
+.btn.night{background:var(--night);color:#fff}
+.btn.ghost{background:none;color:var(--mute)}
+.sky .btn.ghost{color:#a9bcd8}
+.stack{display:flex;flex-direction:column;gap:10px;margin-top:auto;padding-top:18px}
+.cand{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-top:10px}
+.cand .tx{flex:1}.cand .tx b{display:block;font-weight:600;font-size:17px}.cand .tx span{font-size:14px;color:var(--mute)}
+.cand .d{font:600 22px/1 var(--cond);white-space:nowrap}
+.seg{display:flex;gap:8px;margin-top:8px}.seg button{flex:1;border:1px solid var(--line);background:#fff;border-radius:12px;padding:11px 6px;font-size:15px}
+.seg button.on{background:var(--night);color:#fff;border-color:var(--night)}
+#map{height:300px;border-radius:16px;margin-top:12px}
+.resnum{font:700 72px/1 var(--cond);margin:22px 0 4px}
+.resnum small{font-size:30px;font-weight:600;margin-left:4px}
+.reslab{font-size:18px;color:#c9d8ec}
+#resVault{margin:18px -8px 0}
+input.txt{font:inherit;width:100%;padding:14px 16px;border-radius:14px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;margin-top:8px}
+input.txt::placeholder{color:#8fa3c2}
+#drawCv{width:100%;aspect-ratio:4/3;display:block;border-radius:18px;margin-top:14px;touch-action:none}
+.steps{margin:14px 0 0;padding:0;list-style:none;counter-reset:s}
+.steps li{counter-increment:s;display:flex;gap:12px;margin:12px 0;font-size:16.5px}
+.steps li::before{content:counter(s);flex:none;width:28px;height:28px;border-radius:50%;background:var(--night);color:#fff;font:600 15px/28px var(--cond);text-align:center}
+.choice{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.choice button{text-align:left;background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;font-size:17px}
+#cmp{width:100%;height:auto;margin-top:16px;border-radius:18px}
+input[type=range]{width:100%;margin-top:18px;accent-color:var(--dusk)}
+#fix{position:fixed;inset:0;background:#000;z-index:40;display:flex;align-items:center;justify-content:center;flex-direction:column}
+#fix .disc{width:62vmin;height:62vmin;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center}
+#fix .disc i{width:10px;height:10px;border-radius:50%;background:#e01b1b}
+#fix .cnt{color:#888;font:500 18px var(--cond);margin-top:26px;letter-spacing:.02em}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--night);color:#fff;padding:12px 18px;border-radius:14px;font-size:15.5px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:60;max-width:90vw;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+#flash{position:fixed;inset:0;background:var(--gold);opacity:0;pointer-events:none;transition:opacity .35s;z-index:50}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
-<div id="flash"></div><div id="toast"></div>
-<main>
-  <h1>Visée de la voûte</h1>
-  <div class="small"><span class="dot" id="dS"></span><span id="sTxt">capteurs…</span> &nbsp; <span class="dot" id="dG"></span><span id="gTxt">GPS…</span> <span id="dWrap" class="hide">&nbsp; <span class="dot" id="dD"></span><span id="dTxt"></span></span></div>
+<div id="flash"></div><div id="toast" role="status"></div>
 
-  <section id="intro" class="card hide">
-    <b>Comment faire</b>
-    <ol>
-      <li>Touche « Nouveau repère » et prends en photo le repère avec le ciel au-dessus.</li>
-      <li>Bras tendu, vise le pied du repère avec le bord du haut du téléphone, en regardant le paysage. Tiens immobile : bip.</li>
-      <li>Monte vers le point du ciel qui est juste au-dessus du repère. Tiens immobile : double bip.</li>
-      <li>Choisis le repère dans la liste ou sur la carte.</li>
-    </ol>
-    <label class="small" style="display:block;margin-top:10px">Ton prénom ou pseudo (pour comparer les participants)</label>
-    <input id="pseudoIn" autocomplete="nickname" style="font:inherit;padding:9px;border:1px solid var(--line);border-radius:8px;width:100%;margin-top:4px">
-    <div class="row"><button class="pri" id="introOk">C'est parti</button></div>
+<!-- accueil -->
+<header id="hdr" class="sky"><div class="stars"></div><div class="wrap">
+  <div class="top"><div class="brand">Visée de la voûte</div><div class="status"><span><i id="dS"></i>capteurs</span><span><i id="dG"></i><span id="gTxt">GPS</span></span></div></div>
+  <div id="vaultHdr"></div>
+  <div id="hdrTitle"></div>
+  <div id="hdrLine"></div>
+  <button id="propBtn" class="hide">Voir les vraies proportions</button>
+</div></header>
+
+<main class="sheet"><div class="wrap">
+  <button class="go" id="newBtn"><div><b>Viser un repère</b><span>Une éolienne, un clocher, un château d'eau…</span></div>
+    <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="21" fill="#3a2700" fill-opacity=".12"/><path d="M14 29L29 14M29 14h-9M29 14v9" stroke="#3a2700" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <label class="switch"><input type="checkbox" id="photoChk" checked>Commencer par une photo du repère</label>
+
+  <h2>Trois expériences</h2>
+  <div class="sub">Une minute chacune, pour vérifier ta voûte autrement.</div>
+  <div id="xpList">
+    <button class="row xp" data-xp="dessin"><span class="ic"><svg width="26" height="26" viewBox="0 0 26 26"><path d="M2 22C5 11 9 7 13 7s8 4 11 15" fill="none" stroke="#2c4c86" stroke-width="2.2" stroke-linecap="round"/><path d="M1 23h24" stroke="#9aa5b7"/></svg></span><span class="tx"><b>Dessine ton ciel</b><span>Trace au doigt la forme que tu imagines. À faire en premier.</span></span><span class="st" id="st-dessin">à faire</span></button>
+    <button class="row xp" data-xp="partage"><span class="ic"><svg width="26" height="26" viewBox="0 0 26 26"><path d="M2 23A21 21 0 0 1 24 23" fill="none" stroke="#2c4c86" stroke-width="2"/><path d="M13 23L6 9M13 23V3M13 23l8-13" stroke="#f3b23c" stroke-width="1.8" stroke-linecap="round"/></svg></span><span class="tx"><b>Partage le ciel</b><span>Vise le milieu entre l'horizon et le dessus de ta tête.</span></span><span class="st" id="st-partage">à faire</span></button>
+    <button class="row xp" data-xp="tache"><span class="ic"><svg width="26" height="26" viewBox="0 0 26 26"><circle cx="13" cy="13" r="10" fill="#16223a"/><circle cx="13" cy="13" r="6" fill="#fff"/><circle cx="13" cy="13" r="1.6" fill="#e01b1b"/></svg></span><span class="tx"><b>La tache dans le ciel</b><span>Une illusion d'optique qui révèle la distance du ciel.</span></span><span class="st" id="st-tache">à faire</span></button>
+  </div>
+
+  <section id="skySec" class="hide">
+    <h2>Mon ciel</h2>
+    <div class="stats" id="stats"></div>
+    <div id="crossBox"></div>
   </section>
 
-  <section id="stepPanel" class="card hide">
-    <div class="stepnum" id="stepNum"></div>
-    <div class="steptxt" id="stepTxt"></div>
-    <div class="livel" id="liveEl">-</div>
-    <div class="bar"><i id="holdBar"></i></div>
-    <div class="small" id="stepHint">Regarde le paysage, pas l'écran : le bip te dit quand c'est enregistré.</div>
-    <div class="row" style="justify-content:center"><button class="ghost" id="cancelStep">Annuler</button></div>
-  </section>
+  <h2>Mes repères</h2>
+  <div class="sub">La hauteur du ciel que tu as visée au-dessus de chacun.</div>
+  <div id="list"></div>
 
-  <section id="idPanel" class="card hide">
-    <div id="idHead"></div>
-    <div id="aimRow" class="hide">
-      <div class="small" style="margin-top:10px">Il y avait des nuages : tu as visé</div>
-      <div class="seg" style="margin-top:6px"><button data-aim="nuage">le nuage</button><button data-aim="voute">la voûte derrière</button></div>
-    </div>
-    <div class="small" style="margin-top:12px">Quel est ce repère ?</div>
-    <div id="cands"></div>
-    <div id="map" class="hide"></div>
-    <div id="mapPick" class="hide"></div>
-    <div class="row"><button id="mapBtn">Choisir sur la carte</button><button class="ghost" id="laterBtn">Plus tard</button></div>
-  </section>
+  <div style="margin-top:22px"><button class="btn2 wide" id="share">Partager mes résultats</button></div>
 
-  <section id="home">
-    <button class="big pri" id="newBtn">Nouveau repère</button>
-    <label class="chk"><input type="checkbox" id="photoChk" checked>commencer par une photo</label>
-  </section>
+  <details class="set"><summary>Réglages</summary><div class="in">
+    <div>Participant : <b id="pseudoShow"></b> · <a href="#" id="pseudoEdit">changer</a></div>
+    <label class="switch" style="margin:0"><input type="checkbox" id="voiceChk" checked>Consignes à voix haute</label>
+    <div id="syncTxt" class="sub" style="margin:0"></div>
+    <div class="acts"><button class="btn2" id="calibBtn">Tester ma précision</button><button class="btn2" id="copy">Copier les données</button><button class="btn2" id="clear">Tout effacer</button></div>
+    <div id="calibRes" class="sub" style="margin:0"></div>
+  </div></details>
+</div></main>
+<input type="file" id="photoIn" accept="image/*" capture="environment" hidden>
 
-  <section class="card" id="xpCard">
-    <div class="xp-h"><span>Trois petites expériences</span><span class="small">1 min chacune</span></div>
-    <button class="xp" data-xp="partage"><svg width="34" height="34" viewBox="0 0 34 34"><path d="M3 29A26 26 0 0 1 31 29" fill="none" stroke="#1d3f86" stroke-width="2"/><path d="M17 29L8 12M17 29L17 4M17 29L27 13" stroke="#477fcb" stroke-width="1.6" stroke-dasharray="2 2.5"/><circle cx="17" cy="29" r="2.4"/></svg><span class="xp-t"><b>Partage le ciel</b><span>Vise le milieu entre l'horizon et le point juste au-dessus de ta tête.</span></span><span class="xp-s" id="st-partage"></span></button>
-    <button class="xp" data-xp="dessin"><svg width="34" height="34" viewBox="0 0 34 34"><path d="M2 28C6 14 12 9 17 9S28 14 32 28" fill="none" stroke="#1d3f86" stroke-width="2" stroke-linecap="round"/><path d="M1 29H33" stroke="#8e8a7c"/><path d="M24 4l5 5-9 9-6 1 1-6z" fill="#e2622b"/></svg><span class="xp-t"><b>Dessine ton ciel</b><span>Trace au doigt la forme du ciel telle que tu la sens.</span></span><span class="xp-s" id="st-dessin"></span></button>
-    <button class="xp" data-xp="tache"><svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="13" fill="#0b0b0b"/><circle cx="17" cy="17" r="8" fill="#fff"/><circle cx="17" cy="17" r="1.8" fill="#e01b1b"/></svg><span class="xp-t"><b>La tache dans le ciel</b><span>Une illusion d'optique pour comparer l'horizon et le haut du ciel.</span></span><span class="xp-s" id="st-tache"></span></button>
-  </section>
+<!-- premier lancement -->
+<section id="intro" class="full sky hide"><div class="stars"></div><div class="in" style="position:relative">
+  <div class="brand">Visée de la voûte</div>
+  <div class="big" style="font-size:44px;margin-top:auto">Ton ciel a une forme.</div>
+  <div class="hint">On croit voir une coupole, mais le ciel paraît plus loin vers l'horizon qu'au-dessus de nos têtes. Mesure le tien : tu pointes le ciel avec ton téléphone, bras tendu, et il fait le reste.</div>
+  <label class="hint" style="margin-top:22px;display:block">Ton prénom<input class="txt" id="pseudoIn" autocomplete="given-name" placeholder="Pour comparer avec tes amis"></label>
+  <div class="stack"><button class="btn gold" id="introOk">Commencer</button></div>
+</div></section>
 
-  <section class="card hide" id="vaultCard"><div id="vaultBox"></div><div id="crossBox"></div></section>
+<!-- visée -->
+<section id="measure" class="full sky hide"><div class="stars"></div><div class="in" style="position:relative">
+  <div class="bar"><span id="mStep"></span><button class="close" id="mClose">Annuler</button></div>
+  <div class="big" id="mTitle"></div>
+  <div class="hint" id="mHint"></div>
+  <svg id="gauge" viewBox="0 0 340 300" aria-hidden="true"></svg>
+  <div id="mState"></div>
+  <div class="hold"><i id="holdBar"></i></div>
+  <div class="foot">Regarde le paysage, pas l'écran. Le téléphone vibre quand c'est enregistré.</div>
+</div></section>
 
-  <section class="card" id="listCard">
-    <div id="list"></div>
-    <div class="row"><button class="pri" id="share">Partager les résultats</button></div>
-    <details><summary>Plus</summary>
-      <div class="row"><button id="calibBtn">Tester ma précision</button><button id="copy">Copier</button><button id="clear">Tout effacer</button></div>
-      <div class="small" id="calibRes" style="margin-top:8px"></div>
-      <div class="small" style="margin-top:8px">Participant : <b id="pseudoShow"></b> · <a href="#" id="pseudoEdit">modifier</a></div>
-      <label class="small" style="display:flex;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" id="voiceChk" checked> Consignes lues à voix haute pendant la visée</label>
-    </details>
-  </section>
-  <input type="file" id="photoIn" accept="image/*" capture="environment" hidden>
-</main>
+<!-- identification et résultat -->
+<section id="ident" class="full light hide"><div class="in">
+  <div class="bar"><span id="iStep" style="color:var(--mute)"></span><button class="close" id="iClose">Fermer</button></div>
+  <div id="iBody"></div>
+</div></section>
+<section id="result" class="full sky hide"><div class="stars"></div><div class="in" style="position:relative">
+  <div class="bar"><span>Repère enregistré</span><button class="close" id="rClose">Fermer</button></div>
+  <div class="resnum" id="resNum"></div>
+  <div class="reslab" id="resLab"></div>
+  <div id="resVault"></div>
+  <div class="stack"><button class="btn gold" id="rNext">Viser un autre repère</button><button class="btn ghost" id="rDone">Terminer</button></div>
+</div></section>
 
-<div id="drawModal" class="modal hide"><div class="m-in">
-  <div class="m-t">Dessine ton ciel</div>
-  <div class="m-s">Imagine que tu es le petit personnage. Trace au doigt la forme du ciel au-dessus de toi, d'un bord de l'horizon à l'autre, telle que tu la ressens. Il n'y a pas de bonne réponse.</div>
+<!-- dessin -->
+<section id="drawModal" class="full sky hide"><div class="stars"></div><div class="in" style="position:relative">
+  <div class="bar"><span>Expérience · dessin</span><button class="close" id="drawCancel">Annuler</button></div>
+  <div class="big">Dessine ton ciel</div>
+  <div class="hint">Tu es le petit personnage. Trace au doigt la forme du ciel au-dessus de toi, d'un bout de l'horizon à l'autre. Il n'y a pas de bonne réponse.</div>
   <canvas id="drawCv"></canvas>
-  <div class="small" id="drawMsg" style="margin-top:8px;min-height:18px"></div>
-  <div class="row"><button id="drawClear">Effacer</button><button class="pri" id="drawOk" disabled>Valider</button><button class="ghost" id="drawCancel">Annuler</button></div>
-</div></div>
+  <div class="foot" id="drawMsg" style="min-height:20px"></div>
+  <div class="stack"><button class="btn gold" id="drawOk" disabled>Valider mon dessin</button><button class="btn ghost" id="drawClear">Effacer</button></div>
+</div></section>
 
-<div id="tacheModal" class="modal hide"><div class="m-in" id="tacheIn"></div></div>
+<!-- tache -->
+<section id="tacheModal" class="full light hide"><div class="in" id="tacheIn"></div></section>
 <div id="fix" class="hide"><div class="disc"><i></i></div><div class="cnt" id="fixCnt"></div></div>
+
 <!--VAULT--><script>
 /* Vault : modèle et dessin de la voûte perçue d'une personne.
    Points : [{x: distance horizontale (m), y: hauteur de la voûte au-dessus du sol (m)}] */
@@ -217,7 +301,12 @@ const Vault=(()=>{
   }
 
   let uid=0;
+  const THEMES={
+    day:{bg:"#f4f3ef",g0:"#d8d1ba",g1:"#f2efe6",gl:"#8e8a7c",s0:"#173a80",s1:"#477fcb",s2:"#d3e6f7",halo:"#fff3cf",stroke:"#10306c",txt:"#0b0b0b",halo2:"#f4f3ef",mut:"#6b6a65",foot:"#76756f",person:"#0b0b0b",dot:"#fff",cmp:"#0b0b0b"},
+    night:{bg:"none",g0:"#1b2a4a",g1:"#0e1830",gl:"#4a5d84",s0:"#5d86c4",s1:"#2f4f86",s2:"#1a2d52",halo:"#f3b23c",stroke:"#f3b23c",txt:"#eef3fa",halo2:"#0f1b33",mut:"#93a6c4",foot:"#7f93b3",person:"#eef3fa",dot:"#eef3fa",cmp:"#bfd6ee"}
+  };
   function svg(M,opt={}){
+    const T=THEMES[opt.theme]||THEMES.day, K=opt.fs||1;
     const W=680, pad=26, id="v"+(++uid), real=opt.real===true, O=opt.overlay&&opt.overlay.ok?opt.overlay:null;
     const X=Math.max(M.xEnd,O?O.xEnd:0)*1.06, sx=(W/2-pad)/X;
     const top=Math.max(M.peak.y,M.zen,O?O.peak.y:0,O?O.zen:0);
@@ -233,29 +322,29 @@ const Vault=(()=>{
     const mir=d=>d.replace(/([ML])([\d.]+),/g,(m,c,u)=>c+(2*xC-parseFloat(u)).toFixed(1)+",");
     const x0=M.bins[0].x, x1=M.far.x, solid=seg(x0,x1), dashA=seg(0,x0), dashB=seg(x1,M.xEnd);
     const topY=py(M.zen);
-    let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${M.title}, ${M.line}" style="width:100%;height:auto;display:block;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
+    let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${M.title}, ${M.line}" style="width:100%;height:auto;display:block;font-family:${opt.font||"system-ui,-apple-system,Segoe UI,Roboto,sans-serif"}">
 <defs>
- <linearGradient id="${id}s" gradientUnits="userSpaceOnUse" x1="0" y1="${yG-Math.max(domePx,40)}" x2="0" y2="${yG}"><stop offset="0" stop-color="#173a80"/><stop offset=".5" stop-color="#477fcb"/><stop offset="1" stop-color="#d3e6f7"/></linearGradient>
- <linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8d1ba"/><stop offset="1" stop-color="#f2efe6"/></linearGradient>
- <radialGradient id="${id}h" gradientUnits="userSpaceOnUse" cx="${xC}" cy="${yG}" r="${W*.55}"><stop offset="0" stop-color="#fff3cf" stop-opacity=".6"/><stop offset="1" stop-color="#fff3cf" stop-opacity="0"/></radialGradient>
+ <linearGradient id="${id}s" gradientUnits="userSpaceOnUse" x1="0" y1="${yG-Math.max(domePx,40)}" x2="0" y2="${yG}"><stop offset="0" stop-color="${T.s0}"/><stop offset=".5" stop-color="${T.s1}"/><stop offset="1" stop-color="${T.s2}"/></linearGradient>
+ <linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${T.g0}"/><stop offset="1" stop-color="${T.g1}"/></linearGradient>
+ <radialGradient id="${id}h" gradientUnits="userSpaceOnUse" cx="${xC}" cy="${yG}" r="${W*.55}"><stop offset="0" stop-color="${T.halo}" stop-opacity="${opt.theme==="night"?.22:.6}"/><stop offset="1" stop-color="${T.halo}" stop-opacity="0"/></radialGradient>
  <clipPath id="${id}c"><path d="${pathAll}L${px(M.xEnd)},${yG}L${2*xC-px(M.xEnd)},${yG}Z"/></clipPath>
 </defs>
-<rect width="${W}" height="${H}" fill="#f4f3ef"/>
+${T.bg==="none"?"":`<rect width="${W}" height="${H}" fill="${T.bg}"/>`}
 <rect x="0" y="${yG}" width="${W}" height="${H-yG}" fill="url(#${id}g)"/>
 <g clip-path="url(#${id}c)"><rect width="${W}" height="${yG}" fill="url(#${id}s)"/><rect width="${W}" height="${yG}" fill="url(#${id}h)"/>`;
     let seed=11; const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
     for(let k=0;k<60;k++){ const u=rnd()*W, v=yG-rnd()*Math.max(domePx,30)*.95; s+=`<circle cx="${u.toFixed(1)}" cy="${v.toFixed(1)}" r="${(rnd()*.9+.35).toFixed(2)}" fill="#fff" opacity="${(rnd()*.55+.15).toFixed(2)}"/>`; }
     s+=`</g>`;
-    if(real&&opt.compare!==false){ const r=M.zen*sx; s+=`<path d="M${(xC-r).toFixed(1)},${yG}A${r.toFixed(1)},${r.toFixed(1)} 0 0 1 ${(xC+r).toFixed(1)},${yG}" fill="none" stroke="#0b0b0b" stroke-opacity=".4" stroke-dasharray="3 4"/>`; }
-    const stroke=`stroke="#10306c" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"`;
+    if(real&&opt.compare!==false){ const r=M.zen*sx; s+=`<path d="M${(xC-r).toFixed(1)},${yG}A${r.toFixed(1)},${r.toFixed(1)} 0 0 1 ${(xC+r).toFixed(1)},${yG}" fill="none" stroke="${T.cmp}" stroke-opacity=".45" stroke-dasharray="3 4"/>`; }
+    const stroke=`stroke="${T.stroke}" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"`;
     for(const d of [solid,mir(solid)]) if(d) s+=`<path d="${d}" ${stroke}/>`;
     for(const d of [dashA,mir(dashA),dashB,mir(dashB)]) if(d) s+=`<path d="${d}" ${stroke} stroke-dasharray="1.5 6" stroke-opacity=".7"/>`;
-    s+=`<line x1="0" x2="${W}" y1="${yG}" y2="${yG}" stroke="#8e8a7c" stroke-width="1"/>`;
+    s+=`<line x1="0" x2="${W}" y1="${yG}" y2="${yG}" stroke="${T.gl}" stroke-width="1"/>`;
     // repères mesurés, côté droit
     const many=M.pts.length>12;
     for(const p of M.pts){ if(p.x>X) continue; const u=px(p.x), v=Math.max(56,py(Math.min(p.y,top*1.8)));
-      if(!many) s+=`<line x1="${u.toFixed(1)}" x2="${u.toFixed(1)}" y1="${yG}" y2="${v.toFixed(1)}" stroke="#fff" stroke-opacity=".45"/>`;
-      s+=`<circle cx="${u.toFixed(1)}" cy="${v.toFixed(1)}" r="${many?2.3:3.2}" fill="#fff" stroke="#10306c" stroke-width="1" opacity="${many?.75:.95}"/>`; }
+      if(!many) s+=`<line x1="${u.toFixed(1)}" x2="${u.toFixed(1)}" y1="${yG}" y2="${v.toFixed(1)}" stroke="${T.dot}" stroke-opacity=".35"/>`;
+      s+=`<circle cx="${u.toFixed(1)}" cy="${v.toFixed(1)}" r="${many?2.3:3.2}" fill="${T.dot}" stroke="${opt.theme==="night"?"#0f1b33":"#10306c"}" stroke-width="1" opacity="${many?.75:.95}"/>`; }
     if(O){
       const OC="#e2622b", xo=[]; for(let k=0;k<=N;k++) xo.push(O.xEnd*k/N);
       const sg=(a,b)=>{ const r=xo.filter(x=>x>=a-1e-9&&x<=b+1e-9).map(x=>[px(x),py(O.f(x))]); return r.length>1?"M"+r.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join("L"):""; };
@@ -269,24 +358,25 @@ const Vault=(()=>{
       s+=`<text x="${W-12}" y="21" font-size="11" fill="#6b6a65" text-anchor="end">points bleus à droite, orange à gauche</text>`;
     }
     // observateur
-    s+=`<g transform="translate(${xC},${yG})" fill="#0b0b0b"><circle cx="0" cy="-17" r="3.6"/><path d="M-3.4,-12.5h6.8l1.2,8h-2.2l-.8,4.5h-3.2l-.8-4.5h-2.2z"/></g>`;
+    s+=`<g transform="translate(${xC},${yG})" fill="${T.person}"><circle cx="0" cy="-17" r="3.6"/><path d="M-3.4,-12.5h6.8l1.2,8h-2.2l-.8,4.5h-3.2l-.8-4.5h-2.2z"/></g>`;
     // échelle au sol
     const ticks=[100,200,500,1000,2000,5000,10000,20000,50000].filter(t=>t<X*.97&&t*sx>30);
-    const tk=ticks.filter((t,i)=>i===ticks.length-1||px(ticks[i+1])-px(t)>44);
-    for(const t of tk){ const u=px(t); s+=`<line x1="${u}" x2="${u}" y1="${yG}" y2="${yG+5}" stroke="#8e8a7c"/><text x="${u}" y="${yG+18}" font-size="11" fill="#6b6a65" text-anchor="middle">${dist(t)}</text>`; }
+    const tk=ticks.filter((t,i)=>i===ticks.length-1||px(ticks[i+1])-px(t)>44*K);
+    for(const t of tk){ const u=px(t); s+=`<line x1="${u}" x2="${u}" y1="${yG}" y2="${yG+5}" stroke="${T.gl}"/><text x="${u}" y="${yG+8+10*K}" font-size="${11*K}" fill="${T.mut}" text-anchor="middle">${dist(t)}</text>`; }
     // étiquettes sur des rangées fixes, reliées par un fil
-    const lab=(x,y,t,a="middle")=>`<text x="${x.toFixed(1)}" y="${y}" font-size="13" font-weight="650" fill="#0b0b0b" text-anchor="${a}" paint-order="stroke" stroke="#f4f3ef" stroke-width="4" stroke-linejoin="round">${t}</text>`;
-    const lead=(x1,y1,x2,y2)=>`<path d="M${x1.toFixed(1)},${y1.toFixed(1)}L${x2.toFixed(1)},${y2.toFixed(1)}" stroke="#0b0b0b" stroke-opacity=".45" stroke-width="1"/><circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="2.6" fill="#0b0b0b"/>`;
-    const rowA=20, rowB=40, inside=topY-14>rowA+8;
+    const lab=(x,y,t,a="middle")=>`<text x="${x.toFixed(1)}" y="${y}" font-size="${13*K}" font-weight="650" fill="${T.txt}" text-anchor="${a}" paint-order="stroke" stroke="${T.halo2}" stroke-width="4" stroke-linejoin="round">${t}</text>`;
+    const lead=(x1,y1,x2,y2)=>`<path d="M${x1.toFixed(1)},${y1.toFixed(1)}L${x2.toFixed(1)},${y2.toFixed(1)}" stroke="${T.txt}" stroke-opacity=".45" stroke-width="1"/><circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="2.6" fill="${T.txt}"/>`;
+    const rowA=Math.round(18*K), rowB=Math.round(38*K), inside=topY-14>rowA+8;
+    const fitX=(x,t)=>{ const w=t.length*13*K*.56; return Math.max(w/2+8,Math.min(W-w/2-8,x)); };
     if(!O){
     s+=lead(xC,inside?topY-12:rowA+6,xC,topY)+lab(xC,inside?topY-16:rowA,"≈ "+hgt(M.zen)+" au-dessus de toi");
-    const fu=px(M.far.x), fv=py(M.far.y), fx=Math.min(W-10,Math.max(fu,xC+150));
-    s+=lead(fx,rowB+5,fu,fv)+lab(fx,rowB,hgt(M.far.y)+" à "+dist(M.far.x),fx>W-120?"end":"middle");
-    if(M.shape!=="plafond"&&M.peak.x>M.far.x*.15&&M.peak.x<M.far.x*.85&&M.peak.y>M.zen*1.1){ const u=2*xC-px(M.peak.x), v=py(M.peak.y), lx=Math.max(10,Math.min(u,xC-150)); s+=lead(lx,rowB+5,u,v)+lab(lx,rowB,"au plus haut "+hgt(M.peak.y)+" vers "+dist(M.peak.x),lx<120?"start":"middle"); }
+    const fu=px(M.far.x), fv=py(M.far.y), ft=hgt(M.far.y)+" à "+dist(M.far.x), fx=fitX(Math.max(fu,xC+150),ft);
+    s+=lead(fx,rowB+5,fu,fv)+lab(fx,rowB,ft);
+    if(M.shape!=="plafond"&&M.peak.x>M.far.x*.15&&M.peak.x<M.far.x*.85&&M.peak.y>M.zen*1.1){ const u=2*xC-px(M.peak.x), v=py(M.peak.y), pt="au plus haut "+hgt(M.peak.y)+" vers "+dist(M.peak.x), lx=fitX(Math.min(u,xC-150),pt); s+=lead(lx,rowB+5,u,v)+lab(lx,rowB,pt); }
     }
-    if(M.closes&&!O){ const u=2*xC-px(M.xEnd); s+=`<text x="${Math.max(8,u).toFixed(1)}" y="${yG+18}" font-size="11" fill="#6b6a65" text-anchor="${u<60?"start":"middle"}">horizon ≈ ${dist(M.xEnd)}</text>`; }
+    if(M.closes&&!O){ const u=2*xC-px(M.xEnd); s+=`<text x="${Math.max(8,u).toFixed(1)}" y="${yG+8+10*K}" font-size="${11*K}" fill="${T.mut}" text-anchor="${u<60?"start":"middle"}">horizon ≈ ${dist(M.xEnd)}</text>`; }
     const ratio=sy/sx, f1=real?"vraies proportions · tirets : coupole parfaite de même hauteur":ratio>1.5?"hauteurs agrandies ×"+Math.round(ratio)+" pour voir la forme":ratio<.67?"hauteurs réduites pour tenir dans le cadre":"proportions proches du réel";
-    s+=`<text x="8" y="${H-8}" font-size="10.5" fill="#76756f">${O?M.n+" + "+O.n+" repères":M.n+" repère"+(M.n>1?"s":"")} · pointillés : extrapolé</text><text x="${W-8}" y="${H-8}" font-size="10.5" fill="#76756f" text-anchor="end">${f1}</text>`;
+    if(opt.foot!==false) s+=`<text x="8" y="${H-8}" font-size="10.5" fill="${T.foot}">${O?M.n+" + "+O.n+" repères":M.n+" repère"+(M.n>1?"s":"")} · pointillés : extrapolé</text><text x="${W-8}" y="${H-8}" font-size="10.5" fill="${T.foot}" text-anchor="end">${f1}</text>`;
     return s+`</svg>`;
   }
 
@@ -357,65 +447,68 @@ const Vault=(()=>{
 </script><!--/VAULT-->
 <script>
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const D=Math.PI/180, R_E=6371000, EYE=1.5;
-const LSK="visee.v2";
-let store={recs:[],calib:[],introSeen:false};
+const D=Math.PI/180, R_E=6371000, EYE=1.5, LSK="visee.v2", FONT="'Barlow',system-ui,sans-serif";
+let store={recs:[],calib:[],tasks:[],introSeen:false};
 try{const s=JSON.parse(localStorage.getItem(LSK)||"null"); if(s&&Array.isArray(s.recs)) store={...store,...s};}catch(e){}
+store.tasks=store.tasks||[]; store.calib=store.calib||[];
 const persist=()=>{try{localStorage.setItem(LSK,JSON.stringify(store))}catch(e){}};
 const fmt=(v,d=1)=>v==null||isNaN(v)?"-":v.toFixed(d).replace(".",",");
-const km=d=>d>=1000?fmt(d/1000,d<10000?1:0)+" km":Math.round(d)+" m";
+const km=d=>d>=1000?fmt(d/1000,d<10000?1:0).replace(/,0$/,"")+" km":Math.round(d)+" m";
 const mean=a=>a.reduce((s,v)=>s+v,0)/a.length;
 const sd=a=>{ if(a.length<2) return 0; const m=mean(a); return Math.sqrt(a.reduce((s,v)=>s+(v-m)*(v-m),0)/(a.length-1)); };
 const circMean=a=>{ let s=0,c=0; a.forEach(v=>{s+=Math.sin(v*D);c+=Math.cos(v*D)}); return ((Math.atan2(s,c)/D)+360)%360; };
-function toast(t,ms=2600){ const e=$("#toast"); e.textContent=t; e.style.opacity=1; clearTimeout(toast.h); toast.h=setTimeout(()=>e.style.opacity=0,ms); }
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const cap=s=>s?s[0].toUpperCase()+s.slice(1):s;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function toast(t,ms=2800){ const e=$("#toast"); e.textContent=t; e.style.opacity=1; clearTimeout(toast.h); toast.h=setTimeout(()=>e.style.opacity=0,ms); }
+function openFull(id){ $("#"+id).classList.remove("hide"); document.body.style.overflow="hidden"; }
+function closeFull(id){ $("#"+id).classList.add("hide"); if(!$$(".full:not(.hide)").length) document.body.style.overflow=""; }
 
 /* ---------- capteurs ---------- */
-let absolute=false, lastEv=0, nEv=0, t0Ev=0, rate=0, gps=null;
+let absolute=false, lastEv=0, gps=null;
 const buf=[];
 function onOri(e,isAbs){
   if(e.beta==null) return;
   let al=e.alpha||0;
   if(e.webkitCompassHeading!=null){ al=360-e.webkitCompassHeading; isAbs=true; }
   if(isAbs) absolute=true; else if(absolute) return;
-  const now=performance.now(); if(!t0Ev) t0Ev=now; nEv++; lastEv=now;
-  if(now-t0Ev>1000){ rate=nEv*1000/(now-t0Ev); nEv=0; t0Ev=now; }
+  const now=performance.now(); lastEv=now;
   const b=e.beta*D, a=al*D;
-  const el=Math.asin(Math.max(-1,Math.min(1,Math.sin(b))))/D;            // bord du haut
+  const el=Math.asin(Math.max(-1,Math.min(1,Math.sin(b))))/D;                // élévation du bord du haut
   const az=((Math.atan2(-Math.cos(b)*Math.sin(a),Math.cos(b)*Math.cos(a))/D)+360)%360;
   buf.push({t:now,el,az}); while(buf.length&&now-buf[0].t>5000) buf.shift();
 }
-function startSensors(){
-  window.addEventListener("deviceorientationabsolute",e=>onOri(e,true));
-  window.addEventListener("deviceorientation",e=>onOri(e,false));
-  try{ navigator.geolocation.watchPosition(p=>{gps={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy,alt:p.coords.altitude}},()=>{gps=gps||null},{enableHighAccuracy:true,maximumAge:5000}); }catch(e){}
-}
-startSensors();
+window.addEventListener("deviceorientationabsolute",e=>onOri(e,true));
+window.addEventListener("deviceorientation",e=>onOri(e,false));
+try{ navigator.geolocation.watchPosition(p=>{gps={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy,alt:p.coords.altitude}},()=>{},{enableHighAccuracy:true,maximumAge:5000}); }catch(e){}
 let permAsked=false;
 function askPerm(){ if(permAsked) return; permAsked=true; try{ if(typeof DeviceOrientationEvent!=="undefined"&&DeviceOrientationEvent.requestPermission) DeviceOrientationEvent.requestPermission().catch(()=>{}); }catch(e){} }
 function statusTick(){
   const alive=performance.now()-lastEv<1000;
-  $("#dS").className="dot "+(alive?"ok":"bad"); $("#sTxt").textContent=alive?("capteurs ok"+(absolute?"":", boussole relative")):"capteurs inactifs";
-  $("#dG").className="dot "+(gps?"ok":"bad"); $("#gTxt").textContent=gps?"GPS ±"+Math.round(gps.acc)+" m":"GPS en attente";
-  const l=buf[buf.length-1]; if(l) $("#liveEl").textContent=fmt(l.el)+"°";
+  $("#dS").className=alive?"ok":"bad";
+  $("#dG").className=gps?"ok":"bad"; $("#gTxt").textContent=gps?"GPS ±"+Math.round(gps.acc)+" m":"GPS";
+  if(gaugeOn){ const l=buf[buf.length-1]; if(l) drawGauge(l.el); }
   requestAnimationFrame(statusTick);
 }
 requestAnimationFrame(statusTick);
 
-/* ---------- son, vibration, écran ---------- */
+/* ---------- son, vibration, voix ---------- */
 let AC=null;
 function initAudio(){ try{ if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)(); AC.resume(); }catch(e){} }
-function tone(f,dur,vol,at=0){ try{ if(!AC) return; if(AC.state!=="running") AC.resume(); const o=AC.createOscillator(), g=AC.createGain(), t=AC.currentTime+.02+at; o.type="square"; o.frequency.value=f; g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0005,t+dur); o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t+dur+.02); }catch(e){} }
-function beep(n=1,f=880){ for(let k=0;k<n;k++) tone(f+k*330,.22,.35,k*.26); }
-const tick=()=>tone(1500,.03,.08);
+function tone(f,dur,vol,at=0,type="sine"){ try{ if(!AC) return; if(AC.state!=="running") AC.resume(); const o=AC.createOscillator(), g=AC.createGain(), t=AC.currentTime+.02+at; o.type=type; o.frequency.value=f; g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0005,t+dur); o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t+dur+.02); }catch(e){} }
+const tick=()=>tone(1400,.04,.12);
+const count=()=>tone(660,.12,.3,0,"triangle");
+const chime=()=>{ tone(880,.3,.35,0,"triangle"); tone(1320,.45,.3,.12,"triangle"); };
+const finale=()=>{ [784,988,1175].forEach((f,i)=>tone(f,.4,.3,i*.13,"triangle")); };
 const nag=()=>tone(260,.35,.3);
 document.addEventListener("pointerdown",initAudio,{capture:true});
 function vib(p){ try{ navigator.vibrate&&navigator.vibrate(p); }catch(e){} }
-function flash(){ const f=$("#flash"); f.style.opacity=.45; setTimeout(()=>f.style.opacity=0,140); }
+function flash(){ const f=$("#flash"); f.style.opacity=.35; setTimeout(()=>f.style.opacity=0,140); }
+function say(t){ try{ if(store.voice===false||!window.speechSynthesis) return; speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang="fr-FR"; u.rate=1.04; speechSynthesis.speak(u); }catch(e){} }
 let wl=null;
 function wake(){ try{ if(navigator.wakeLock&&!wl) navigator.wakeLock.request("screen").then(l=>{wl=l; l.addEventListener("release",()=>wl=null);}).catch(()=>{}); }catch(e){} }
-document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible"&&store.recs.length) wake(); });
 
-/* ---------- soleil ---------- */
+/* ---------- soleil et géographie ---------- */
 function sunPos(date,lat,lon){
   const n=date.getTime()/86400000+2440587.5-2451545.0;
   const L=(280.460+0.9856474*n)%360, g=((357.528+0.9856003*n)%360)*D;
@@ -427,13 +520,11 @@ function sunPos(date,lat,lon){
   return {el:+(el/D).toFixed(2),az:+(((az/D)+360)%360).toFixed(1)};
 }
 const lightOf=e=>e==null?null:e>6?"jour":e>0?"soleil bas":e>-6?"crépuscule":e>-12?"crépuscule nautique":"nuit";
-
-/* ---------- géo ---------- */
 function dest(lat,lon,brg,d){ const p1=lat*D, l1=lon*D, b=brg*D, r=d/R_E; const p2=Math.asin(Math.sin(p1)*Math.cos(r)+Math.cos(p1)*Math.sin(r)*Math.cos(b)); const l2=l1+Math.atan2(Math.sin(b)*Math.sin(r)*Math.cos(p1),Math.cos(r)-Math.sin(p1)*Math.sin(p2)); return [p2/D,l2/D]; }
 function distBrg(lat1,lon1,lat2,lon2){ const p1=lat1*D,p2=lat2*D,dl=(lon2-lon1)*D; const a=Math.sin((p2-p1)/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2; const d=2*R_E*Math.asin(Math.sqrt(a)); const y=Math.sin(dl)*Math.cos(p2), x=Math.cos(p1)*Math.sin(p2)-Math.sin(p1)*Math.cos(p2)*Math.cos(dl); return {d,brg:((Math.atan2(y,x)/D)+360)%360}; }
 const dAng=(a,b)=>((a-b+540)%360)-180;
 
-/* ---------- photos (IndexedDB) ---------- */
+/* ---------- photos ---------- */
 let idbP=null;
 function idbOpen(){ return idbP||(idbP=new Promise((res,rej)=>{ try{ const r=indexedDB.open("visee",1); r.onupgradeneeded=()=>r.result.createObjectStore("photos"); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error);}catch(e){rej(e)} })); }
 async function idbRun(mode,fn){ const db=await idbOpen(); return new Promise((res,rej)=>{ const tx=db.transaction("photos",mode); const q=fn(tx.objectStore("photos")); tx.oncomplete=()=>res(q&&q.result); tx.onerror=()=>rej(tx.error); }); }
@@ -466,58 +557,91 @@ function photoPromise(){
   });
 }
 
-/* ---------- attente d'immobilité ---------- */
+/* ---------- le sextant : écran de visée ---------- */
+let gaugeOn=false, gMarks=[], gCount=null, gHold=0;
+const GX=48, GY=262, GR=232;
+function gpt(a,r){ return [GX+r*Math.cos(a*D), GY-r*Math.sin(a*D)]; }
+function drawGauge(el){
+  const e=Math.max(-12,Math.min(98,el==null?0:el));
+  let s=`<defs><radialGradient id="gg" cx="${GX}" cy="${GY}" r="${GR}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f3b23c" stop-opacity=".16"/><stop offset="1" stop-color="#f3b23c" stop-opacity="0"/></radialGradient></defs>`;
+  const [ax,ay]=gpt(0,GR), [bx,by]=gpt(90,GR);
+  s+=`<path d="M${GX},${GY}L${ax},${ay}A${GR},${GR} 0 0 0 ${bx},${by}Z" fill="rgba(255,255,255,.04)"/>`;
+  s+=`<path d="M${ax},${ay}A${GR},${GR} 0 0 0 ${bx},${by}" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.5"/>`;
+  s+=`<line x1="${GX-30}" y1="${GY}" x2="${ax+8}" y2="${GY}" stroke="rgba(255,255,255,.35)"/>`;
+  for(let a=0;a<=90;a+=5){ const L=a%45===0?16:a%15===0?11:6, [x1,y1]=gpt(a,GR), [x2,y2]=gpt(a,GR-L); s+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="rgba(255,255,255,${a%45===0?.8:.4})" stroke-width="${a%45===0?2:1.2}"/>`; }
+  for(const a of [0,45,90]){ const [x,y]=gpt(a,GR+16); s+=`<text x="${x.toFixed(1)}" y="${(y+5).toFixed(1)}" font-size="13" fill="#a9bcd8" text-anchor="middle" font-family="${FONT}">${a}°</text>`; }
+  s+=`<text x="${(ax-4)}" y="${GY+22}" font-size="12" fill="#8fa3c2" text-anchor="end" font-family="${FONT}">horizon</text><text x="${GX+30}" y="${by+6}" font-size="12" fill="#8fa3c2" font-family="${FONT}">au-dessus de toi</text>`;
+  for(const m of gMarks){ const [x,y]=gpt(m,GR); s+=`<line x1="${GX}" y1="${GY}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#f3b23c" stroke-opacity=".35" stroke-dasharray="3 5"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6" fill="#f3b23c"/>`; }
+  const [nx,ny]=gpt(e,GR-4);
+  s+=`<path d="M${GX},${GY}L${gpt(e-9,GR)[0].toFixed(1)},${gpt(e-9,GR)[1].toFixed(1)}A${GR},${GR} 0 0 0 ${gpt(e+9,GR)[0].toFixed(1)},${gpt(e+9,GR)[1].toFixed(1)}Z" fill="url(#gg)"/>`;
+  s+=`<line x1="${GX}" y1="${GY}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="#f3b23c" stroke-width="3.5" stroke-linecap="round"/><circle cx="${GX}" cy="${GY}" r="7" fill="#f3b23c"/><circle cx="${nx.toFixed(1)}" cy="${ny.toFixed(1)}" r="5" fill="#fff"/>`;
+  if(gCount!=null) s+=`<text x="212" y="226" font-size="132" font-weight="700" fill="#f3b23c" text-anchor="middle" font-family="'Barlow Condensed',${FONT}">${gCount}</text>`;
+  else s+=`<text x="196" y="214" font-size="64" font-weight="700" fill="#fff" text-anchor="middle" font-family="'Barlow Condensed',${FONT}">${fmt(el==null?0:el,1)}°</text>`;
+  $("#gauge").innerHTML=s;
+}
+function setHold(p){ gHold=p; $("#holdBar").style.width=Math.round(Math.max(0,Math.min(1,p))*100)+"%"; }
+function setState(t,ok){ const e=$("#mState"); e.textContent=t||""; e.classList.toggle("ok",!!ok); }
 let run=null;
-function waitStill({grace=800,hold=1200,cond=()=>true,rearmFrom=null}){
+const live=()=>run&&!run.cancel;
+async function waitFor(ms){ const t=performance.now(); while(performance.now()-t<ms){ if(!live()) return false; await sleep(50); } return live(); }
+function waitStill({hold=1300,cond=()=>true}){
   return new Promise(res=>{
-    const t0=performance.now(); let armed=rearmFrom==null, q=0, lastNag=t0;
+    const t0=performance.now(); let q=0, lastNag=t0;
     const iv=setInterval(()=>{
-      if(!run||run.cancel){ clearInterval(iv); res(null); return; }
-      const now=performance.now(), last=buf[buf.length-1]; if(!last||now-last.t>800){ $("#holdBar").style.width="0"; return; }
-      if(now-lastNag>12000&&now-t0>14000){ nag(); vib(60); lastNag=now; }
-      if(!armed){ if(Math.abs(last.el-rearmFrom)>8) armed=true; $("#holdBar").style.width="0"; q=0; return; }
-      if(now-t0<grace||!cond(last.el)){ $("#holdBar").style.width="0"; q=0; return; }
+      if(!live()){ clearInterval(iv); res(null); return; }
+      const now=performance.now(), last=buf[buf.length-1];
+      if(!last||now-last.t>800){ setHold(0); setState("Le téléphone ne donne pas son orientation"); return; }
+      if(now-lastNag>12000&&now-t0>12000){ nag(); vib(60); lastNag=now; }
+      if(!cond(last.el)){ setHold(0); q=0; setState(run.wrongMsg||"Vise le bon point"); return; }
       let lo=last.el, hi=last.el, start=last.t;
-      for(let k=buf.length-1;k>=0;k--){ const v=buf[k]; lo=Math.min(lo,v.el); hi=Math.max(hi,v.el); if(hi-lo>1.0||v.t<t0+grace) break; start=v.t; }
-      const still=now-start; $("#holdBar").style.width=Math.min(100,still/hold*100)+"%";
+      for(let k=buf.length-1;k>=0;k--){ const v=buf[k]; lo=Math.min(lo,v.el); hi=Math.max(hi,v.el); if(hi-lo>1.0||v.t<t0) break; start=v.t; }
+      const still=now-start; setHold(still/hold); setState(still>250?"Ne bouge plus…":"Tiens le téléphone immobile");
       const nq=Math.min(3,Math.floor(still/hold*4)); if(nq>q) tick(); q=nq;
-      if(still>=hold){ const w=buf.filter(v=>v.t>now-hold); const els=w.map(v=>v.el); if(sd(els)<0.35){ clearInterval(iv); res({el:+mean(els).toFixed(3),az:+circMean(w.map(v=>v.az)).toFixed(1),sd:+sd(els).toFixed(3),n:w.length}); } }
+      if(still>=hold){ const w=buf.filter(v=>v.t>now-hold), els=w.map(v=>v.el); if(sd(els)<0.35){ clearInterval(iv); res({el:+mean(els).toFixed(3),az:+circMean(w.map(v=>v.az)).toFixed(1),sd:+sd(els).toFixed(3),n:w.length}); } }
     },60);
   });
 }
-function say(t){ try{ if(store.voice===false||!window.speechSynthesis) return; speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang="fr-FR"; u.rate=1.05; speechSynthesis.speak(u); }catch(e){} }
-function showStep(num,txt,hint){ say(txt); $("#xpCard").classList.add("hide"); $("#stepPanel").classList.remove("hide"); $("#home").classList.add("hide"); $("#idPanel").classList.add("hide"); $("#intro").classList.add("hide"); $("#stepNum").textContent=num; $("#stepTxt").textContent=txt; if(hint) $("#stepHint").textContent=hint; $("#holdBar").style.width="0"; }
-function hideStep(){ $("#stepPanel").classList.add("hide"); $("#home").classList.remove("hide"); $("#xpCard").classList.remove("hide"); }
-$("#cancelStep").onclick=()=>{ if(run){ run.cancel=true; if(run.rec) idbDel(run.rec.i); } run=null; hideStep(); };
+// une étape : consigne, compte à rebours, visée, confirmation
+async function step({label,title,hint,cond,wrong,hold=1300}){
+  $("#mStep").textContent=label; $("#mTitle").textContent=title; $("#mHint").textContent=hint;
+  setHold(0); setState(""); run.wrongMsg=wrong;
+  say(title);
+  gCount=null; if(!await waitFor(1400)) return null;
+  for(const n of [3,2,1]){ gCount=n; count(); vib(45); setState("Prépare-toi"); if(!await waitFor(900)) return null; }
+  gCount=null;
+  const r=await waitStill({hold,cond});
+  if(!r) return null;
+  gMarks.push(r.el); setHold(1); setState("Enregistré",true); chime(); vib([220]); flash();
+  await waitFor(800); return live()?r:null;
+}
+function startMeasure(){ gMarks=[]; gCount=null; gaugeOn=true; openFull("measure"); }
+function endMeasure(){ gaugeOn=false; closeFull("measure"); }
+$("#mClose").onclick=()=>{ if(run){ run.cancel=true; if(run.rec) idbDel(run.rec.i); } run=null; try{speechSynthesis.cancel();}catch(e){} endMeasure(); };
 
-/* ---------- nouveau repère ---------- */
+/* ---------- viser un repère ---------- */
 const nextId=()=>store.recs.reduce((m,r)=>Math.max(m,r.i),0)+1;
-$("#newBtn").onclick=async()=>{
+async function newLandmark(){
   if(run) return; askPerm(); initAudio(); wake();
   const rec={i:nextId(),t:new Date().toISOString()};
   run={rec,cancel:false};
   let pp=null;
   if($("#photoChk").checked){ pp=photoPromise(); $("#photoIn").click(); }
-  if(pp){ const ph=await pp; if(!run||run.cancel) return; if(ph){ rec.photo={...ph.stats,kb:Math.round(ph.blob.size/1024)}; await idbPut(rec.i,ph.blob); delete thumbs[rec.i]; } initAudio(); }
-  if(performance.now()-lastEv>1500){ toast("Pas de données des capteurs d'orientation sur ce navigateur.",4000); }
-  showStep("Étape 1 sur 2","Vise le pied du repère","Bras tendu, bord du haut du téléphone vers le pied. Regarde le paysage : bip quand c'est enregistré.");
-  const base=await waitStill({grace:900,hold:1200,cond:el=>Math.abs(el)<25});
+  if(pp){ const ph=await pp; if(!live()) return; if(ph){ rec.photo={...ph.stats,kb:Math.round(ph.blob.size/1024)}; await idbPut(rec.i,ph.blob); delete thumbs[rec.i]; } initAudio(); }
+  startMeasure();
+  const base=await step({label:"Repère · étape 1 sur 2",title:"Vise le pied du repère",hint:"Bras tendu, le bord du haut du téléphone pointé vers le bas du repère, là où il touche le sol.",cond:el=>Math.abs(el)<25,wrong:"Baisse le téléphone vers le pied du repère"});
   if(!base) return;
-  rec.base=base; beep(1); vib(180); flash();
-  rec.gps=gps?{...gps}:null;
-  rec.candsP=findCands(rec);
-  showStep("Étape 2 sur 2","Monte vers le ciel juste au-dessus","Vise le point du ciel à la verticale du repère et tiens immobile : double bip.");
-  const sky=await waitStill({grace:500,hold:1400,cond:el=>el>base.el+3});
+  rec.base=base; rec.gps=gps?{...gps}:null; rec.candsP=findCands(rec);
+  const sky=await step({label:"Repère · étape 2 sur 2",title:"Monte vers le ciel juste au-dessus",hint:"Lève le bras et vise le point du ciel qui est exactement à la verticale du repère.",cond:el=>el>base.el+3,wrong:"Plus haut, dans le ciel au-dessus du repère"});
   if(!sky) return;
   rec.sky=sky; rec.t=new Date().toISOString(); if(!rec.gps&&gps) rec.gps={...gps};
   if(rec.gps){ rec.sun=sunPos(new Date(),rec.gps.lat,rec.gps.lon); rec.light=lightOf(rec.sun.el); }
-  beep(2); vib([180,110,180]); flash();
   const candsP=rec.candsP; delete rec.candsP;
-  rec.dirty=true; store.recs.push(rec); persist(); syncSoon(); run=null; hideStep(); render();
+  rec.dirty=true; store.recs.push(rec); persist(); syncSoon(); run=null; endMeasure(); render();
   openId(rec,candsP);
-};
+}
+$("#newBtn").onclick=newLandmark;
 
-/* ---------- identification du repère ---------- */
+/* ---------- identification ---------- */
 const KIND=t=>{
   if(t["generator:source"]==="wind") return "éolienne";
   const mm=t.man_made, tt=t["tower:type"];
@@ -527,6 +651,7 @@ const KIND=t=>{
   if(t.building==="cathedral") return "cathédrale"; if(t.building==="chapel") return "chapelle"; if(t.building==="church"||t.amenity==="place_of_worship") return "église";
   if(t.natural==="peak") return "sommet"; if(t.historic==="castle") return "château"; return "repère";
 };
+const tLabel=t=>t.name?(t.name.toLowerCase().includes(t.kind.split(" ")[0].toLowerCase())?esc(t.name):esc(t.name)+" ("+t.kind+")"):cap(t.kind);
 async function findCands(rec){
   if(!rec.gps||!rec.base) return [];
   const {lat,lon}=rec.gps, b=rec.base.az, RMAX=12000, HW=20;
@@ -542,237 +667,232 @@ async function findCands(rec){
       const key=e.type+e.id; if(seen.has(key)) continue; seen.add(key);
       out.push({id:key,kind:KIND(t),name:t.name||"",lat:la,lon:lo,d:Math.round(d),brg:+brg.toFixed(1),db:+dAng(brg,b).toFixed(1),h:t.height?parseFloat(t.height):null});
     }
-    // fusionne les doublons proches (église en point et en bâtiment)
     const merged=[]; for(const c of out.sort((a,b2)=>Math.abs(a.db)-Math.abs(b2.db))){ if(!merged.some(m=>m.kind===c.kind&&distBrg(m.lat,m.lon,c.lat,c.lon).d<80)) merged.push(c); }
     return merged;
   }catch(e){ return null; }
 }
 let idRec=null, map=null, mapLayers=null, pickMarker=null;
-function idHeadHtml(rec){
-  const t=rec.target, p=rec.photo;
-  let h=`<div class="small">Repère n° ${rec.i} · ciel visé à <b>${fmt(rec.sky.el)}°</b>${rec.light?" · "+rec.light:""}${p&&p.cover!=null?" · nuages ~"+Math.round(p.cover*100)+" %":""}</div>`;
-  if(t) h+=`<div style="margin-top:6px;font-size:18px"><b>${tLabel(t)}</b> à ${km(t.d)} : voûte à <b>${Math.round(rec.y)} m</b> au-dessus</div>`;
-  return h;
-}
-const cap=s=>s?s[0].toUpperCase()+s.slice(1):s;
-const tLabel=t=>t.name?(t.name.toLowerCase().includes(t.kind.split(" ")[0].toLowerCase())?esc(t.name):esc(t.name)+" ("+t.kind+")"):cap(t.kind);
 async function openId(rec,candsP){
-  idRec=rec; $("#idPanel").classList.remove("hide"); $("#map").classList.add("hide"); $("#mapPick").classList.add("hide");
-  $("#idHead").innerHTML=idHeadHtml(rec);
+  idRec=rec; openFull("ident"); $("#iStep").textContent="Ciel visé à "+fmt(rec.sky.el)+"°";
   const cloudy=rec.photo&&rec.photo.cover!=null&&rec.photo.cover>.15;
-  $("#aimRow").classList.toggle("hide",!cloudy); $$("#aimRow button").forEach(b=>b.classList.toggle("on",b.dataset.aim===rec.aim));
-  $("#idPanel").scrollIntoView({behavior:"smooth",block:"start"});
+  $("#iBody").innerHTML=`<div class="big" style="margin-top:10px">Quel repère as-tu visé ?</div>
+    <div class="hint">Voici ce qui se trouve dans la direction de ta visée.</div>
+    ${cloudy?`<div style="margin-top:16px;font-weight:600">Il y avait des nuages. Tu as visé :</div><div class="seg" id="aimRow"><button data-aim="nuage" class="${rec.aim==="nuage"?"on":""}">un nuage</button><button data-aim="voute" class="${rec.aim==="voute"?"on":""}">le ciel derrière</button></div>`:""}
+    <div id="cands" style="margin-top:6px"></div><div id="map" class="hide"></div><div id="mapPick"></div>
+    <div class="stack"><button class="btn2 wide" id="mapBtn">Il n'est pas dans la liste : le placer sur la carte</button><button class="btn ghost" id="laterBtn">Je l'identifierai plus tard</button></div>`;
+  $$("#aimRow button").forEach(b=>b.onclick=()=>{ rec.aim=b.dataset.aim; markDirty(rec); $$("#aimRow button").forEach(x=>x.classList.toggle("on",x===b)); });
+  $("#laterBtn").onclick=()=>{ delete rec._c; persist(); idRec=null; closeFull("ident"); render(); };
+  $("#mapBtn").onclick=()=>openMap(rec);
   const box=$("#cands");
-  if(!rec.gps){ box.innerHTML=`<div class="small" style="margin-top:6px">Pas de position GPS pour cette mesure : choisis le repère plus tard sur ordinateur.</div>`; return; }
-  box.innerHTML=`<div class="small" style="margin-top:6px">Recherche des repères dans cette direction…</div>`;
+  if(!rec.gps){ box.innerHTML=`<p class="hint">Pas de position GPS pour cette visée : il faudra l'identifier plus tard.</p>`; return; }
+  box.innerHTML=`<p class="hint">Recherche des repères…</p>`;
   const cands=await (candsP||(rec._c?Promise.resolve(rec._c):findCands(rec))); if(idRec!==rec) return;
   rec._c=cands;
-  if(cands==null){ box.innerHTML=`<div class="small" style="margin-top:6px">Recherche impossible (réseau). Choisis sur la carte ou plus tard.</div>`; return; }
-  if(!cands.length){ box.innerHTML=`<div class="small" style="margin-top:6px">Aucun repère connu dans cette direction : choisis sur la carte.</div>`; return; }
-  box.innerHTML=cands.slice(0,5).map((c,k)=>`<button class="cand" data-k="${k}"><b>${tLabel(c)}</b> · ${km(c.d)}<br><span class="small">${Math.abs(c.db)<3?"dans l'axe de ta visée":fmt(Math.abs(c.db),0)+"° "+(c.db>0?"à droite":"à gauche")+" de ta visée"}</span></button>`).join("");
+  if(cands==null){ box.innerHTML=`<p class="hint">Pas de réseau pour chercher les repères. Place-le sur la carte, ou plus tard.</p>`; return; }
+  if(!cands.length){ box.innerHTML=`<p class="hint">Aucun repère connu dans cette direction. Place-le sur la carte.</p>`; return; }
+  box.innerHTML=cands.slice(0,5).map((c,k)=>`<button class="cand" data-k="${k}"><span class="tx"><b>${tLabel(c)}</b><span>${Math.abs(c.db)<3?"pile dans ta direction":fmt(Math.abs(c.db),0)+"° "+(c.db>0?"à droite":"à gauche")}</span></span><span class="d">${km(c.d)}</span></button>`).join("");
   $$("#cands .cand").forEach(b=>b.onclick=()=>choose(rec,cands[+b.dataset.k]));
 }
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+$("#iClose").onclick=()=>{ idRec=null; closeFull("ident"); render(); };
 function choose(rec,c){
   rec.target={kind:c.kind,name:c.name||"",lat:c.lat,lon:c.lon,d:c.d,src:c.id||"carte",db:c.db??null,h:c.h??null};
   rec.y=+(c.d*(Math.tan(rec.sky.el*D)-Math.tan(rec.base.el*D))).toFixed(1);
   rec.yEye=+(c.d*Math.tan(rec.sky.el*D)+EYE).toFixed(1);
-  delete rec._c; markDirty(rec); render();
-  $("#idPanel").classList.add("hide"); idRec=null;
-  toast(`${tLabel(rec.target).replace(/&amp;/g,"&")} à ${km(c.d)} : voûte à ${Math.round(rec.y)} m au-dessus`);
+  delete rec._c; markDirty(rec); idRec=null; closeFull("ident"); render(); showResult(rec);
 }
-$$("#aimRow button").forEach(b=>b.onclick=()=>{ if(!idRec) return; idRec.aim=b.dataset.aim; markDirty(idRec); $$("#aimRow button").forEach(x=>x.classList.toggle("on",x===b)); });
-$("#laterBtn").onclick=()=>{ if(idRec) delete idRec._c; persist(); $("#idPanel").classList.add("hide"); idRec=null; render(); };
+function showResult(rec){
+  $("#resNum").innerHTML=`${Math.round(rec.y)}<small>m</small>`;
+  $("#resLab").innerHTML=`Hauteur où tu places le ciel, à la verticale de : <b style="color:#fff">${tLabel(rec.target)}</b>, à ${km(rec.target.d)} de toi.`;
+  const M=vaultModel(); $("#resVault").innerHTML=M&&M.ok?Vault.svg(M,{theme:"night",font:FONT,foot:false,fs:1.75})+`<p class="hint" style="margin:10px 8px 0">${M.title} : ${M.line}</p>`:emptyDome()+`<p class="hint" style="margin:10px 8px 0">Encore ${Math.max(1,3-pointsFor().length)} repère(s), proches et lointains, pour dessiner ta voûte.</p>`;
+  openFull("result"); finale(); vib([80,60,80]);
+}
+$("#rClose").onclick=()=>closeFull("result");
+$("#rDone").onclick=()=>{ closeFull("result"); window.scrollTo({top:0,behavior:"smooth"}); };
+$("#rNext").onclick=()=>{ closeFull("result"); newLandmark(); };
 function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement("script"); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
-$("#mapBtn").onclick=async()=>{
-  const rec=idRec; if(!rec||!rec.gps) return;
-  if(!window.L){ try{ await loadScript("https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"); }catch(e){ toast("Carte indisponible (réseau)."); return; } }
-  $("#map").classList.remove("hide");
-  if(!map){
-    map=L.map("map",{zoomControl:true,attributionControl:true});
-    const osm=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"});
-    const sat=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,attribution:"Esri"});
-    osm.addTo(map); L.control.layers({"Plan":osm,"Satellite":sat},null,{position:"topright"}).addTo(map);
-    mapLayers=L.layerGroup().addTo(map);
-    map.on("click",e=>pickAt(e.latlng.lat,e.latlng.lng));
-  }
-  mapLayers.clearLayers(); pickMarker=null; $("#mapPick").classList.add("hide");
+async function openMap(rec){
+  if(!rec.gps) return;
+  if(!window.L){ try{ await loadScript("https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"); }catch(e){ toast("Carte indisponible sans réseau."); return; } }
+  const el=$("#map"); el.classList.remove("hide");
+  if(map){ map.remove(); map=null; }
+  map=L.map(el,{zoomControl:true,attributionControl:true});
+  const osm=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"});
+  const sat=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,attribution:"Esri"});
+  osm.addTo(map); L.control.layers({"Plan":osm,"Satellite":sat},null,{position:"topright"}).addTo(map);
+  mapLayers=L.layerGroup().addTo(map); pickMarker=null;
+  map.on("click",e=>pickAt(rec,e.latlng.lat,e.latlng.lng));
   const {lat,lon}=rec.gps, b=rec.base.az;
-  L.circleMarker([lat,lon],{radius:7,color:"#2a78d6",fillOpacity:1}).addTo(mapLayers);
-  L.polyline([[lat,lon],dest(lat,lon,b,12000)],{color:"#2a78d6",weight:2,dashArray:"6 6"}).addTo(mapLayers);
-  L.polygon([[lat,lon],dest(lat,lon,b-15,12000),dest(lat,lon,b+15,12000)],{color:"#2a78d6",weight:0,fillOpacity:.07}).addTo(mapLayers);
-  (rec._c||[]).forEach(c=>L.circleMarker([c.lat,c.lon],{radius:6,color:"#b4560f",fillOpacity:.9}).bindTooltip(tLabel(c)).on("click",ev=>{ L.DomEvent.stopPropagation(ev); choose(rec,c); }).addTo(mapLayers));
-  setTimeout(()=>{ map.invalidateSize(); map.fitBounds(L.latLngBounds([[lat,lon],dest(lat,lon,b,4000)]).pad(.4)); },60);
-  $("#map").scrollIntoView({behavior:"smooth",block:"center"});
-};
-function pickAt(la,lo){
-  const rec=idRec; if(!rec) return; const {d,brg}=distBrg(rec.gps.lat,rec.gps.lon,la,lo);
+  L.circleMarker([lat,lon],{radius:7,color:"#2c4c86",fillOpacity:1}).addTo(mapLayers);
+  L.polyline([[lat,lon],dest(lat,lon,b,12000)],{color:"#2c4c86",weight:2,dashArray:"6 6"}).addTo(mapLayers);
+  L.polygon([[lat,lon],dest(lat,lon,b-15,12000),dest(lat,lon,b+15,12000)],{color:"#2c4c86",weight:0,fillOpacity:.08}).addTo(mapLayers);
+  (rec._c||[]).forEach(c=>L.circleMarker([c.lat,c.lon],{radius:7,color:"#c98a14",fillColor:"#f3b23c",fillOpacity:1}).bindTooltip(tLabel(c)).on("click",ev=>{ L.DomEvent.stopPropagation(ev); choose(rec,c); }).addTo(mapLayers));
+  setTimeout(()=>{ map.invalidateSize(); map.fitBounds(L.latLngBounds([[lat,lon],dest(lat,lon,b,4000)]).pad(.4)); el.scrollIntoView({behavior:"smooth",block:"center"}); },60);
+  $("#mapPick").innerHTML=`<p class="hint" style="margin-top:8px">Touche la carte à l'endroit du repère.</p>`;
+}
+function pickAt(rec,la,lo){
+  const {d,brg}=distBrg(rec.gps.lat,rec.gps.lon,la,lo);
   if(pickMarker) mapLayers.removeLayer(pickMarker); pickMarker=L.marker([la,lo]).addTo(mapLayers);
-  const p=$("#mapPick"); p.classList.remove("hide");
-  p.innerHTML=`<div class="row"><button class="pri" id="pickOk">Valider ce point (${km(d)})</button></div>`;
+  $("#mapPick").innerHTML=`<button class="btn night" style="width:100%;margin-top:10px" id="pickOk">Valider ce point, à ${km(d)}</button>`;
   $("#pickOk").onclick=()=>choose(rec,{kind:"point choisi",name:"",lat:la,lon:lo,d:Math.round(d),db:+dAng(brg,rec.base.az).toFixed(1),id:"carte"});
 }
 
-/* ---------- ta voûte ---------- */
+/* ---------- ma voûte ---------- */
 try{ document.head.insertAdjacentHTML("beforeend","<style>"+Vault.css+"</style>"); }catch(e){}
-store.tasks=store.tasks||[];
 const lastTask=k=>{ const a=store.tasks.filter(t=>t.kind===k); return a[a.length-1]||null; };
+const pointsFor=()=>store.recs.filter(r=>r.target&&r.y>0).map(r=>({x:r.target.d,y:r.y}));
+const vaultModel=()=>Vault.model(pointsFor());
+let realProp=false;
+function emptyDome(){ return `<svg class="empty-dome" viewBox="0 0 680 230" aria-hidden="true"><path d="M30 196C110 70 230 40 340 40S570 70 650 196" fill="none" stroke="#f3b23c" stroke-width="2.4" stroke-dasharray="2 9" stroke-linecap="round" opacity=".85"/><rect x="0" y="196" width="680" height="34" fill="#0e1830"/><line x1="0" x2="680" y1="196" y2="196" stroke="#4a5d84"/><g transform="translate(340,196)" fill="#eef3fa"><circle cx="0" cy="-17" r="3.6"/><path d="M-3.4,-12.5h6.8l1.2,8h-2.2l-.8,4.5h-3.2l-.8-4.5h-2.2z"/></g></svg>`; }
 function renderVault(){
-  const pts=store.recs.filter(r=>r.target&&r.y>0).map(r=>({x:r.target.d,y:r.y}));
-  const any=store.recs.length||store.tasks.length;
-  $("#vaultCard").classList.toggle("hide",!any);
-  let M=null;
-  if(store.recs.length) M=Vault.card($("#vaultBox"),pts,{emptyText:"Ta voûte se dessinera ici dès que tu auras identifié au moins 3 repères, proches et lointains."}); else $("#vaultBox").innerHTML="";
+  const M=vaultModel(), ok=M&&M.ok;
+  $("#vaultHdr").innerHTML=ok?Vault.svg(M,{theme:"night",font:FONT,real:realProp,foot:false,fs:1.75}):emptyDome();
+  $("#propBtn").classList.toggle("hide",!ok); $("#propBtn").textContent=realProp?"Revenir à la forme":"Voir les vraies proportions";
+  $("#hdrTitle").textContent=ok?M.title:"Ton ciel se dessinera ici";
+  $("#hdrLine").textContent=ok?M.line:(store.recs.length?`Encore ${Math.max(1,3-pointsFor().length)} repère(s) identifiés, proches et lointains.`:"Vise trois repères à des distances différentes, proches et lointains.");
   const tp=lastTask("partage"), td=lastTask("dessin"), tt=lastTask("tache"), rm=Vault.ratioOfModel(M);
-  $("#crossBox").classList.toggle("nofig",!store.recs.length);
+  const anyX=ok||tp||td||tt;
+  $("#skySec").classList.toggle("hide",!anyX);
+  $("#stats").innerHTML=ok?Vault.stats(M).map(t=>`<div><span>${t.k}</span><b>${t.v}</b></div>`).join(""):"";
   $("#crossBox").innerHTML=Vault.crossHtml([
-    {k:"Repères",r:rm,note:M&&M.ok?"sans fin":"à compléter"},
+    {k:"Repères",r:rm,note:ok?"∞":"3 repères"},
     {k:"Ciel partagé",r:tp?tp.ratio:null},
     {k:"Dessin",r:td?td.ratio:null},
-    {k:"Tache",r:tt?tt.ratio:null,note:tt&&tt.ratio==null?"pas de tache vue":"à faire"}]);
-  for(const k of ["partage","dessin","tache"]){ const t=lastTask(k), e=$("#st-"+k); if(!e) continue; e.textContent=t?"fait ✓":"à faire"; e.className="xp-s"+(t?" ok":""); }
+    {k:"Tache",r:tt?tt.ratio:null,note:tt&&tt.ratio==null?"pas vue":"à faire"}]);
+  for(const k of ["partage","dessin","tache"]){ const t=lastTask(k), e=$("#st-"+k); e.textContent=t?"✓ faite":"à faire"; e.className="st"+(t?" done":""); }
 }
+$("#propBtn").onclick=()=>{ realProp=!realProp; renderVault(); };
+
+/* ---------- expériences ---------- */
 function saveTask(kind,data,ratio){
   const n=store.tasks.reduce((m,t)=>Math.max(m,+String(t.id).split("-")[1]||0),0)+1;
   const now=new Date(), g=gps?{...gps}:null, sun=g?sunPos(now,g.lat,g.lon):null;
-  const t={id:"tache-"+n,kind,t:now.toISOString(),gps:g,sun,light:sun?lightOf(sun.el):null,data,ratio:ratio!=null?+ratio.toFixed(3):null,dirty:true};
-  store.tasks.push(t); persist(); syncSoon(); render(); return t;
+  store.tasks.push({id:"tache-"+n,kind,t:now.toISOString(),gps:g,sun,light:sun?lightOf(sun.el):null,data,ratio:ratio!=null?+ratio.toFixed(3):null,dirty:true});
+  persist(); syncSoon(); render();
 }
 $$(".xp").forEach(b=>b.onclick=()=>{ const k=b.dataset.xp; if(k==="partage") partage(); else if(k==="dessin") openDraw(); else openTache(); });
 
-/* ---------- expérience 1 : partager le ciel ---------- */
 async function partage(){
   if(run) return; askPerm(); initAudio(); wake();
-  run={cancel:false};
-  showStep("Partage le ciel · 1 sur 3","Vise le milieu du ciel","À mi-chemin entre l'horizon et le point juste au-dessus de ta tête. Bras tendu, bord du haut du téléphone vers ce point. Tiens immobile : bip.");
-  const a=await waitStill({grace:900,hold:1300,cond:el=>el>4&&el<86}); if(!a) return; beep(1); vib(180); flash();
-  showStep("Partage le ciel · 2 sur 3","Coupe la partie basse en deux","Vise le milieu entre l'horizon et le point que tu viens de viser. Tiens immobile : bip.");
-  const b=await waitStill({grace:500,hold:1300,cond:el=>el>1&&el<a.el-2}); if(!b) return; beep(1); vib(180); flash();
-  showStep("Partage le ciel · 3 sur 3","Coupe la partie haute en deux","Vise le milieu entre le point du milieu et le dessus de ta tête. Tiens immobile : bip.");
-  const c=await waitStill({grace:500,hold:1300,cond:el=>el>a.el+2&&el<89.5}); if(!c) return;
-  run=null; hideStep(); beep(3,700); vib([120,80,120,80,300]); flash(); say("C'est fini, merci.");
-  const d={half:a.el,low:b.el,high:c.el,az:a.az,sd:[a.sd,b.sd,c.sd]}, r=Vault.ratioFromSplit(d);
-  saveTask("partage",d,r);
-  toast(`Ton milieu du ciel est à ${fmt(a.el,0)}° (45° pour une coupole parfaite).`,4500);
+  run={cancel:false}; startMeasure();
+  const a=await step({label:"Partage le ciel · 1 sur 3",title:"Vise le milieu du ciel",hint:"Le point à mi-chemin entre l'horizon et le point juste au-dessus de ta tête.",cond:el=>el>4&&el<86,wrong:"Entre l'horizon et le dessus de ta tête"}); if(!a) return;
+  const b=await step({label:"Partage le ciel · 2 sur 3",title:"Coupe le bas en deux",hint:"Le milieu entre l'horizon et le point que tu viens de viser.",cond:el=>el>1&&el<a.el-2,wrong:"Plus bas, sous le point du milieu"}); if(!b) return;
+  const c=await step({label:"Partage le ciel · 3 sur 3",title:"Coupe le haut en deux",hint:"Le milieu entre le point du milieu et le dessus de ta tête.",cond:el=>el>a.el+2&&el<89.5,wrong:"Plus haut, au-dessus du point du milieu"}); if(!c) return;
+  run=null; endMeasure(); finale(); vib([120,80,120,80,300]); say("C'est fini, merci.");
+  const d={half:a.el,low:b.el,high:c.el,az:a.az,sd:[a.sd,b.sd,c.sd]};
+  saveTask("partage",d,Vault.ratioFromSplit(d));
+  toast(`Ton milieu du ciel est à ${fmt(a.el,0)}°. Pour une coupole parfaite, ce serait 45°.`,5000);
 }
 
-/* ---------- expérience 2 : dessiner son ciel ---------- */
 let drawPts=[], drawing=false;
-function cvSetup(){
-  const cv=$("#drawCv"), r=cv.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
-  cv.width=Math.round(r.width*dpr); cv.height=Math.round(r.height*dpr); const x=cv.getContext("2d"); x.setTransform(dpr,0,0,dpr,0,0); return {cv,x,W:r.width,H:r.height};
-}
+function cvSetup(){ const cv=$("#drawCv"), r=cv.getBoundingClientRect(), dpr=window.devicePixelRatio||1; cv.width=Math.round(r.width*dpr); cv.height=Math.round(r.height*dpr); const x=cv.getContext("2d"); x.setTransform(dpr,0,0,dpr,0,0); return {x,W:r.width,H:r.height}; }
 function drawScene(){
-  const {x,W,H}=cvSetup(), yG=H*.86, xc=W/2;
-  x.clearRect(0,0,W,H);
-  const g=x.createLinearGradient(0,yG,0,H); g.addColorStop(0,"#d8d1ba"); g.addColorStop(1,"#f2efe6"); x.fillStyle=g; x.fillRect(0,yG,W,H-yG);
-  x.strokeStyle="#8e8a7c"; x.lineWidth=1; x.beginPath(); x.moveTo(0,yG); x.lineTo(W,yG); x.stroke();
-  x.fillStyle="#0b0b0b"; x.beginPath(); x.arc(xc,yG-17,3.6,0,7); x.fill(); x.fillRect(xc-3.4,yG-12.5,6.8,12.5);
-  x.fillStyle="#9a9993"; x.font="12px system-ui"; x.textAlign="left"; x.fillText("horizon",8,yG-6); x.textAlign="right"; x.fillText("horizon",W-8,yG-6);
-  if(drawPts.length>1){ x.strokeStyle="#1d3f86"; x.lineWidth=3; x.lineCap="round"; x.lineJoin="round"; x.beginPath(); drawPts.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])); x.stroke(); }
+  const {x,W,H}=cvSetup(), yG=H*.84, xc=W/2;
+  const g=x.createLinearGradient(0,0,0,yG); g.addColorStop(0,"#0b1428"); g.addColorStop(1,"#2c4c86"); x.fillStyle=g; x.fillRect(0,0,W,yG);
+  x.fillStyle="#0e1830"; x.fillRect(0,yG,W,H-yG);
+  x.strokeStyle="#4a5d84"; x.lineWidth=1; x.beginPath(); x.moveTo(0,yG); x.lineTo(W,yG); x.stroke();
+  x.fillStyle="#eef3fa"; x.beginPath(); x.arc(xc,yG-17,3.6,0,7); x.fill(); x.fillRect(xc-3.4,yG-12.5,6.8,12.5);
+  x.fillStyle="#8fa3c2"; x.font="13px Barlow, system-ui"; x.textAlign="left"; x.fillText("horizon",10,yG+18); x.textAlign="right"; x.fillText("horizon",W-10,yG+18);
+  if(drawPts.length>1){ x.strokeStyle="#f3b23c"; x.lineWidth=4; x.lineCap="round"; x.lineJoin="round"; x.beginPath(); drawPts.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])); x.stroke(); }
   return {W,H,yG,xc};
 }
 function drawEval(){
   const {W,yG,xc}=drawScene(), half=W/2;
   if(drawPts.length<8) return null;
   const xs=drawPts.map(p=>p[0]);
-  if(Math.min(...xs)>xc-half*.2||Math.max(...xs)<xc+half*.2) return {err:"Trace d'un côté à l'autre, en passant au-dessus du personnage."};
+  if(Math.min(...xs)>xc-half*.2||Math.max(...xs)<xc+half*.2) return {err:"Trace d'un bout à l'autre, en passant au-dessus du personnage."};
   let best=null; for(const p of drawPts){ const d=Math.abs(p[0]-xc); if(!best||d<best.d) best={d,y:p[1]}; }
   const h0=(yG-best.y)/half; if(h0<.02) return {err:"Le trait doit passer au-dessus du personnage."};
-  const ends=[drawPts[0],drawPts[drawPts.length-1]].map(p=>Math.abs(p[0]-xc)/half), w=(ends[0]+ends[1])/2;
+  const w=([drawPts[0],drawPts[drawPts.length-1]].map(p=>Math.abs(p[0]-xc)/half)).reduce((a,b)=>a+b)/2;
   const poly=drawPts.filter((p,i)=>i%Math.max(1,Math.floor(drawPts.length/48))===0).map(p=>[+((p[0]-xc)/half).toFixed(3),+((yG-p[1])/half).toFixed(3)]);
   return {h0,w,ratio:w/h0,poly};
 }
-function openDraw(){ drawPts=[]; $("#drawModal").classList.remove("hide"); $("#drawOk").disabled=true; $("#drawMsg").textContent=""; requestAnimationFrame(drawScene); }
+function openDraw(){ drawPts=[]; openFull("drawModal"); $("#drawOk").disabled=true; $("#drawMsg").textContent=""; requestAnimationFrame(drawScene); }
 (()=>{
-  const cv=$("#drawCv");
-  const pos=e=>{ const r=cv.getBoundingClientRect(); return [e.clientX-r.left,e.clientY-r.top]; };
+  const cv=$("#drawCv"), pos=e=>{ const r=cv.getBoundingClientRect(); return [e.clientX-r.left,e.clientY-r.top]; };
   cv.addEventListener("pointerdown",e=>{ drawing=true; drawPts=[pos(e)]; try{cv.setPointerCapture(e.pointerId);}catch(_){} drawScene(); });
   cv.addEventListener("pointermove",e=>{ if(!drawing) return; drawPts.push(pos(e)); drawScene(); });
-  const end=()=>{ if(!drawing) return; drawing=false; const r=drawEval(); $("#drawOk").disabled=!(r&&!r.err); $("#drawMsg").textContent=r&&r.err?r.err:r?"Tu peux valider, ou effacer pour recommencer.":""; };
+  const end=()=>{ if(!drawing) return; drawing=false; const r=drawEval(); $("#drawOk").disabled=!(r&&!r.err); $("#drawMsg").textContent=r&&r.err?r.err:r?"Ça te ressemble ? Valide, ou efface pour recommencer.":""; };
   cv.addEventListener("pointerup",end); cv.addEventListener("pointercancel",end);
   $("#drawClear").onclick=()=>{ drawPts=[]; drawScene(); $("#drawOk").disabled=true; $("#drawMsg").textContent=""; };
-  $("#drawCancel").onclick=()=>$("#drawModal").classList.add("hide");
-  $("#drawOk").onclick=()=>{ const r=drawEval(); if(!r||r.err) return; $("#drawModal").classList.add("hide"); saveTask("dessin",{h0:+r.h0.toFixed(3),w:+r.w.toFixed(3),poly:r.poly},r.ratio); toast(`Ton ciel dessiné est ${fmt(r.ratio,1)} fois plus loin à l'horizon qu'au-dessus de toi.`,4500); };
+  $("#drawCancel").onclick=()=>closeFull("drawModal");
+  $("#drawOk").onclick=()=>{ const r=drawEval(); if(!r||r.err) return; closeFull("drawModal"); saveTask("dessin",{h0:+r.h0.toFixed(3),w:+r.w.toFixed(3),poly:r.poly},r.ratio); vib(80); toast(`Dans ton dessin, le ciel est ${fmt(r.ratio,1)} fois plus loin à l'horizon qu'au-dessus de toi.`,5000); };
   window.addEventListener("resize",()=>{ if(!$("#drawModal").classList.contains("hide")) drawScene(); });
 })();
 
-/* ---------- expérience 3 : la tache dans le ciel (image rémanente, loi d'Emmert) ---------- */
 let tacheAns=null;
 function tacheView(v){
   const box=$("#tacheIn");
-  if(v==="intro") box.innerHTML=`<div class="m-t">La tache dans le ciel</div>
-    <div class="m-s">Une illusion d'optique : la même tache paraît plus ou moins grande selon l'endroit du ciel où tu la regardes. Ça mesure à quelle distance ton cerveau place le ciel.</div>
-    <ol class="steps"><li>Mets la luminosité de l'écran au maximum. Il faut du ciel de jour, bleu ou uniformément gris.</li><li>Fixe le point rouge pendant 20 secondes, sans bouger les yeux.</li><li>Au bip, regarde le ciel juste au-dessus de l'horizon : une tache sombre apparaît.</li><li>Lève aussitôt les yeux haut dans le ciel et compare sa taille.</li></ol>
-    <div class="row"><button class="pri" id="tGo">Commencer</button><button class="ghost" id="tNo">Annuler</button></div>`;
-  if(v==="q") box.innerHTML=`<div class="m-t">Où la tache paraissait-elle la plus grande ?</div>
-    <div class="choice"><button data-a="horizon">Près de l'horizon</button><button data-a="pareil">Pareil partout</button><button data-a="haut">En haut du ciel</button><button data-a="rien">Je n'ai pas vu de tache</button></div>
-    <div class="row"><button class="ghost" id="tAgain">Recommencer</button></div>`;
-  if(v==="size") box.innerHTML=`<div class="m-t">Environ combien de fois plus grande ?</div>
-    <div class="m-s">Fais glisser jusqu'à ce que le dessin ressemble à ce que tu as vu.</div>
-    <svg id="cmp" viewBox="0 0 340 170"></svg>
+  if(v==="intro") box.innerHTML=`<div class="bar"><span style="color:var(--mute)">Expérience · illusion</span><button class="close" id="tNo">Annuler</button></div>
+    <div class="big">La tache dans le ciel</div>
+    <div class="hint">Une même tache paraît plus grande là où ton cerveau croit le ciel plus lointain. Il faut du ciel de jour, bleu ou uniformément gris.</div>
+    <ol class="steps"><li>Mets la luminosité de l'écran au maximum.</li><li>Fixe le point rouge sans bouger les yeux, pendant 20 secondes.</li><li>Au signal, regarde le ciel juste au-dessus de l'horizon : une tache sombre y flotte.</li><li>Lève aussitôt les yeux haut dans le ciel et compare sa taille.</li></ol>
+    <div class="stack"><button class="btn night" id="tGo">Je suis prêt</button></div>`;
+  if(v==="q") box.innerHTML=`<div class="bar"><span style="color:var(--mute)">Expérience · illusion</span><button class="close" id="tNo">Fermer</button></div>
+    <div class="big">Où la tache paraissait-elle la plus grande ?</div>
+    <div class="choice"><button data-a="horizon">Près de l'horizon</button><button data-a="pareil">Pareille partout</button><button data-a="haut">En haut du ciel</button><button data-a="rien">Je n'ai pas vu de tache</button></div>
+    <div class="stack"><button class="btn ghost" id="tAgain">Recommencer</button></div>`;
+  if(v==="size") box.innerHTML=`<div class="bar"><span style="color:var(--mute)">Expérience · illusion</span><button class="close" id="tNo">Fermer</button></div>
+    <div class="big">Combien de fois plus grande ?</div>
+    <div class="hint">Fais glisser jusqu'à ce que les deux taches ressemblent à ce que tu as vu.</div>
+    <svg id="cmp" viewBox="0 0 340 180"></svg>
     <input type="range" id="tR" min="1.1" max="3" step="0.1" value="1.5">
-    <div class="row"><button class="pri" id="tOk">Valider</button><button class="ghost" id="tAgain">Recommencer</button></div>`;
+    <div class="stack"><button class="btn night" id="tOk">Valider</button><button class="btn ghost" id="tAgain">Recommencer</button></div>`;
   const on=(id,f)=>{ const e=$("#"+id); if(e) e.onclick=f; };
-  on("tNo",()=>$("#tacheModal").classList.add("hide"));
-  on("tGo",fixation);
-  on("tAgain",()=>tacheView("intro"));
-  $$("#tacheIn .choice button").forEach(b=>b.onclick=()=>{ tacheAns=b.dataset.a;
-    if(tacheAns==="pareil"){ finishTache(1); } else if(tacheAns==="rien"){ finishTache(null); } else { tacheView("size"); drawCmp(); } });
+  on("tNo",()=>closeFull("tacheModal")); on("tGo",fixation); on("tAgain",()=>tacheView("intro"));
+  $$("#tacheIn .choice button").forEach(b=>b.onclick=()=>{ tacheAns=b.dataset.a; if(tacheAns==="pareil") finishTache(1); else if(tacheAns==="rien") finishTache(null); else { tacheView("size"); drawCmp(); } });
   const r=$("#tR"); if(r){ r.oninput=drawCmp; on("tOk",()=>{ const v=+r.value; finishTache(tacheAns==="horizon"?v:1/v); }); }
 }
 function drawCmp(){
-  const v=+$("#tR").value, big=tacheAns==="horizon", base=26, rH=big?base*v:base, rT=big?base:base*v;
-  $("#cmp").innerHTML=`<rect width="340" height="170" rx="12" fill="#dbe7f3"/><text x="85" y="160" font-size="12" text-anchor="middle" fill="#52514e">près de l'horizon</text><text x="255" y="160" font-size="12" text-anchor="middle" fill="#52514e">en haut du ciel</text><circle cx="85" cy="78" r="${Math.min(rH,66)}" fill="#2b3a4a" opacity=".75"/><circle cx="255" cy="78" r="${Math.min(rT,66)}" fill="#2b3a4a" opacity=".75"/><text x="170" y="22" font-size="14" font-weight="700" text-anchor="middle" fill="#0b0b0b">×${fmt(v,1)}</text>`;
+  const v=+$("#tR").value, big=tacheAns==="horizon", base=24, rH=Math.min(big?base*v:base,70), rT=Math.min(big?base:base*v,70);
+  $("#cmp").innerHTML=`<defs><linearGradient id="cg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#cfe0f2"/><stop offset="1" stop-color="#7fa6d6"/></linearGradient></defs><rect width="340" height="180" rx="18" fill="url(#cg)"/><circle cx="88" cy="88" r="${rH}" fill="#24324a" opacity=".78"/><circle cx="252" cy="88" r="${rT}" fill="#24324a" opacity=".78"/><text x="88" y="170" font-size="13" text-anchor="middle" fill="#16223a" font-family="${FONT}">près de l'horizon</text><text x="252" y="170" font-size="13" text-anchor="middle" fill="#16223a" font-family="${FONT}">en haut du ciel</text><text x="170" y="30" font-size="26" font-weight="700" text-anchor="middle" fill="#16223a" font-family="'Barlow Condensed',${FONT}">× ${fmt(v,1)}</text>`;
 }
-function openTache(){ initAudio(); $("#tacheModal").classList.remove("hide"); tacheView("intro"); }
+function openTache(){ initAudio(); openFull("tacheModal"); tacheView("intro"); }
 function fixation(){
   initAudio(); wake(); const f=$("#fix"); f.classList.remove("hide");
   try{ f.requestFullscreen&&f.requestFullscreen().catch(()=>{}); }catch(e){}
   let n=20; $("#fixCnt").textContent="Fixe le point rouge · "+n;
-  const iv=setInterval(()=>{ n--; $("#fixCnt").textContent="Fixe le point rouge · "+n; if(n<=0){ clearInterval(iv); beep(2,900); vib([200,100,200]); say("Regarde le ciel juste au-dessus de l'horizon, puis lève les yeux."); f.classList.add("hide"); try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(e){} tacheView("q"); } },1000);
+  const iv=setInterval(()=>{ n--; $("#fixCnt").textContent="Fixe le point rouge · "+n; if(n<=3&&n>0){ count(); vib(40); }
+    if(n<=0){ clearInterval(iv); chime(); vib([250,120,250]); say("Regarde le ciel juste au-dessus de l'horizon, puis lève les yeux."); f.classList.add("hide"); try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(e){} tacheView("q"); } },1000);
 }
 function finishTache(ratio){
-  $("#tacheModal").classList.add("hide");
-  saveTask("tache",{answer:tacheAns},ratio);
-  toast(ratio==null?"Pas de tache : réessaie avec un ciel plus lumineux et l'écran au maximum.":ratio===1?"Même taille partout : pour toi, le ciel est aussi loin partout.":`La tache paraissait ${fmt(Math.max(ratio,1/ratio),1)} fois plus grande ${ratio>1?"près de l'horizon":"en haut"}.`,4500);
+  closeFull("tacheModal"); saveTask("tache",{answer:tacheAns},ratio); vib(80);
+  toast(ratio==null?"Pas de tache : réessaie avec un ciel plus lumineux et l'écran au maximum.":ratio===1?"Même taille partout : pour toi, le ciel est aussi loin partout.":`La tache paraissait ${fmt(Math.max(ratio,1/ratio),1)} fois plus grande ${ratio>1?"près de l'horizon":"en haut du ciel"}.`,5000);
 }
 
-/* ---------- liste ---------- */
+/* ---------- liste des repères ---------- */
 async function render(){
-  try{ renderVault(); }catch(e){}
+  try{ renderVault(); }catch(e){ console.error(e); }
   const L_=$("#list"), recs=store.recs.slice().reverse();
-  if(!recs.length){ L_.innerHTML=`<div class="small">Tes repères apparaîtront ici.</div>`; return; }
+  if(!recs.length){ L_.innerHTML=`<div class="empty">Aucun repère pour l'instant. Commence par une éolienne ou un clocher bien visible.</div>`; syncStatus(); return; }
   L_.innerHTML=recs.map(r=>{
-    const t=r.target, p=r.photo;
-    const title=t?`${tLabel(t)} · ${km(t.d)}`:`<span class="todo">Repère n° ${r.i} à identifier</span>`;
-    const h=t?`voûte à ${Math.round(r.y)} m au-dessus`:`ciel visé à ${fmt(r.sky.el)}°`;
-    const extra=[t?fmt(r.sky.el)+"°":null, r.light, p&&p.cover!=null?"nuages ~"+Math.round(p.cover*100)+" %":null, r.aim?"visé : "+(r.aim==="voute"?"voûte":"nuage"):null, ENDPOINT?(r.synced&&!r.dirty?"enregistré ✓":"envoi en attente"):null].filter(Boolean).join(" · ");
-    return `<div class="item" data-i="${r.i}"><img data-th="${r.i}" alt=""><div class="tx"><div>${title}</div><div class="h">${h}</div><div class="small">${extra}</div></div><button class="ghost del" data-del="${r.i}">✕</button></div>`;
+    const t=r.target;
+    const head=t?`${Math.round(r.y)} m`:`<span class="todo">À identifier</span>`;
+    const sub=t?`${tLabel(t)}, à ${km(t.d)}`:`Ciel visé à ${fmt(r.sky.el)}°. Touche pour choisir le repère.`;
+    const meta=[r.light, r.photo&&r.photo.cover!=null?"nuages ~"+Math.round(r.photo.cover*100)+" %":null, ENDPOINT&&!(r.synced&&!r.dirty)?"envoi en attente":null].filter(Boolean).join(", ");
+    return `<div class="rec" data-i="${r.i}"><img data-th="${r.i}" alt=""><div class="tx"><b>${head}</b><span>${sub}</span>${meta?`<span style="font-size:13px">${cap(meta)}</span>`:""}</div><button class="x" data-del="${r.i}" aria-label="Supprimer">Supprimer</button></div>`;
   }).join("");
-  $$("#list .item").forEach(el=>el.onclick=e=>{ if(e.target.closest(".del")) return; const r=store.recs.find(x=>x.i===+el.dataset.i); if(r&&!run) openId(r); });
-  $$("#list .del").forEach(b=>b.onclick=()=>{ if(b.dataset.arm){ const i=+b.dataset.del; const was=store.recs.find(x=>x.i===i); store.recs=store.recs.filter(x=>x.i!==i); if(was&&was.synced){ store.delQ.push(i); syncSoon(); } idbDel(i); persist(); render(); } else { b.dataset.arm=1; b.textContent="Supprimer ?"; setTimeout(()=>{ if(b.isConnected){ delete b.dataset.arm; b.textContent="✕"; } },3000); } });
+  $$("#list .rec").forEach(el=>el.onclick=e=>{ if(e.target.closest(".x")) return; const r=store.recs.find(x=>x.i===+el.dataset.i); if(r&&!run) openId(r); });
+  $$("#list .x").forEach(b=>b.onclick=()=>{ if(b.dataset.arm){ const i=+b.dataset.del; const was=store.recs.find(x=>x.i===i); store.recs=store.recs.filter(x=>x.i!==i); if(was&&was.synced){ store.delQ.push(i); syncSoon(); } idbDel(i); persist(); render(); } else { b.dataset.arm=1; b.textContent="Confirmer"; b.style.color="#c0392b"; setTimeout(()=>{ if(b.isConnected){ delete b.dataset.arm; b.textContent="Supprimer"; b.style.color=""; } },3000); } });
   syncStatus();
-  for(const img of $$("#list img[data-th]")){ const u=await thumbOf(+img.dataset.th); if(u) img.src=u; else img.remove(); }
+  for(const img of $$("#list img[data-th]")){ const u=await thumbOf(+img.dataset.th); if(u) img.src=u; else img.replaceWith(Object.assign(document.createElement("div"),{className:"ph"})); }
 }
 
 /* ---------- précision ---------- */
 $("#calibBtn").onclick=async()=>{
   if(run) return; askPerm(); initAudio(); wake();
-  run={cancel:false}; const caps=[]; let prev=null;
+  run={cancel:false}; startMeasure(); const caps=[];
   for(let k=0;k<5;k++){
-    showStep(`Précision ${k+1} sur 5`,k?"Baisse le bras, puis vise de nouveau l'horizon":"Vise l'horizon","La ligne d'horizon la plus lointaine, bras tendu. Tiens immobile : bip.");
-    const c=await waitStill({grace:k?200:900,hold:1200,cond:el=>Math.abs(el)<10,rearmFrom:prev});
-    if(!c) return; caps.push(c); prev=c.el; beep(1); vib(180); flash();
+    const c=await step({label:`Précision · ${k+1} sur 5`,title:k?"Baisse le bras, puis vise de nouveau l'horizon":"Vise l'horizon",hint:"La ligne d'horizon la plus lointaine, bras tendu.",cond:el=>Math.abs(el)<10,wrong:"Vise l'horizon"});
+    if(!c) return; caps.push(c);
   }
-  run=null; hideStep(); setTimeout(()=>{ beep(3,700); vib([120,80,120,80,300]); },350);
-  const els=caps.map(c=>c.el), res={t:new Date().toISOString(),gps:gps?{...gps}:null,els,mean:+mean(els).toFixed(2),sd:+sd(els).toFixed(2)};
-  store.calib.push(res); persist(); showCalib(); syncSoon();
+  run=null; endMeasure(); finale(); vib([120,80,300]);
+  const els=caps.map(c=>c.el);
+  store.calib.push({t:new Date().toISOString(),gps:gps?{...gps}:null,els,mean:+mean(els).toFixed(2),sd:+sd(els).toFixed(2)}); persist(); showCalib(); syncSoon();
 };
-function showCalib(){ const c=store.calib[store.calib.length-1]; $("#calibRes").textContent=c?`Dernier test : précision ±${fmt(c.sd,2)}°, décalage moyen ${fmt(c.mean,2)}° (5 visées de l'horizon).`:""; }
+function showCalib(){ const c=store.calib[store.calib.length-1]; $("#calibRes").textContent=c?`Dernier test : tes visées varient de ±${fmt(c.sd,2)}°, avec un décalage moyen de ${fmt(c.mean,2)}°.`:""; }
 
-/* ---------- export ---------- */
-function exportText(){ return JSON.stringify({app:"visee.v2",exportedAt:new Date().toISOString(),dev:{ua:navigator.userAgent},recs:store.recs.map(r=>{const o={...r}; delete o._c; delete o.dirty; delete o.photoSent; return o;}),calib:store.calib,tasks:store.tasks}); }
+/* ---------- partage et réglages ---------- */
+function exportText(){ return JSON.stringify({app:"visee.v3",exportedAt:new Date().toISOString(),dev:{ua:navigator.userAgent},recs:store.recs.map(r=>{const o={...r}; delete o._c; delete o.dirty; delete o.photoSent; return o;}),calib:store.calib,tasks:store.tasks}); }
 $("#share").onclick=async()=>{
   const t=exportText();
   try{
@@ -781,13 +901,12 @@ $("#share").onclick=async()=>{
     if(navigator.canShare&&navigator.canShare({files})){ await navigator.share({title:"Visée de la voûte",files}); return; }
     if(navigator.share){ await navigator.share({title:"Visée de la voûte",text:t}); return; }
   }catch(e){ if(e&&e.name==="AbortError") return; }
-  try{ await navigator.clipboard.writeText(t); toast("Résultats copiés : colle-les dans le chat."); }catch(e){ toast("Partage indisponible."); }
+  try{ await navigator.clipboard.writeText(t); toast("Résultats copiés."); }catch(e){ toast("Partage indisponible sur ce navigateur."); }
 };
-$("#copy").onclick=async()=>{ try{ await navigator.clipboard.writeText(exportText()); toast("Copié."); }catch(e){ toast("Copie refusée."); } };
-$("#clear").onclick=()=>{ const b=$("#clear"); if(b.dataset.arm){ store.recs=[]; store.calib=[]; store.tasks=[]; persist(); idbClear(); render(); showCalib(); b.textContent="Tout effacer"; delete b.dataset.arm; } else { b.dataset.arm=1; b.textContent="Confirmer"; setTimeout(()=>{ delete b.dataset.arm; b.textContent="Tout effacer"; },3000); } };
+$("#copy").onclick=async()=>{ try{ await navigator.clipboard.writeText(exportText()); toast("Données copiées."); }catch(e){ toast("Copie refusée par le navigateur."); } };
+$("#clear").onclick=()=>{ const b=$("#clear"); if(b.dataset.arm){ store.recs=[]; store.calib=[]; store.tasks=[]; persist(); idbClear(); render(); showCalib(); b.textContent="Tout effacer"; delete b.dataset.arm; toast("Tout est effacé de ce téléphone."); } else { b.dataset.arm=1; b.textContent="Confirmer l'effacement"; setTimeout(()=>{ delete b.dataset.arm; b.textContent="Tout effacer"; },3000); } };
 
 /* ---------- envoi automatique ---------- */
-// adresse et clé d'envoi : données une fois par un lien d'installation (#setup=...), gardées sur l'appareil
 let CFG={}; try{CFG=JSON.parse(localStorage.getItem("visee.cfg")||"{}")||{}}catch(e){}
 if(location.hash.startsWith("#setup=")){
   try{ const o=JSON.parse(atob(decodeURIComponent(location.hash.slice(7)))); if(o&&o.e&&o.k){ CFG={e:o.e,k:o.k}; localStorage.setItem("visee.cfg",JSON.stringify(CFG)); if(o.p){ store.pseudo=o.p; persist(); } setTimeout(()=>toast("Envoi automatique activé.",3500),300); } }catch(e){}
@@ -796,7 +915,7 @@ if(location.hash.startsWith("#setup=")){
 const ENDPOINT=CFG.e||"", SKEY=CFG.k||"";
 if(!store.device){ store.device=Math.random().toString(36).slice(2,8); persist(); }
 store.delQ=store.delQ||[];
-let syncing=false, syncT=null, lastSyncOk=null;
+let syncing=false, syncT=null;
 function markDirty(r){ r.dirty=true; persist(); syncSoon(); }
 function syncSoon(){ clearTimeout(syncT); syncT=setTimeout(sync,300); }
 async function post(o){ const r=await fetch(ENDPOINT,{method:"POST",body:JSON.stringify({key:SKEY,device:store.device,pseudo:store.pseudo||"",model:store.model||"",...o})}); const j=await r.json(); if(!j.ok) throw new Error(j.err||"refus"); return j; }
@@ -812,29 +931,24 @@ async function sync(){
       r.dirty=false; r.synced=true; if(photo) r.photoSent=true; persist();
     }
     for(const c of store.calib.filter(x=>!x.synced)){ await post({type:"calib",calib:c}); c.synced=true; persist(); }
-    for(const t of (store.tasks||[]).filter(x=>x.dirty)){ const o={...t}; delete o.dirty; await post({type:"rec",rec:{i:t.id,t:t.t,gps:t.gps,sun:t.sun,light:t.light,target:{kind:"mesure : "+t.kind},task:t.kind,data:t.data,ratio:t.ratio}}); t.dirty=false; persist(); }
-    lastSyncOk=true;
-  }catch(e){ lastSyncOk=false; }
+    for(const t of store.tasks.filter(x=>x.dirty)){ await post({type:"rec",rec:{i:t.id,t:t.t,gps:t.gps,sun:t.sun,light:t.light,target:{kind:"mesure : "+t.kind},task:t.kind,data:t.data,ratio:t.ratio}}); t.dirty=false; persist(); }
+  }catch(e){}
   syncing=false; render();
 }
 function syncStatus(){
-  if(!ENDPOINT) return; $("#dWrap").classList.remove("hide");
-  const n=store.recs.filter(x=>x.dirty).length+store.calib.filter(x=>!x.synced).length+store.delQ.length+(store.tasks||[]).filter(x=>x.dirty).length;
-  $("#dD").className="dot "+(n?"bad":"ok"); $("#dTxt").textContent=n?(navigator.onLine?n+" à envoyer":"hors ligne, "+n+" à envoyer"):"tout est enregistré";
+  const n=store.recs.filter(x=>x.dirty).length+store.calib.filter(x=>!x.synced).length+store.delQ.length+store.tasks.filter(x=>x.dirty).length;
+  $("#syncTxt").textContent=!ENDPOINT?"Envoi automatique non activé : tes mesures restent sur ce téléphone.":n?(navigator.onLine?`${n} mesure(s) en cours d'envoi.`:`Hors ligne : ${n} mesure(s) partiront dès que le réseau revient.`):"Toutes tes mesures sont enregistrées en ligne.";
 }
 setInterval(sync,20000); window.addEventListener("online",syncSoon);
 
-/* ---------- participant et appareil ---------- */
+/* ---------- participant ---------- */
 (async()=>{ try{ let m=""; if(navigator.userAgentData&&navigator.userAgentData.getHighEntropyValues){ const h=await navigator.userAgentData.getHighEntropyValues(["model","platform","platformVersion"]); m=[h.model,h.platform,h.platformVersion].filter(Boolean).join(" "); } if(!m){ const x=navigator.userAgent.match(/\(([^)]+)\)/); m=x?x[1]:navigator.userAgent.slice(0,60); } if(m!==store.model){ store.model=m; persist(); } }catch(e){} })();
 function showPseudo(){ $("#pseudoShow").textContent=store.pseudo||"anonyme"; }
-$("#pseudoEdit").onclick=e=>{ e.preventDefault(); store.introSeen=false; $("#intro").classList.remove("hide"); $("#pseudoIn").value=store.pseudo||""; $("#intro").scrollIntoView({behavior:"smooth"}); };
-
-/* ---------- démarrage ---------- */
-if(!store.introSeen){ $("#intro").classList.remove("hide"); $("#pseudoIn").value=store.pseudo||""; }
-$("#introOk").onclick=()=>{ const v=$("#pseudoIn").value.trim().slice(0,40); if(v) store.pseudo=v; store.introSeen=true; persist(); showPseudo(); $("#intro").classList.add("hide"); };
-showPseudo();
+$("#pseudoEdit").onclick=e=>{ e.preventDefault(); $("#pseudoIn").value=store.pseudo||""; openFull("intro"); };
+$("#introOk").onclick=()=>{ const v=$("#pseudoIn").value.trim().slice(0,40); if(v) store.pseudo=v; store.introSeen=true; persist(); showPseudo(); closeFull("intro"); initAudio(); };
 $("#voiceChk").checked=store.voice!==false; $("#voiceChk").onchange=e=>{ store.voice=e.target.checked; persist(); };
-render(); showCalib();
+if(!store.introSeen){ $("#pseudoIn").value=store.pseudo||""; openFull("intro"); }
+showPseudo(); render(); showCalib();
 </script>
 </body>
 </html>
