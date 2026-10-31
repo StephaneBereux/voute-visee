@@ -3,132 +3,144 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0f1b33">
+<meta name="theme-color" content="#ffffff">
 <title>Visée de la voûte</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
 :root{
-  --night:#0f1b33; --dusk:#2c4c86; --haze:#bfd6ee; --gold:#f3b23c; --gold-ink:#3a2700;
-  --paper:#f5f7fa; --ink:#16223a; --mute:#66728a; --line:#dce2ea; --ok:#2e9e6b;
-  --cond:"Barlow Condensed","Arial Narrow",system-ui,sans-serif; --text:"Barlow",system-ui,-apple-system,sans-serif;
+  --blue:#1131b8; --ink:#0d1440; --grey:#7c8299; --line:#e4e6ee; --soft:#f3f4f8; --white:#ffffff; --sun:#ffd23f; --ok:#1131b8;
+  --f:"Jost","Futura","Century Gothic",system-ui,sans-serif;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--night)}
-body{font:17px/1.45 var(--text);color:var(--ink);-webkit-user-select:none;user-select:none}
+html,body{margin:0;background:var(--white)}
+body{font:400 17px/1.5 var(--f);color:var(--ink);-webkit-user-select:none;user-select:none;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit;cursor:pointer}
-button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
 .hide{display:none!important}
-.sky{background:radial-gradient(120% 70% at 50% 100%,#3a5f9e 0%,rgba(58,95,158,0) 60%),linear-gradient(180deg,#0b1428 0%,#13244a 55%,#2c4c86 100%);color:#eef3fa;position:relative;overflow:hidden}
-.stars{position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(1px 1px at 12% 18%,#fff8 50%,transparent 51%),radial-gradient(1px 1px at 33% 9%,#fff6 50%,transparent 51%),radial-gradient(1.4px 1.4px at 58% 22%,#fff9 50%,transparent 51%),radial-gradient(1px 1px at 77% 12%,#fff6 50%,transparent 51%),radial-gradient(1px 1px at 88% 30%,#fff5 50%,transparent 51%),radial-gradient(1.2px 1.2px at 22% 36%,#fff5 50%,transparent 51%),radial-gradient(1px 1px at 66% 40%,#fff4 50%,transparent 51%),radial-gradient(1px 1px at 46% 6%,#fff7 50%,transparent 51%)}
+.wrap{max-width:540px;margin:0 auto;padding:0 22px}
 
 /* ---------- accueil ---------- */
-#hdr{padding:calc(14px + env(safe-area-inset-top)) 18px 46px}
-.top{display:flex;justify-content:space-between;align-items:center;position:relative}
-.brand{font:600 21px/1 var(--cond);letter-spacing:.01em}
-.status{display:flex;gap:10px;font-size:13px;color:#a9bcd8}
-.status i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#6b7a95;margin-right:5px;vertical-align:1px}
-.status i.ok{background:#59d39a}.status i.bad{background:#e9a03b}
-#vaultHdr{margin:14px -6px 0;position:relative}
+.top{display:flex;justify-content:space-between;align-items:center;padding-top:calc(18px + env(safe-area-inset-top));padding-bottom:6px}
+.brand{font-weight:500;font-size:16px;letter-spacing:.02em}
+.status{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--grey)}
+.status i{display:inline-block;width:8px;height:8px;border-radius:50%;border:1.5px solid var(--grey)}
+.status i.ok{background:var(--blue);border-color:var(--blue)}
+.hero{padding-top:8px}
+#vaultHdr{margin:0 -10px}
 #vaultHdr svg{display:block}
-.empty-dome{display:block;width:100%;height:auto}
-#hdrTitle{font:700 30px/1.08 var(--cond);margin:6px 0 2px;position:relative}
-#hdrLine{color:#c9d8ec;font-size:16px;position:relative;max-width:34em}
-#propBtn{position:relative;margin-top:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#dfe8f5;border-radius:999px;padding:5px 12px;font-size:14px}
-.sheet{background:var(--paper);border-radius:26px 26px 0 0;margin-top:-26px;position:relative;padding:22px 18px calc(40px + env(safe-area-inset-bottom));min-height:60vh}
-.wrap{max-width:560px;margin:0 auto}
-.go{display:flex;align-items:center;justify-content:space-between;width:100%;border:0;border-radius:20px;background:var(--gold);color:var(--gold-ink);padding:20px 22px;text-align:left;box-shadow:0 6px 20px rgba(243,178,60,.35)}
-.go b{font:700 27px/1.05 var(--cond);display:block}
-.go span{font-size:14.5px;opacity:.82}
-.go svg{flex:none}
-.switch{display:flex;align-items:center;gap:10px;margin:12px 4px 0;font-size:15px;color:var(--mute)}
-.switch input{appearance:none;width:42px;height:24px;border-radius:12px;background:#c9d1dc;position:relative;margin:0;transition:background .2s}
-.switch input::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s}
-.switch input:checked{background:var(--dusk)}.switch input:checked::after{left:21px}
-h2{font:600 22px/1.2 var(--cond);margin:30px 0 6px;color:var(--ink)}
-.sub{font-size:14.5px;color:var(--mute);margin:-2px 0 8px}
-.row{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:14px 2px}
-.row:last-child{border-bottom:0}
-.row .ic{flex:none;width:44px;height:44px;border-radius:14px;background:#e7edf5;display:flex;align-items:center;justify-content:center}
-.row .tx{flex:1;min-width:0}
-.row .tx b{display:block;font-weight:600;font-size:17px}
-.row .tx span{display:block;font-size:14.5px;color:var(--mute);line-height:1.35}
-.row .st{font-size:13.5px;color:var(--mute);white-space:nowrap}
-.row .st.done{color:var(--ok);font-weight:600}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px;margin-top:6px}
-.stats div span{display:block;font-size:13.5px;color:var(--mute)}
-.stats div b{font:600 25px/1.1 var(--cond)}
-.rec{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+#hdrLine{font-weight:300;font-size:25px;line-height:1.25;margin:4px 0 0;letter-spacing:-.005em}
+#hdrLine b{font-weight:500;color:var(--blue)}
+.link{background:none;border:0;padding:8px 0;color:var(--blue);font-size:15px;font-weight:500}
+.go{display:flex;align-items:center;gap:18px;width:100%;margin-top:22px;border:0;border-radius:999px;background:var(--blue);color:#fff;padding:12px 26px 12px 12px;text-align:left}
+.go .c{flex:none;width:58px;height:58px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center}
+.go b{display:block;font-weight:500;font-size:21px;line-height:1.15}
+.go small{display:block;font-size:14px;opacity:.75;font-weight:300}
+.switch{display:flex;align-items:center;gap:12px;margin:14px 0 0 6px;font-size:15px;color:var(--grey)}
+.switch input{appearance:none;width:40px;height:22px;border-radius:11px;border:1.5px solid var(--grey);position:relative;margin:0;flex:none}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:13px;height:13px;border-radius:50%;background:var(--grey);transition:left .2s,background .2s}
+.switch input:checked{border-color:var(--blue)}.switch input:checked::after{left:20px;background:var(--blue)}
+h2{font-weight:500;font-size:14px;letter-spacing:.06em;color:var(--grey);margin:42px 0 14px}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{position:relative;aspect-ratio:1/1.12;border:1.5px solid var(--line);background:#fff;border-radius:22px;padding:14px 10px 12px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;text-align:center}
+.tile svg{width:54px;height:54px;margin-top:6px}
+.tile b{font-weight:400;font-size:15px;line-height:1.2}
+.tile .st{position:absolute;top:10px;right:10px;width:10px;height:10px;border-radius:50%;border:1.5px solid var(--line)}
+.tile.done{border-color:var(--blue)}.tile.done .st{background:var(--blue);border-color:var(--blue)}
+.order{font-size:14px;color:var(--grey);margin:10px 2px 0;font-weight:300}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:18px 20px}
+.stats span{display:block;font-size:14px;color:var(--grey);font-weight:300}
+.stats b{display:block;font-weight:300;font-size:34px;line-height:1.05;letter-spacing:-.02em;margin-top:4px}
+.stats small{display:block;font-size:14px;color:var(--grey);font-weight:300;margin-top:2px}
+.ruler{margin-top:30px}
+.ruler .q{font-weight:300;font-size:21px;line-height:1.25;margin-bottom:16px}
+.rl{display:grid;grid-template-columns:96px 1fr 50px;align-items:center;gap:12px;height:40px}
+.rl .k{font-size:15px}
+.rl .v{text-align:right;font-weight:500;font-size:17px;color:var(--blue)}
+.rl .v.no{color:var(--grey);font-weight:300;font-size:14px}
+.track{position:relative;height:22px}
+.track i{position:absolute;display:block}
+.track .tk{top:7px;width:1px;height:8px;background:#c9ccd8;transform:translateX(-.5px)}
+.track:before{content:"";position:absolute;left:0;right:0;top:10px;height:2px;background:var(--line)}
+.track .bar{left:0;top:10px;height:2px;background:var(--blue)}
+.track .pt{top:4px;width:14px;height:14px;border-radius:50%;background:var(--blue);transform:translateX(-7px)}
+.track .pt.over{border-radius:0;clip-path:polygon(0 0,100% 50%,0 100%)}
+.scale{display:grid;grid-template-columns:96px 1fr 50px;gap:12px;font-size:12px;color:var(--grey);margin-top:2px}
+.scale div{position:relative;height:16px}
+.scale div span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.note{font-size:14px;color:var(--grey);font-weight:300;margin-top:10px}
+.rec{display:flex;gap:16px;align-items:center;padding:14px 0;border-bottom:1.5px solid var(--soft)}
 .rec:last-child{border-bottom:0}
-.rec img,.rec .ph{width:54px;height:54px;border-radius:12px;object-fit:cover;flex:none;background:#e7edf5}
+.rec .g{flex:none;width:52px;height:52px}
 .rec .tx{flex:1;min-width:0}
-.rec .tx b{font:600 23px/1.1 var(--cond);display:block}
-.rec .tx span{display:block;font-size:14.5px;color:var(--mute)}
-.rec .todo{color:var(--dusk);font-weight:600}
-.rec .x{background:none;border:0;color:#9aa5b7;font-size:14px;padding:8px}
-.empty{color:var(--mute);font-size:15px;padding:6px 0}
-.btn2{border:1px solid var(--line);background:#fff;border-radius:14px;padding:12px 16px;font-weight:500}
+.rec .tx b{display:block;font-weight:300;font-size:27px;line-height:1.1}
+.rec .tx span{display:block;font-size:14.5px;color:var(--grey)}
+.rec .todo{color:var(--blue)!important;font-weight:500}
+.rec img{width:52px;height:52px;border-radius:50%;object-fit:cover;flex:none}
+.rec .x{background:none;border:0;color:var(--grey);font-size:13.5px;padding:8px 0 8px 8px}
+.empty{color:var(--grey);font-weight:300}
+.btn2{border:1.5px solid var(--ink);background:#fff;border-radius:999px;padding:13px 20px;font-weight:500;font-size:16px}
 .btn2.wide{width:100%}
-details.set{margin-top:26px;border-top:1px solid var(--line);padding-top:12px}
-details.set summary{cursor:pointer;color:var(--mute);font-size:15px;list-style:none}
+.btn2.small{padding:9px 14px;font-size:14px;border-color:var(--line)}
+details.set{margin:28px 0 calc(40px + env(safe-area-inset-bottom))}
+details.set summary{list-style:none;cursor:pointer;color:var(--grey);font-size:15px}
 details.set summary::-webkit-details-marker{display:none}
-details.set .in{display:flex;flex-direction:column;gap:12px;margin-top:12px;font-size:15px}
+details.set .in{display:flex;flex-direction:column;gap:14px;margin-top:14px;font-size:15px}
 details.set .acts{display:flex;gap:8px;flex-wrap:wrap}
-details.set a{color:var(--dusk)}
-.vx{margin-top:22px!important;padding-top:0!important;border-top:0!important}
-.vx-h{font:600 20px/1.2 var(--cond)!important}
-.vx-b i{background:linear-gradient(90deg,#9cb9e0,var(--dusk))!important}
-.vx-r{font-size:15px!important;grid-template-columns:108px 1fr 72px!important}
-.vx-v em{font-size:13px!important}
+details.set a{color:var(--blue)}
+.sub{font-size:14.5px;color:var(--grey);font-weight:300}
 
 /* ---------- écrans plein cadre ---------- */
-.full{position:fixed;inset:0;z-index:20;overflow:auto;display:flex;flex-direction:column}
-.full .in{max-width:560px;width:100%;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom));flex:1;display:flex;flex-direction:column}
-.light{background:var(--paper);color:var(--ink)}
-.bar{display:flex;justify-content:space-between;align-items:center;font-size:14.5px}
-.close{background:none;border:0;font-size:15px;padding:8px 0 8px 12px;color:inherit;opacity:.8}
-.big{font:700 36px/1.05 var(--cond);margin:18px 0 8px}
-.hint{font-size:17px;line-height:1.45;color:#c9d8ec;max-width:30em}
-.light .hint{color:var(--mute)}
-#gauge{width:100%;max-width:400px;margin:auto auto 0;display:block}
-#mState{text-align:center;font:600 21px/1.2 var(--cond);min-height:26px;margin:6px 0 4px;color:var(--haze)}
-#mState.ok{color:#7ee0ac}
-.hold{height:8px;border-radius:5px;background:rgba(255,255,255,.12);overflow:hidden;margin:10px auto 0;max-width:400px;width:100%}
-.hold i{display:block;height:100%;width:0;background:var(--gold);border-radius:5px;transition:width .08s linear}
-.foot{text-align:center;color:#8fa3c2;font-size:14px;margin-top:14px}
-.btn{border:0;border-radius:16px;padding:16px 18px;font-weight:600;font-size:17px}
-.btn.gold{background:var(--gold);color:var(--gold-ink)}
-.btn.night{background:var(--night);color:#fff}
-.btn.ghost{background:none;color:var(--mute)}
-.sky .btn.ghost{color:#a9bcd8}
-.stack{display:flex;flex-direction:column;gap:10px;margin-top:auto;padding-top:18px}
-.cand{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-top:10px}
-.cand .tx{flex:1}.cand .tx b{display:block;font-weight:600;font-size:17px}.cand .tx span{font-size:14px;color:var(--mute)}
-.cand .d{font:600 22px/1 var(--cond);white-space:nowrap}
-.seg{display:flex;gap:8px;margin-top:8px}.seg button{flex:1;border:1px solid var(--line);background:#fff;border-radius:12px;padding:11px 6px;font-size:15px}
-.seg button.on{background:var(--night);color:#fff;border-color:var(--night)}
-#map{height:300px;border-radius:16px;margin-top:12px}
-.resnum{font:700 72px/1 var(--cond);margin:22px 0 4px}
-.resnum small{font-size:30px;font-weight:600;margin-left:4px}
-.reslab{font-size:18px;color:#c9d8ec}
-#resVault{margin:18px -8px 0}
-input.txt{font:inherit;width:100%;padding:14px 16px;border-radius:14px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;margin-top:8px}
-input.txt::placeholder{color:#8fa3c2}
-#drawCv{width:100%;aspect-ratio:4/3;display:block;border-radius:18px;margin-top:14px;touch-action:none}
-.steps{margin:14px 0 0;padding:0;list-style:none;counter-reset:s}
-.steps li{counter-increment:s;display:flex;gap:12px;margin:12px 0;font-size:16.5px}
-.steps li::before{content:counter(s);flex:none;width:28px;height:28px;border-radius:50%;background:var(--night);color:#fff;font:600 15px/28px var(--cond);text-align:center}
-.choice{display:flex;flex-direction:column;gap:10px;margin-top:14px}
-.choice button{text-align:left;background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;font-size:17px}
-#cmp{width:100%;height:auto;margin-top:16px;border-radius:18px}
-input[type=range]{width:100%;margin-top:18px;accent-color:var(--dusk)}
+.full{position:fixed;inset:0;z-index:20;overflow:auto;display:flex;flex-direction:column;background:#fff}
+.full .in{max-width:540px;width:100%;margin:0 auto;padding:calc(18px + env(safe-area-inset-top)) 22px calc(26px + env(safe-area-inset-bottom));flex:1;display:flex;flex-direction:column}
+.full.blue{background:var(--blue);color:#fff}
+.bar{display:flex;justify-content:space-between;align-items:center;font-size:14.5px;color:var(--grey)}
+.blue .bar{color:rgba(255,255,255,.75)}
+.close{background:none;border:0;font-size:15px;padding:8px 0 8px 14px;color:inherit}
+.big{font-weight:300;font-size:36px;line-height:1.1;letter-spacing:-.01em;margin:22px 0 10px}
+.hint{font-weight:300;font-size:17.5px;line-height:1.45;color:var(--grey);max-width:30em}
+.blue .hint{color:rgba(255,255,255,.82)}
+#gauge{width:100%;max-width:400px;margin:auto;display:block}
+#mState{text-align:center;font-weight:400;font-size:19px;min-height:26px;margin:6px 0 4px}
+.hold{height:3px;background:rgba(255,255,255,.25);margin:12px auto 0;max-width:400px;width:100%}
+.hold i{display:block;height:100%;width:0;background:#fff;transition:width .08s linear}
+.foot{text-align:center;color:rgba(255,255,255,.7);font-size:14px;font-weight:300;margin-top:16px}
+.btn{border:0;border-radius:999px;padding:17px 20px;font-weight:500;font-size:17px}
+.btn.solid{background:var(--blue);color:#fff}
+.btn.white{background:#fff;color:var(--blue)}
+.btn.ghost{background:none;color:var(--grey)}
+.blue .btn.ghost{color:rgba(255,255,255,.8)}
+.btn:disabled{opacity:.35}
+.stack{display:flex;flex-direction:column;gap:8px;margin-top:auto;padding-top:20px}
+.cand{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:#fff;border:0;border-bottom:1.5px solid var(--soft);padding:16px 2px}
+.cand .dot{flex:none;width:14px;height:14px;border-radius:50%;border:1.5px solid var(--blue)}
+.cand .tx{flex:1}.cand .tx b{display:block;font-weight:500;font-size:17px}.cand .tx span{font-size:14px;color:var(--grey)}
+.cand .d{font-weight:300;font-size:24px;white-space:nowrap}
+.seg{display:flex;gap:8px;margin-top:10px}.seg button{flex:1;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:11px 6px;font-size:15px}
+.seg button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+#map{height:300px;border-radius:22px;margin-top:14px}
+.resnum{font-weight:200;font-size:96px;line-height:1;letter-spacing:-.03em;margin:34px 0 8px}
+.resnum small{font-size:34px;font-weight:300;margin-left:6px;letter-spacing:0}
+.reslab{font-weight:300;font-size:19px;line-height:1.4;color:rgba(255,255,255,.85)}
+.reslab b{font-weight:500;color:#fff}
+#resVault{margin:22px -10px 0}
+input.txt{font:inherit;font-weight:300;width:100%;padding:15px 20px;border-radius:999px;border:1.5px solid rgba(255,255,255,.5);background:transparent;color:#fff;margin-top:10px;font-size:18px}
+input.txt::placeholder{color:rgba(255,255,255,.55)}
+#drawCv{width:100%;aspect-ratio:4/3;display:block;margin-top:16px;touch-action:none;border-radius:22px;background:var(--soft)}
+.steps{margin:18px 0 0;padding:0;list-style:none;counter-reset:s}
+.steps li{counter-increment:s;display:flex;gap:14px;margin:14px 0;font-weight:300;font-size:17px;align-items:flex-start}
+.steps li::before{content:counter(s);flex:none;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--blue);color:var(--blue);font-weight:500;font-size:15px;line-height:27px;text-align:center}
+.choice{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.choice button{text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:16px 22px;font-size:17px}
+#cmp{width:100%;height:auto;margin-top:18px}
+input[type=range]{width:100%;margin-top:20px;accent-color:var(--blue)}
 #fix{position:fixed;inset:0;background:#000;z-index:40;display:flex;align-items:center;justify-content:center;flex-direction:column}
 #fix .disc{width:62vmin;height:62vmin;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center}
 #fix .disc i{width:10px;height:10px;border-radius:50%;background:#e01b1b}
-#fix .cnt{color:#888;font:500 18px var(--cond);margin-top:26px;letter-spacing:.02em}
-#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--night);color:#fff;padding:12px 18px;border-radius:14px;font-size:15.5px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:60;max-width:90vw;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.25)}
-#flash{position:fixed;inset:0;background:var(--gold);opacity:0;pointer-events:none;transition:opacity .35s;z-index:50}
+#fix .cnt{color:#888;font-weight:300;font-size:18px;margin-top:28px}
+#toast{position:fixed;left:50%;top:calc(16px + env(safe-area-inset-top));transform:translateX(-50%);background:var(--ink);color:#fff;padding:13px 20px;border-radius:22px;font-size:15.5px;font-weight:300;opacity:0;transition:opacity .3s;pointer-events:none;z-index:60;max-width:88vw;text-align:center}
+#flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .35s;z-index:50}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -136,94 +148,94 @@ input[type=range]{width:100%;margin-top:18px;accent-color:var(--dusk)}
 <div id="flash"></div><div id="toast" role="status"></div>
 
 <!-- accueil -->
-<header id="hdr" class="sky"><div class="stars"></div><div class="wrap">
-  <div class="top"><div class="brand">Visée de la voûte</div><div class="status"><span><i id="dS"></i>capteurs</span><span><i id="dG"></i><span id="gTxt">GPS</span></span></div></div>
+<header class="wrap top"><span class="brand">Visée de la voûte</span><span class="status"><i id="dS" title="capteurs"></i><i id="dG" title="GPS"></i><span id="gTxt"></span></span></header>
+<section class="wrap hero">
   <div id="vaultHdr"></div>
-  <div id="hdrTitle"></div>
   <div id="hdrLine"></div>
-  <button id="propBtn" class="hide">Voir les vraies proportions</button>
-</div></header>
+  <button id="propBtn" class="link hide">Voir les vraies proportions</button>
+</section>
 
-<main class="sheet"><div class="wrap">
-  <button class="go" id="newBtn"><div><b>Viser un repère</b><span>Une éolienne, un clocher, un château d'eau…</span></div>
-    <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="21" fill="#3a2700" fill-opacity=".12"/><path d="M14 29L29 14M29 14h-9M29 14v9" stroke="#3a2700" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-  <label class="switch"><input type="checkbox" id="photoChk" checked>Commencer par une photo du repère</label>
+<main class="wrap">
+  <button class="go" id="newBtn"><span class="c"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="13" fill="none" stroke="#1131b8" stroke-width="1.6"/><circle cx="15" cy="15" r="3.4" fill="#1131b8"/></svg></span><span><b>Viser un repère</b><small>Éolienne, clocher, château d'eau…</small></span></button>
+  <label class="switch"><input type="checkbox" id="photoChk" checked>Commencer par une photo</label>
 
-  <h2>Trois expériences</h2>
-  <div class="sub">Une minute chacune, pour vérifier ta voûte autrement.</div>
-  <div id="xpList">
-    <button class="row xp" data-xp="dessin"><span class="ic"><svg width="26" height="26" viewBox="0 0 26 26"><path d="M2 22C5 11 9 7 13 7s8 4 11 15" fill="none" stroke="#2c4c86" stroke-width="2.2" stroke-linecap="round"/><path d="M1 23h24" stroke="#9aa5b7"/></svg></span><span class="tx"><b>Dessine ton ciel</b><span>Trace au doigt la forme que tu imagines. À faire en premier.</span></span><span class="st" id="st-dessin">à faire</span></button>
-    <button class="row xp" data-xp="partage"><span class="ic"><svg width="26" height="26" viewBox="0 0 26 26"><path d="M2 23A21 21 0 0 1 24 23" fill="none" stroke="#2c4c86" stroke-width="2"/><path d="M13 23L6 9M13 23V3M13 23l8-13" stroke="#f3b23c" stroke-width="1.8" stroke-linecap="round"/></svg></span><span class="tx"><b>Partage le ciel</b><span>Vise le milieu entre l'horizon et le dessus de ta tête.</span></span><span class="st" id="st-partage">à faire</span></button>
-    <button class="row xp" data-xp="tache"><span class="ic"><svg width="26" height="26" viewBox="0 0 26 26"><circle cx="13" cy="13" r="10" fill="#16223a"/><circle cx="13" cy="13" r="6" fill="#fff"/><circle cx="13" cy="13" r="1.6" fill="#e01b1b"/></svg></span><span class="tx"><b>La tache dans le ciel</b><span>Une illusion d'optique qui révèle la distance du ciel.</span></span><span class="st" id="st-tache">à faire</span></button>
+  <h2>Expériences</h2>
+  <div class="tiles">
+    <button class="tile xp" data-xp="dessin"><span class="st" id="st-dessin"></span><svg viewBox="0 0 54 54"><path d="M5 44C9 22 18 14 27 14s18 8 22 30" fill="none" stroke="#1131b8" stroke-width="2.2" stroke-linecap="round"/><line x1="3" y1="45" x2="51" y2="45" stroke="#0d1440" stroke-width="1.5"/><circle cx="27" cy="45" r="2.6" fill="#0d1440"/></svg><b>Dessiner<br>son ciel</b></button>
+    <button class="tile xp" data-xp="partage"><span class="st" id="st-partage"></span><svg viewBox="0 0 54 54"><path d="M8 45A19 19 0 0 1 46 45" fill="none" stroke="#0d1440" stroke-width="1.5"/><path d="M27 45L14.5 30.5M27 45V26M27 45l12.5-14.5" stroke="#1131b8" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="45" x2="51" y2="45" stroke="#0d1440" stroke-width="1.5"/></svg><b>Partager<br>le ciel</b></button>
+    <button class="tile xp" data-xp="tache"><span class="st" id="st-tache"></span><svg viewBox="0 0 54 54"><circle cx="27" cy="27" r="20" fill="#1131b8"/><circle cx="27" cy="27" r="10" fill="#fff"/><circle cx="27" cy="27" r="2.6" fill="#e01b1b"/></svg><b>La tache<br>dans le ciel</b></button>
   </div>
+  <div class="order">Trois façons de vérifier ta voûte autrement. Commence par le dessin.</div>
 
   <section id="skySec" class="hide">
     <h2>Mon ciel</h2>
     <div class="stats" id="stats"></div>
-    <div id="crossBox"></div>
+    <div class="ruler" id="crossBox"></div>
   </section>
 
   <h2>Mes repères</h2>
-  <div class="sub">La hauteur du ciel que tu as visée au-dessus de chacun.</div>
   <div id="list"></div>
 
-  <div style="margin-top:22px"><button class="btn2 wide" id="share">Partager mes résultats</button></div>
+  <div style="margin-top:28px"><button class="btn2 wide" id="share">Partager mes résultats</button></div>
 
   <details class="set"><summary>Réglages</summary><div class="in">
     <div>Participant : <b id="pseudoShow"></b> · <a href="#" id="pseudoEdit">changer</a></div>
     <label class="switch" style="margin:0"><input type="checkbox" id="voiceChk" checked>Consignes à voix haute</label>
-    <div id="syncTxt" class="sub" style="margin:0"></div>
-    <div class="acts"><button class="btn2" id="calibBtn">Tester ma précision</button><button class="btn2" id="copy">Copier les données</button><button class="btn2" id="clear">Tout effacer</button></div>
-    <div id="calibRes" class="sub" style="margin:0"></div>
+    <div id="syncTxt" class="sub"></div>
+    <div class="acts"><button class="btn2 small" id="calibBtn">Tester ma précision</button><button class="btn2 small" id="copy">Copier les données</button><button class="btn2 small" id="clear">Tout effacer</button></div>
+    <div id="calibRes" class="sub"></div>
   </div></details>
-</div></main>
+</main>
 <input type="file" id="photoIn" accept="image/*" capture="environment" hidden>
 
 <!-- premier lancement -->
-<section id="intro" class="full sky hide"><div class="stars"></div><div class="in" style="position:relative">
+<section id="intro" class="full blue hide"><div class="in">
   <div class="brand">Visée de la voûte</div>
-  <div class="big" style="font-size:44px;margin-top:auto">Ton ciel a une forme.</div>
-  <div class="hint">On croit voir une coupole, mais le ciel paraît plus loin vers l'horizon qu'au-dessus de nos têtes. Mesure le tien : tu pointes le ciel avec ton téléphone, bras tendu, et il fait le reste.</div>
-  <label class="hint" style="margin-top:22px;display:block">Ton prénom<input class="txt" id="pseudoIn" autocomplete="given-name" placeholder="Pour comparer avec tes amis"></label>
-  <div class="stack"><button class="btn gold" id="introOk">Commencer</button></div>
+  <svg viewBox="0 0 340 190" style="width:100%;margin-top:auto" aria-hidden="true"><path d="M20 170A150 150 0 0 1 320 170" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1.5"/><path d="M20 170C70 110 120 96 170 96S270 110 320 170Z" fill="#fff"/><line x1="0" y1="170" x2="340" y2="170" stroke="#fff" stroke-width="1.5"/><circle cx="170" cy="170" r="5" fill="#1131b8" stroke="#fff" stroke-width="1.5"/></svg>
+  <div class="big" style="font-size:46px;margin-top:26px">Ton ciel a une forme.</div>
+  <div class="hint">On croit voir une coupole parfaite. Pourtant, le ciel paraît plus loin vers l'horizon qu'au-dessus de nos têtes. Mesure le tien : pointe le ciel avec ton téléphone, bras tendu.</div>
+  <label class="hint" style="margin-top:24px;display:block">Ton prénom<input class="txt" id="pseudoIn" autocomplete="given-name" placeholder="Pour comparer avec tes amis"></label>
+  <div class="stack"><button class="btn white" id="introOk">Commencer</button></div>
 </div></section>
 
 <!-- visée -->
-<section id="measure" class="full sky hide"><div class="stars"></div><div class="in" style="position:relative">
+<section id="measure" class="full blue hide"><div class="in">
   <div class="bar"><span id="mStep"></span><button class="close" id="mClose">Annuler</button></div>
   <div class="big" id="mTitle"></div>
   <div class="hint" id="mHint"></div>
-  <svg id="gauge" viewBox="0 0 340 300" aria-hidden="true"></svg>
+  <svg id="gauge" viewBox="0 -16 340 316" aria-hidden="true"></svg>
   <div id="mState"></div>
   <div class="hold"><i id="holdBar"></i></div>
-  <div class="foot">Regarde le paysage, pas l'écran. Le téléphone vibre quand c'est enregistré.</div>
+  <div class="foot">Regarde le paysage, pas l'écran. Le téléphone vibre à chaque étape.</div>
 </div></section>
 
-<!-- identification et résultat -->
-<section id="ident" class="full light hide"><div class="in">
-  <div class="bar"><span id="iStep" style="color:var(--mute)"></span><button class="close" id="iClose">Fermer</button></div>
+<!-- identification -->
+<section id="ident" class="full hide"><div class="in">
+  <div class="bar"><span id="iStep"></span><button class="close" id="iClose">Fermer</button></div>
   <div id="iBody"></div>
 </div></section>
-<section id="result" class="full sky hide"><div class="stars"></div><div class="in" style="position:relative">
+
+<!-- résultat -->
+<section id="result" class="full blue hide"><div class="in">
   <div class="bar"><span>Repère enregistré</span><button class="close" id="rClose">Fermer</button></div>
   <div class="resnum" id="resNum"></div>
   <div class="reslab" id="resLab"></div>
   <div id="resVault"></div>
-  <div class="stack"><button class="btn gold" id="rNext">Viser un autre repère</button><button class="btn ghost" id="rDone">Terminer</button></div>
+  <div class="stack"><button class="btn white" id="rNext">Viser un autre repère</button><button class="btn ghost" id="rDone">Terminer</button></div>
 </div></section>
 
 <!-- dessin -->
-<section id="drawModal" class="full sky hide"><div class="stars"></div><div class="in" style="position:relative">
-  <div class="bar"><span>Expérience · dessin</span><button class="close" id="drawCancel">Annuler</button></div>
+<section id="drawModal" class="full hide"><div class="in">
+  <div class="bar"><span>Dessin, expérience 1 sur 3</span><button class="close" id="drawCancel">Annuler</button></div>
   <div class="big">Dessine ton ciel</div>
-  <div class="hint">Tu es le petit personnage. Trace au doigt la forme du ciel au-dessus de toi, d'un bout de l'horizon à l'autre. Il n'y a pas de bonne réponse.</div>
+  <div class="hint">Le point, c'est toi. Trace au doigt la forme du ciel au-dessus de toi, d'un bout de l'horizon à l'autre. Il n'y a pas de bonne réponse.</div>
   <canvas id="drawCv"></canvas>
-  <div class="foot" id="drawMsg" style="min-height:20px"></div>
-  <div class="stack"><button class="btn gold" id="drawOk" disabled>Valider mon dessin</button><button class="btn ghost" id="drawClear">Effacer</button></div>
+  <div class="sub" id="drawMsg" style="min-height:22px;margin-top:10px;text-align:center"></div>
+  <div class="stack"><button class="btn solid" id="drawOk" disabled>Valider mon dessin</button><button class="btn ghost" id="drawClear">Effacer</button></div>
 </div></section>
 
 <!-- tache -->
-<section id="tacheModal" class="full light hide"><div class="in" id="tacheIn"></div></section>
+<section id="tacheModal" class="full hide"><div class="in" id="tacheIn"></div></section>
 <div id="fix" class="hide"><div class="disc"><i></i></div><div class="cnt" id="fixCnt"></div></div>
 
 <!--VAULT--><script>
@@ -293,16 +305,18 @@ const Vault=(()=>{
   }
 
   function stats(M){
-    const out=[{k:"Au-dessus de toi",v:"≈ "+hgt(M.zen)}];
-    if(M.shape!=="plafond"&&M.peak.x>M.far.x*.15&&M.peak.x<M.far.x*.85&&M.peak.y>M.zen*1.1) out.push({k:"Au plus haut",v:hgt(M.peak.y)+" vers "+dist(M.peak.x)});
-    out.push({k:"Au loin",v:hgt(M.far.y)+" à "+dist(M.far.x)});
-    out.push(M.closes?{k:"Rejoint l'horizon",v:"vers "+dist(M.xEnd)}:{k:"Repères",v:String(M.n)});
+    const out=[{k:"Au-dessus de toi",v:"≈ "+hgt(M.zen),big:hgt(M.zen),sub:"à la verticale"}];
+    if(M.shape!=="plafond"&&M.peak.x>M.far.x*.15&&M.peak.x<M.far.x*.85&&M.peak.y>M.zen*1.1) out.push({k:"Au plus haut",v:hgt(M.peak.y)+" vers "+dist(M.peak.x),big:hgt(M.peak.y),sub:"vers "+dist(M.peak.x)});
+    out.push({k:"Au loin",v:hgt(M.far.y)+" à "+dist(M.far.x),big:hgt(M.far.y),sub:"à "+dist(M.far.x)});
+    out.push(M.closes?{k:"Rejoint l'horizon",v:"vers "+dist(M.xEnd),big:dist(M.xEnd),sub:"de toi"}:{k:"Repères",v:String(M.n),big:String(M.n),sub:"visés"});
     return out;
   }
 
   let uid=0;
   const THEMES={
     day:{bg:"#f4f3ef",g0:"#d8d1ba",g1:"#f2efe6",gl:"#8e8a7c",s0:"#173a80",s1:"#477fcb",s2:"#d3e6f7",halo:"#fff3cf",stroke:"#10306c",txt:"#0b0b0b",halo2:"#f4f3ef",mut:"#6b6a65",foot:"#76756f",person:"#0b0b0b",dot:"#fff",cmp:"#0b0b0b"},
+    geo:{flat:true,bg:"none",gl:"#0d1440",fill:"#1131b8",stroke:"#0d1440",txt:"#0d1440",halo2:"#ffffff",mut:"#7c8299",foot:"#7c8299",person:"#0d1440",dot:"#ffffff",dotS:"#1131b8",cmp:"#0d1440",sw:1.6},
+    geoInv:{flat:true,bg:"none",gl:"#ffffff",fill:"#ffffff",fillOp:.92,stroke:"#ffffff",txt:"#ffffff",halo2:"#1131b8",mut:"rgba(255,255,255,.7)",foot:"rgba(255,255,255,.6)",person:"#ffffff",dot:"#1131b8",dotS:"#ffffff",cmp:"#ffffff",sw:1.6},
     night:{bg:"none",g0:"#1b2a4a",g1:"#0e1830",gl:"#4a5d84",s0:"#5d86c4",s1:"#2f4f86",s2:"#1a2d52",halo:"#f3b23c",stroke:"#f3b23c",txt:"#eef3fa",halo2:"#0f1b33",mut:"#93a6c4",foot:"#7f93b3",person:"#eef3fa",dot:"#eef3fa",cmp:"#bfd6ee"}
   };
   function svg(M,opt={}){
@@ -330,21 +344,23 @@ const Vault=(()=>{
  <clipPath id="${id}c"><path d="${pathAll}L${px(M.xEnd)},${yG}L${2*xC-px(M.xEnd)},${yG}Z"/></clipPath>
 </defs>
 ${T.bg==="none"?"":`<rect width="${W}" height="${H}" fill="${T.bg}"/>`}
-<rect x="0" y="${yG}" width="${W}" height="${H-yG}" fill="url(#${id}g)"/>
-<g clip-path="url(#${id}c)"><rect width="${W}" height="${yG}" fill="url(#${id}s)"/><rect width="${W}" height="${yG}" fill="url(#${id}h)"/>`;
+${T.flat?"":`<rect x="0" y="${yG}" width="${W}" height="${H-yG}" fill="url(#${id}g)"/>`}`;
+    if(T.flat){ s+=`<!--LEAD--><path d="${pathAll}L${px(M.xEnd)},${yG}L${2*xC-px(M.xEnd)},${yG}Z" fill="${T.fill}" fill-opacity="${T.fillOp||1}"/>`; }
+    else {
+    s+=`<g clip-path="url(#${id}c)"><rect width="${W}" height="${yG}" fill="url(#${id}s)"/><rect width="${W}" height="${yG}" fill="url(#${id}h)"/>`;
     let seed=11; const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
     for(let k=0;k<60;k++){ const u=rnd()*W, v=yG-rnd()*Math.max(domePx,30)*.95; s+=`<circle cx="${u.toFixed(1)}" cy="${v.toFixed(1)}" r="${(rnd()*.9+.35).toFixed(2)}" fill="#fff" opacity="${(rnd()*.55+.15).toFixed(2)}"/>`; }
-    s+=`</g>`;
+    s+=`</g>`; }
     if(real&&opt.compare!==false){ const r=M.zen*sx; s+=`<path d="M${(xC-r).toFixed(1)},${yG}A${r.toFixed(1)},${r.toFixed(1)} 0 0 1 ${(xC+r).toFixed(1)},${yG}" fill="none" stroke="${T.cmp}" stroke-opacity=".45" stroke-dasharray="3 4"/>`; }
-    const stroke=`stroke="${T.stroke}" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"`;
+    const stroke=`stroke="${T.stroke}" stroke-width="${T.sw||2.6}" fill="none" stroke-linecap="round" stroke-linejoin="round"`;
     for(const d of [solid,mir(solid)]) if(d) s+=`<path d="${d}" ${stroke}/>`;
     for(const d of [dashA,mir(dashA),dashB,mir(dashB)]) if(d) s+=`<path d="${d}" ${stroke} stroke-dasharray="1.5 6" stroke-opacity=".7"/>`;
-    s+=`<line x1="0" x2="${W}" y1="${yG}" y2="${yG}" stroke="${T.gl}" stroke-width="1"/>`;
+    s+=`<line x1="0" x2="${W}" y1="${yG}" y2="${yG}" stroke="${T.gl}" stroke-width="${T.flat?1.6:1}"/>`;
     // repères mesurés, côté droit
     const many=M.pts.length>12;
     for(const p of M.pts){ if(p.x>X) continue; const u=px(p.x), v=Math.max(56,py(Math.min(p.y,top*1.8)));
       if(!many) s+=`<line x1="${u.toFixed(1)}" x2="${u.toFixed(1)}" y1="${yG}" y2="${v.toFixed(1)}" stroke="${T.dot}" stroke-opacity=".35"/>`;
-      s+=`<circle cx="${u.toFixed(1)}" cy="${v.toFixed(1)}" r="${many?2.3:3.2}" fill="${T.dot}" stroke="${opt.theme==="night"?"#0f1b33":"#10306c"}" stroke-width="1" opacity="${many?.75:.95}"/>`; }
+      s+=`<circle cx="${u.toFixed(1)}" cy="${v.toFixed(1)}" r="${many?2.3:3.2}" fill="${T.dot}" stroke="${T.dotS||(opt.theme==="night"?"#0f1b33":"#10306c")}" stroke-width="1" opacity="${many?.75:.95}"/>`; }
     if(O){
       const OC="#e2622b", xo=[]; for(let k=0;k<=N;k++) xo.push(O.xEnd*k/N);
       const sg=(a,b)=>{ const r=xo.filter(x=>x>=a-1e-9&&x<=b+1e-9).map(x=>[px(x),py(O.f(x))]); return r.length>1?"M"+r.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join("L"):""; };
@@ -358,17 +374,28 @@ ${T.bg==="none"?"":`<rect width="${W}" height="${H}" fill="${T.bg}"/>`}
       s+=`<text x="${W-12}" y="21" font-size="11" fill="#6b6a65" text-anchor="end">points bleus à droite, orange à gauche</text>`;
     }
     // observateur
-    s+=`<g transform="translate(${xC},${yG})" fill="${T.person}"><circle cx="0" cy="-17" r="3.6"/><path d="M-3.4,-12.5h6.8l1.2,8h-2.2l-.8,4.5h-3.2l-.8-4.5h-2.2z"/></g>`;
+    s+=T.flat?`<circle cx="${xC}" cy="${yG}" r="6.5" fill="${T.person}"/>`:`<g transform="translate(${xC},${yG})" fill="${T.person}"><circle cx="0" cy="-17" r="3.6"/><path d="M-3.4,-12.5h6.8l1.2,8h-2.2l-.8,4.5h-3.2l-.8-4.5h-2.2z"/></g>`;
     // échelle au sol
     const ticks=[100,200,500,1000,2000,5000,10000,20000,50000].filter(t=>t<X*.97&&t*sx>30);
     const tk=ticks.filter((t,i)=>i===ticks.length-1||px(ticks[i+1])-px(t)>44*K);
     for(const t of tk){ const u=px(t); s+=`<line x1="${u}" x2="${u}" y1="${yG}" y2="${yG+5}" stroke="${T.gl}"/><text x="${u}" y="${yG+8+10*K}" font-size="${11*K}" fill="${T.mut}" text-anchor="middle">${dist(t)}</text>`; }
     // étiquettes sur des rangées fixes, reliées par un fil
-    const lab=(x,y,t,a="middle")=>`<text x="${x.toFixed(1)}" y="${y}" font-size="${13*K}" font-weight="650" fill="${T.txt}" text-anchor="${a}" paint-order="stroke" stroke="${T.halo2}" stroke-width="4" stroke-linejoin="round">${t}</text>`;
+    const lab=(x,y,t,a="middle")=>`<text x="${x.toFixed(1)}" y="${y}" font-size="${13*K}" font-weight="${T.flat?500:650}" fill="${T.txt}" text-anchor="${a}" paint-order="stroke" stroke="${T.halo2}" stroke-width="4" stroke-linejoin="round">${t}</text>`;
     const lead=(x1,y1,x2,y2)=>`<path d="M${x1.toFixed(1)},${y1.toFixed(1)}L${x2.toFixed(1)},${y2.toFixed(1)}" stroke="${T.txt}" stroke-opacity=".45" stroke-width="1"/><circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="2.6" fill="${T.txt}"/>`;
     const rowA=Math.round(18*K), rowB=Math.round(38*K), inside=topY-14>rowA+8;
     const fitX=(x,t)=>{ const w=t.length*13*K*.56; return Math.max(w/2+8,Math.min(W-w/2-8,x)); };
-    if(!O){
+    if(!O&&T.flat){
+      // style géométrique : fils sous l'aplat, étiquettes courtes, points posés sur le bord
+      const pin=(x,y)=>`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${3.4}" fill="${T.txt}"/>`;
+      const wire=(x1,y1,x2,y2)=>`<path d="M${x1.toFixed(1)},${y1.toFixed(1)}L${x2.toFixed(1)},${y2.toFixed(1)}" stroke="${T.txt}" stroke-opacity=".5" stroke-width="1"/>`;
+      let under="", over="";
+      const zt=hgt(M.zen); over+=pin(xC,topY)+lab(xC,topY-14,zt);
+      const fu=px(M.far.x), fv=py(M.far.y), ft=hgt(M.far.y)+" à "+dist(M.far.x), fx=fitX(Math.max(fu,xC+130),ft);
+      under+=wire(fx,rowB+6,fu,fv); over+=pin(fu,fv)+lab(fx,rowB,ft);
+      if(M.shape!=="plafond"&&M.peak.x>M.far.x*.15&&M.peak.x<M.far.x*.85&&M.peak.y>M.zen*1.1){ const u=2*xC-px(M.peak.x), v=py(M.peak.y), pt=hgt(M.peak.y)+" au plus haut", lx=fitX(Math.min(u,xC-130),pt); under+=wire(lx,rowB+6,u,v); over+=pin(u,v)+lab(lx,rowB,pt); }
+      s=s.replace("<!--LEAD-->",under)+over;
+    }
+    else if(!O){
     s+=lead(xC,inside?topY-12:rowA+6,xC,topY)+lab(xC,inside?topY-16:rowA,"≈ "+hgt(M.zen)+" au-dessus de toi");
     const fu=px(M.far.x), fv=py(M.far.y), ft=hgt(M.far.y)+" à "+dist(M.far.x), fx=fitX(Math.max(fu,xC+150),ft);
     s+=lead(fx,rowB+5,fu,fv)+lab(fx,rowB,ft);
@@ -377,7 +404,7 @@ ${T.bg==="none"?"":`<rect width="${W}" height="${H}" fill="${T.bg}"/>`}
     if(M.closes&&!O){ const u=2*xC-px(M.xEnd); s+=`<text x="${Math.max(8,u).toFixed(1)}" y="${yG+8+10*K}" font-size="${11*K}" fill="${T.mut}" text-anchor="${u<60?"start":"middle"}">horizon ≈ ${dist(M.xEnd)}</text>`; }
     const ratio=sy/sx, f1=real?"vraies proportions · tirets : coupole parfaite de même hauteur":ratio>1.5?"hauteurs agrandies ×"+Math.round(ratio)+" pour voir la forme":ratio<.67?"hauteurs réduites pour tenir dans le cadre":"proportions proches du réel";
     if(opt.foot!==false) s+=`<text x="8" y="${H-8}" font-size="10.5" fill="${T.foot}">${O?M.n+" + "+O.n+" repères":M.n+" repère"+(M.n>1?"s":"")} · pointillés : extrapolé</text><text x="${W-8}" y="${H-8}" font-size="10.5" fill="${T.foot}" text-anchor="end">${f1}</text>`;
-    return s+`</svg>`;
+    return s.replace("<!--LEAD-->","")+`</svg>`;
   }
 
   // carte complète : titre, dessin, tuiles, bascule de relief
@@ -447,7 +474,7 @@ ${T.bg==="none"?"":`<rect width="${W}" height="${H}" fill="${T.bg}"/>`}
 </script><!--/VAULT-->
 <script>
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const D=Math.PI/180, R_E=6371000, EYE=1.5, LSK="visee.v2", FONT="'Barlow',system-ui,sans-serif";
+const D=Math.PI/180, R_E=6371000, EYE=1.5, LSK="visee.v2", FONT="'Jost',system-ui,sans-serif";
 let store={recs:[],calib:[],tasks:[],introSeen:false};
 try{const s=JSON.parse(localStorage.getItem(LSK)||"null"); if(s&&Array.isArray(s.recs)) store={...store,...s};}catch(e){}
 store.tasks=store.tasks||[]; store.calib=store.calib||[];
@@ -485,8 +512,8 @@ let permAsked=false;
 function askPerm(){ if(permAsked) return; permAsked=true; try{ if(typeof DeviceOrientationEvent!=="undefined"&&DeviceOrientationEvent.requestPermission) DeviceOrientationEvent.requestPermission().catch(()=>{}); }catch(e){} }
 function statusTick(){
   const alive=performance.now()-lastEv<1000;
-  $("#dS").className=alive?"ok":"bad";
-  $("#dG").className=gps?"ok":"bad"; $("#gTxt").textContent=gps?"GPS ±"+Math.round(gps.acc)+" m":"GPS";
+  $("#dS").className=alive?"ok":"";
+  $("#dG").className=gps?"ok":""; $("#gTxt").textContent=gps?"±"+Math.round(gps.acc)+" m":"";
   if(gaugeOn){ const l=buf[buf.length-1]; if(l) drawGauge(l.el); }
   requestAnimationFrame(statusTick);
 }
@@ -562,25 +589,22 @@ let gaugeOn=false, gMarks=[], gCount=null, gHold=0;
 const GX=48, GY=262, GR=232;
 function gpt(a,r){ return [GX+r*Math.cos(a*D), GY-r*Math.sin(a*D)]; }
 function drawGauge(el){
-  const e=Math.max(-12,Math.min(98,el==null?0:el));
-  let s=`<defs><radialGradient id="gg" cx="${GX}" cy="${GY}" r="${GR}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f3b23c" stop-opacity=".16"/><stop offset="1" stop-color="#f3b23c" stop-opacity="0"/></radialGradient></defs>`;
+  const e=Math.max(-12,Math.min(98,el==null?0:el)), W="#ffffff";
   const [ax,ay]=gpt(0,GR), [bx,by]=gpt(90,GR);
-  s+=`<path d="M${GX},${GY}L${ax},${ay}A${GR},${GR} 0 0 0 ${bx},${by}Z" fill="rgba(255,255,255,.04)"/>`;
-  s+=`<path d="M${ax},${ay}A${GR},${GR} 0 0 0 ${bx},${by}" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.5"/>`;
-  s+=`<line x1="${GX-30}" y1="${GY}" x2="${ax+8}" y2="${GY}" stroke="rgba(255,255,255,.35)"/>`;
-  for(let a=0;a<=90;a+=5){ const L=a%45===0?16:a%15===0?11:6, [x1,y1]=gpt(a,GR), [x2,y2]=gpt(a,GR-L); s+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="rgba(255,255,255,${a%45===0?.8:.4})" stroke-width="${a%45===0?2:1.2}"/>`; }
-  for(const a of [0,45,90]){ const [x,y]=gpt(a,GR+16); s+=`<text x="${x.toFixed(1)}" y="${(y+5).toFixed(1)}" font-size="13" fill="#a9bcd8" text-anchor="middle" font-family="${FONT}">${a}°</text>`; }
-  s+=`<text x="${(ax-4)}" y="${GY+22}" font-size="12" fill="#8fa3c2" text-anchor="end" font-family="${FONT}">horizon</text><text x="${GX+30}" y="${by+6}" font-size="12" fill="#8fa3c2" font-family="${FONT}">au-dessus de toi</text>`;
-  for(const m of gMarks){ const [x,y]=gpt(m,GR); s+=`<line x1="${GX}" y1="${GY}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#f3b23c" stroke-opacity=".35" stroke-dasharray="3 5"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6" fill="#f3b23c"/>`; }
-  const [nx,ny]=gpt(e,GR-4);
-  s+=`<path d="M${GX},${GY}L${gpt(e-9,GR)[0].toFixed(1)},${gpt(e-9,GR)[1].toFixed(1)}A${GR},${GR} 0 0 0 ${gpt(e+9,GR)[0].toFixed(1)},${gpt(e+9,GR)[1].toFixed(1)}Z" fill="url(#gg)"/>`;
-  s+=`<line x1="${GX}" y1="${GY}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="#f3b23c" stroke-width="3.5" stroke-linecap="round"/><circle cx="${GX}" cy="${GY}" r="7" fill="#f3b23c"/><circle cx="${nx.toFixed(1)}" cy="${ny.toFixed(1)}" r="5" fill="#fff"/>`;
-  if(gCount!=null) s+=`<text x="212" y="226" font-size="132" font-weight="700" fill="#f3b23c" text-anchor="middle" font-family="'Barlow Condensed',${FONT}">${gCount}</text>`;
-  else s+=`<text x="196" y="214" font-size="64" font-weight="700" fill="#fff" text-anchor="middle" font-family="'Barlow Condensed',${FONT}">${fmt(el==null?0:el,1)}°</text>`;
+  let s=`<path d="M${ax},${ay}A${GR},${GR} 0 0 0 ${bx},${by}" fill="none" stroke="${W}" stroke-opacity=".9" stroke-width="1.5"/>`;
+  s+=`<path d="M${gpt(0,GR*.62)[0]},${gpt(0,GR*.62)[1]}A${GR*.62},${GR*.62} 0 0 0 ${gpt(90,GR*.62)[0]},${gpt(90,GR*.62)[1]}" fill="none" stroke="${W}" stroke-opacity=".25" stroke-width="1"/>`;
+  s+=`<line x1="${GX}" y1="${GY}" x2="${ax+10}" y2="${GY}" stroke="${W}" stroke-width="1.5"/><line x1="${GX}" y1="${GY}" x2="${GX}" y2="${by-10}" stroke="${W}" stroke-opacity=".4" stroke-width="1"/>`;
+  for(let a=0;a<=90;a+=5){ const L=a%45===0?14:a%15===0?9:5, [x1,y1]=gpt(a,GR), [x2,y2]=gpt(a,GR+L); s+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${W}" stroke-opacity="${a%45===0?1:.55}" stroke-width="${a%45===0?1.8:1}"/>`; }
+  s+=`<text x="${ax+2}" y="${GY+24}" font-size="13" fill="${W}" fill-opacity=".7" text-anchor="end" font-family="${FONT}">horizon</text><text x="${GX+12}" y="${by-14}" font-size="13" fill="${W}" fill-opacity=".7" font-family="${FONT}">au-dessus de toi</text><text x="${gpt(45,GR+28)[0]}" y="${gpt(45,GR+28)[1]}" font-size="13" fill="${W}" fill-opacity=".7" text-anchor="middle" font-family="${FONT}">45°</text>`;
+  for(const m of gMarks){ const [x,y]=gpt(m,GR); s+=`<line x1="${GX}" y1="${GY}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#ffd23f" stroke-width="1.2"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="7" fill="#ffd23f"/>`; }
+  const [nx,ny]=gpt(e,GR);
+  s+=`<line x1="${GX}" y1="${GY}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="${W}" stroke-width="2.2"/><circle cx="${GX}" cy="${GY}" r="6" fill="${W}"/><circle cx="${nx.toFixed(1)}" cy="${ny.toFixed(1)}" r="11" fill="none" stroke="${W}" stroke-width="2"/><circle cx="${nx.toFixed(1)}" cy="${ny.toFixed(1)}" r="3.5" fill="${W}"/>`;
+  if(gCount!=null){ s+=`<circle cx="200" cy="168" r="62" fill="none" stroke="${W}" stroke-opacity=".35" stroke-width="1.5"/><text x="200" y="198" font-size="88" font-weight="200" fill="${W}" text-anchor="middle" font-family="${FONT}">${gCount}</text>`; }
+  else s+=`<text x="200" y="196" font-size="62" font-weight="300" fill="${W}" text-anchor="middle" font-family="${FONT}" letter-spacing="-1">${fmt(el==null?0:el,1)}°</text>`;
   $("#gauge").innerHTML=s;
 }
 function setHold(p){ gHold=p; $("#holdBar").style.width=Math.round(Math.max(0,Math.min(1,p))*100)+"%"; }
-function setState(t,ok){ const e=$("#mState"); e.textContent=t||""; e.classList.toggle("ok",!!ok); }
+function setState(t,ok){ const e=$("#mState"); e.textContent=(ok?"✓ ":"")+(t||""); }
 let run=null;
 const live=()=>run&&!run.cancel;
 async function waitFor(ms){ const t=performance.now(); while(performance.now()-t<ms){ if(!live()) return false; await sleep(50); } return live(); }
@@ -628,10 +652,10 @@ async function newLandmark(){
   if($("#photoChk").checked){ pp=photoPromise(); $("#photoIn").click(); }
   if(pp){ const ph=await pp; if(!live()) return; if(ph){ rec.photo={...ph.stats,kb:Math.round(ph.blob.size/1024)}; await idbPut(rec.i,ph.blob); delete thumbs[rec.i]; } initAudio(); }
   startMeasure();
-  const base=await step({label:"Repère · étape 1 sur 2",title:"Vise le pied du repère",hint:"Bras tendu, le bord du haut du téléphone pointé vers le bas du repère, là où il touche le sol.",cond:el=>Math.abs(el)<25,wrong:"Baisse le téléphone vers le pied du repère"});
+  const base=await step({label:"Étape 1 sur 2",title:"Vise le pied du repère",hint:"Bras tendu, le bord du haut du téléphone pointé vers le bas du repère, là où il touche le sol.",cond:el=>Math.abs(el)<25,wrong:"Baisse le téléphone vers le pied du repère"});
   if(!base) return;
   rec.base=base; rec.gps=gps?{...gps}:null; rec.candsP=findCands(rec);
-  const sky=await step({label:"Repère · étape 2 sur 2",title:"Monte vers le ciel juste au-dessus",hint:"Lève le bras et vise le point du ciel qui est exactement à la verticale du repère.",cond:el=>el>base.el+3,wrong:"Plus haut, dans le ciel au-dessus du repère"});
+  const sky=await step({label:"Étape 2 sur 2",title:"Monte vers le ciel juste au-dessus",hint:"Lève le bras et vise le point du ciel qui est exactement à la verticale du repère.",cond:el=>el>base.el+3,wrong:"Plus haut, dans le ciel au-dessus du repère"});
   if(!sky) return;
   rec.sky=sky; rec.t=new Date().toISOString(); if(!rec.gps&&gps) rec.gps={...gps};
   if(rec.gps){ rec.sun=sunPos(new Date(),rec.gps.lat,rec.gps.lon); rec.light=lightOf(rec.sun.el); }
@@ -675,11 +699,11 @@ let idRec=null, map=null, mapLayers=null, pickMarker=null;
 async function openId(rec,candsP){
   idRec=rec; openFull("ident"); $("#iStep").textContent="Ciel visé à "+fmt(rec.sky.el)+"°";
   const cloudy=rec.photo&&rec.photo.cover!=null&&rec.photo.cover>.15;
-  $("#iBody").innerHTML=`<div class="big" style="margin-top:10px">Quel repère as-tu visé ?</div>
+  $("#iBody").innerHTML=`<div class="big">Quel repère as-tu visé ?</div>
     <div class="hint">Voici ce qui se trouve dans la direction de ta visée.</div>
     ${cloudy?`<div style="margin-top:16px;font-weight:600">Il y avait des nuages. Tu as visé :</div><div class="seg" id="aimRow"><button data-aim="nuage" class="${rec.aim==="nuage"?"on":""}">un nuage</button><button data-aim="voute" class="${rec.aim==="voute"?"on":""}">le ciel derrière</button></div>`:""}
     <div id="cands" style="margin-top:6px"></div><div id="map" class="hide"></div><div id="mapPick"></div>
-    <div class="stack"><button class="btn2 wide" id="mapBtn">Il n'est pas dans la liste : le placer sur la carte</button><button class="btn ghost" id="laterBtn">Je l'identifierai plus tard</button></div>`;
+    <div class="stack"><button class="btn2 wide" id="mapBtn">Pas dans la liste ? Le placer sur la carte</button><button class="btn ghost" id="laterBtn">Je l'identifierai plus tard</button></div>`;
   $$("#aimRow button").forEach(b=>b.onclick=()=>{ rec.aim=b.dataset.aim; markDirty(rec); $$("#aimRow button").forEach(x=>x.classList.toggle("on",x===b)); });
   $("#laterBtn").onclick=()=>{ delete rec._c; persist(); idRec=null; closeFull("ident"); render(); };
   $("#mapBtn").onclick=()=>openMap(rec);
@@ -690,7 +714,7 @@ async function openId(rec,candsP){
   rec._c=cands;
   if(cands==null){ box.innerHTML=`<p class="hint">Pas de réseau pour chercher les repères. Place-le sur la carte, ou plus tard.</p>`; return; }
   if(!cands.length){ box.innerHTML=`<p class="hint">Aucun repère connu dans cette direction. Place-le sur la carte.</p>`; return; }
-  box.innerHTML=cands.slice(0,5).map((c,k)=>`<button class="cand" data-k="${k}"><span class="tx"><b>${tLabel(c)}</b><span>${Math.abs(c.db)<3?"pile dans ta direction":fmt(Math.abs(c.db),0)+"° "+(c.db>0?"à droite":"à gauche")}</span></span><span class="d">${km(c.d)}</span></button>`).join("");
+  box.innerHTML=cands.slice(0,5).map((c,k)=>`<button class="cand" data-k="${k}"><span class="dot"></span><span class="tx"><b>${tLabel(c)}</b><span>${Math.abs(c.db)<3?"pile dans ta direction":fmt(Math.abs(c.db),0)+"° "+(c.db>0?"à droite":"à gauche")}</span></span><span class="d">${km(c.d)}</span></button>`).join("");
   $$("#cands .cand").forEach(b=>b.onclick=()=>choose(rec,cands[+b.dataset.k]));
 }
 $("#iClose").onclick=()=>{ idRec=null; closeFull("ident"); render(); };
@@ -702,8 +726,8 @@ function choose(rec,c){
 }
 function showResult(rec){
   $("#resNum").innerHTML=`${Math.round(rec.y)}<small>m</small>`;
-  $("#resLab").innerHTML=`Hauteur où tu places le ciel, à la verticale de : <b style="color:#fff">${tLabel(rec.target)}</b>, à ${km(rec.target.d)} de toi.`;
-  const M=vaultModel(); $("#resVault").innerHTML=M&&M.ok?Vault.svg(M,{theme:"night",font:FONT,foot:false,fs:1.75})+`<p class="hint" style="margin:10px 8px 0">${M.title} : ${M.line}</p>`:emptyDome()+`<p class="hint" style="margin:10px 8px 0">Encore ${Math.max(1,3-pointsFor().length)} repère(s), proches et lointains, pour dessiner ta voûte.</p>`;
+  $("#resLab").innerHTML=`C'est la hauteur où tu places le ciel, à la verticale de <b>${tLabel(rec.target)}</b>, à ${km(rec.target.d)} de toi.`;
+  const M=vaultModel(); $("#resVault").innerHTML=M&&M.ok?Vault.svg(M,{theme:"geoInv",font:FONT,foot:false,fs:1.7})+`<p class="hint" style="margin:12px 10px 0">${M.title}, ${M.line}</p>`:emptyDome(true)+`<p class="hint" style="margin:12px 10px 0">${encore()}, proches et lointains, pour dessiner ta voûte.</p>`;
   openFull("result"); finale(); vib([80,60,80]);
 }
 $("#rClose").onclick=()=>closeFull("result");
@@ -722,17 +746,17 @@ async function openMap(rec){
   mapLayers=L.layerGroup().addTo(map); pickMarker=null;
   map.on("click",e=>pickAt(rec,e.latlng.lat,e.latlng.lng));
   const {lat,lon}=rec.gps, b=rec.base.az;
-  L.circleMarker([lat,lon],{radius:7,color:"#2c4c86",fillOpacity:1}).addTo(mapLayers);
-  L.polyline([[lat,lon],dest(lat,lon,b,12000)],{color:"#2c4c86",weight:2,dashArray:"6 6"}).addTo(mapLayers);
-  L.polygon([[lat,lon],dest(lat,lon,b-15,12000),dest(lat,lon,b+15,12000)],{color:"#2c4c86",weight:0,fillOpacity:.08}).addTo(mapLayers);
-  (rec._c||[]).forEach(c=>L.circleMarker([c.lat,c.lon],{radius:7,color:"#c98a14",fillColor:"#f3b23c",fillOpacity:1}).bindTooltip(tLabel(c)).on("click",ev=>{ L.DomEvent.stopPropagation(ev); choose(rec,c); }).addTo(mapLayers));
+  L.circleMarker([lat,lon],{radius:7,color:"#0d1440",fillOpacity:1}).addTo(mapLayers);
+  L.polyline([[lat,lon],dest(lat,lon,b,12000)],{color:"#1131b8",weight:2,dashArray:"6 6"}).addTo(mapLayers);
+  L.polygon([[lat,lon],dest(lat,lon,b-15,12000),dest(lat,lon,b+15,12000)],{color:"#1131b8",weight:0,fillOpacity:.08}).addTo(mapLayers);
+  (rec._c||[]).forEach(c=>L.circleMarker([c.lat,c.lon],{radius:7,color:"#ffffff",weight:2,fillColor:"#1131b8",fillOpacity:1}).bindTooltip(tLabel(c)).on("click",ev=>{ L.DomEvent.stopPropagation(ev); choose(rec,c); }).addTo(mapLayers));
   setTimeout(()=>{ map.invalidateSize(); map.fitBounds(L.latLngBounds([[lat,lon],dest(lat,lon,b,4000)]).pad(.4)); el.scrollIntoView({behavior:"smooth",block:"center"}); },60);
   $("#mapPick").innerHTML=`<p class="hint" style="margin-top:8px">Touche la carte à l'endroit du repère.</p>`;
 }
 function pickAt(rec,la,lo){
   const {d,brg}=distBrg(rec.gps.lat,rec.gps.lon,la,lo);
   if(pickMarker) mapLayers.removeLayer(pickMarker); pickMarker=L.marker([la,lo]).addTo(mapLayers);
-  $("#mapPick").innerHTML=`<button class="btn night" style="width:100%;margin-top:10px" id="pickOk">Valider ce point, à ${km(d)}</button>`;
+  $("#mapPick").innerHTML=`<button class="btn solid" style="width:100%;margin-top:12px" id="pickOk">Valider ce point, à ${km(d)}</button>`;
   $("#pickOk").onclick=()=>choose(rec,{kind:"point choisi",name:"",lat:la,lon:lo,d:Math.round(d),db:+dAng(brg,rec.base.az).toFixed(1),id:"carte"});
 }
 
@@ -742,23 +766,27 @@ const lastTask=k=>{ const a=store.tasks.filter(t=>t.kind===k); return a[a.length
 const pointsFor=()=>store.recs.filter(r=>r.target&&r.y>0).map(r=>({x:r.target.d,y:r.y}));
 const vaultModel=()=>Vault.model(pointsFor());
 let realProp=false;
-function emptyDome(){ return `<svg class="empty-dome" viewBox="0 0 680 230" aria-hidden="true"><path d="M30 196C110 70 230 40 340 40S570 70 650 196" fill="none" stroke="#f3b23c" stroke-width="2.4" stroke-dasharray="2 9" stroke-linecap="round" opacity=".85"/><rect x="0" y="196" width="680" height="34" fill="#0e1830"/><line x1="0" x2="680" y1="196" y2="196" stroke="#4a5d84"/><g transform="translate(340,196)" fill="#eef3fa"><circle cx="0" cy="-17" r="3.6"/><path d="M-3.4,-12.5h6.8l1.2,8h-2.2l-.8,4.5h-3.2l-.8-4.5h-2.2z"/></g></svg>`; }
+function emptyDome(inv){ const c=inv?"#ffffff":"#0d1440", f=inv?"#1131b8":"#ffffff"; return `<svg viewBox="0 0 680 250" style="display:block;width:100%;height:auto" aria-hidden="true"><path d="M60 214A280 280 0 0 1 620 214" fill="none" stroke="${c}" stroke-opacity=".35" stroke-width="1.6" stroke-dasharray="2 8" stroke-linecap="round"/><path d="M60 214A280 175 0 0 1 620 214" fill="none" stroke="${c}" stroke-opacity=".6" stroke-width="1.6" stroke-dasharray="2 8" stroke-linecap="round"/><line x1="0" x2="680" y1="214" y2="214" stroke="${c}" stroke-width="1.6"/><circle cx="340" cy="214" r="6.5" fill="${c}"/></svg>`; }
+function ratioSvg(r){ // une ligne graduée ×1 à ×16, échelle logarithmique
+  const X=v=>Math.log(Math.max(1,Math.min(v,16)))/Math.log(16)*100;
+  let t=[1,2,4,8,16].map(v=>`<i class="tk" style="left:${X(v)}%"></i>`).join("");
+  if(r!=null) t+=`<i class="bar" style="width:${X(r)}%"></i><i class="pt${r>16?" over":""}" style="left:${X(r)}%"></i>`;
+  return `<div class="track">${t}</div>`;
+}
+function encore(){ const n=Math.max(1,3-pointsFor().length); return n>1?`Encore ${n} repères`:"Encore un repère"; }
 function renderVault(){
   const M=vaultModel(), ok=M&&M.ok;
-  $("#vaultHdr").innerHTML=ok?Vault.svg(M,{theme:"night",font:FONT,real:realProp,foot:false,fs:1.75}):emptyDome();
+  $("#vaultHdr").innerHTML=ok?Vault.svg(M,{theme:"geo",font:FONT,real:realProp,foot:false,fs:1.6}):emptyDome();
   $("#propBtn").classList.toggle("hide",!ok); $("#propBtn").textContent=realProp?"Revenir à la forme":"Voir les vraies proportions";
-  $("#hdrTitle").textContent=ok?M.title:"Ton ciel se dessinera ici";
-  $("#hdrLine").textContent=ok?M.line:(store.recs.length?`Encore ${Math.max(1,3-pointsFor().length)} repère(s) identifiés, proches et lointains.`:"Vise trois repères à des distances différentes, proches et lointains.");
-  const tp=lastTask("partage"), td=lastTask("dessin"), tt=lastTask("tache"), rm=Vault.ratioOfModel(M);
+  const r=Vault.ratioOfModel(M);
+  $("#hdrLine").innerHTML=ok?(r?`Ton ciel est <b>${fmt(r,r<10?1:0)} fois plus loin</b> à l'horizon qu'au-dessus de toi.`:`${M.title}, ${M.line}`):(store.recs.length?`${encore()} à identifier, proches et lointains, pour dessiner <b>ta voûte</b>.`:`Vise trois repères, proches et lointains : <b>ta voûte</b> se dessinera ici.`);
+  const tp=lastTask("partage"), td=lastTask("dessin"), tt=lastTask("tache");
   const anyX=ok||tp||td||tt;
   $("#skySec").classList.toggle("hide",!anyX);
-  $("#stats").innerHTML=ok?Vault.stats(M).map(t=>`<div><span>${t.k}</span><b>${t.v}</b></div>`).join(""):"";
-  $("#crossBox").innerHTML=Vault.crossHtml([
-    {k:"Repères",r:rm,note:ok?"∞":"3 repères"},
-    {k:"Ciel partagé",r:tp?tp.ratio:null},
-    {k:"Dessin",r:td?td.ratio:null},
-    {k:"Tache",r:tt?tt.ratio:null,note:tt&&tt.ratio==null?"pas vue":"à faire"}]);
-  for(const k of ["partage","dessin","tache"]){ const t=lastTask(k), e=$("#st-"+k); e.textContent=t?"✓ faite":"à faire"; e.className="st"+(t?" done":""); }
+  $("#stats").innerHTML=ok?Vault.stats(M).map(t=>`<div><span>${t.k}</span><b>${t.big||t.v}</b>${t.sub?`<small>${t.sub}</small>`:""}</div>`).join(""):"";
+  const rows=[["Repères",r,ok?"∞":"à venir"],["Dessin",td?td.ratio:null,"à faire"],["Partage",tp?tp.ratio:null,"à faire"],["Tache",tt?tt.ratio:null,tt&&tt.ratio==null?"pas vue":"à faire"]];
+  $("#crossBox").innerHTML=`<div class="q">Combien de fois plus loin à l'horizon qu'au-dessus de toi, selon chaque mesure</div>`+rows.map(([k,v,no])=>`<div class="rl"><span class="k">${k}</span>${ratioSvg(v)}<span class="v${v==null?" no":""}">${v!=null?"×"+fmt(v,v<10?1:0):no}</span></div>`).join("")+`<div class="scale"><span></span><div>${[1,2,4,8,16].map(v=>`<span style="left:${Math.log(v)/Math.log(16)*100}%">×${v}</span>`).join("")}</div><span></span></div><div class="note">×1, c'est une coupole parfaite. Plus le chiffre est grand, plus ton ciel est aplati.</div>`;
+  for(const k of ["partage","dessin","tache"]){ const t=lastTask(k); $(`.tile[data-xp="${k}"]`).classList.toggle("done",!!t); }
 }
 $("#propBtn").onclick=()=>{ realProp=!realProp; renderVault(); };
 
@@ -774,9 +802,9 @@ $$(".xp").forEach(b=>b.onclick=()=>{ const k=b.dataset.xp; if(k==="partage") par
 async function partage(){
   if(run) return; askPerm(); initAudio(); wake();
   run={cancel:false}; startMeasure();
-  const a=await step({label:"Partage le ciel · 1 sur 3",title:"Vise le milieu du ciel",hint:"Le point à mi-chemin entre l'horizon et le point juste au-dessus de ta tête.",cond:el=>el>4&&el<86,wrong:"Entre l'horizon et le dessus de ta tête"}); if(!a) return;
-  const b=await step({label:"Partage le ciel · 2 sur 3",title:"Coupe le bas en deux",hint:"Le milieu entre l'horizon et le point que tu viens de viser.",cond:el=>el>1&&el<a.el-2,wrong:"Plus bas, sous le point du milieu"}); if(!b) return;
-  const c=await step({label:"Partage le ciel · 3 sur 3",title:"Coupe le haut en deux",hint:"Le milieu entre le point du milieu et le dessus de ta tête.",cond:el=>el>a.el+2&&el<89.5,wrong:"Plus haut, au-dessus du point du milieu"}); if(!c) return;
+  const a=await step({label:"Partage, étape 1 sur 3",title:"Vise le milieu du ciel",hint:"Le point à mi-chemin entre l'horizon et le point juste au-dessus de ta tête.",cond:el=>el>4&&el<86,wrong:"Entre l'horizon et le dessus de ta tête"}); if(!a) return;
+  const b=await step({label:"Partage, étape 2 sur 3",title:"Coupe le bas en deux",hint:"Le milieu entre l'horizon et le point que tu viens de viser.",cond:el=>el>1&&el<a.el-2,wrong:"Plus bas, sous le point du milieu"}); if(!b) return;
+  const c=await step({label:"Partage, étape 3 sur 3",title:"Coupe le haut en deux",hint:"Le milieu entre le point du milieu et le dessus de ta tête.",cond:el=>el>a.el+2&&el<89.5,wrong:"Plus haut, au-dessus du point du milieu"}); if(!c) return;
   run=null; endMeasure(); finale(); vib([120,80,120,80,300]); say("C'est fini, merci.");
   const d={half:a.el,low:b.el,high:c.el,az:a.az,sd:[a.sd,b.sd,c.sd]};
   saveTask("partage",d,Vault.ratioFromSplit(d));
@@ -786,22 +814,21 @@ async function partage(){
 let drawPts=[], drawing=false;
 function cvSetup(){ const cv=$("#drawCv"), r=cv.getBoundingClientRect(), dpr=window.devicePixelRatio||1; cv.width=Math.round(r.width*dpr); cv.height=Math.round(r.height*dpr); const x=cv.getContext("2d"); x.setTransform(dpr,0,0,dpr,0,0); return {x,W:r.width,H:r.height}; }
 function drawScene(){
-  const {x,W,H}=cvSetup(), yG=H*.84, xc=W/2;
-  const g=x.createLinearGradient(0,0,0,yG); g.addColorStop(0,"#0b1428"); g.addColorStop(1,"#2c4c86"); x.fillStyle=g; x.fillRect(0,0,W,yG);
-  x.fillStyle="#0e1830"; x.fillRect(0,yG,W,H-yG);
-  x.strokeStyle="#4a5d84"; x.lineWidth=1; x.beginPath(); x.moveTo(0,yG); x.lineTo(W,yG); x.stroke();
-  x.fillStyle="#eef3fa"; x.beginPath(); x.arc(xc,yG-17,3.6,0,7); x.fill(); x.fillRect(xc-3.4,yG-12.5,6.8,12.5);
-  x.fillStyle="#8fa3c2"; x.font="13px Barlow, system-ui"; x.textAlign="left"; x.fillText("horizon",10,yG+18); x.textAlign="right"; x.fillText("horizon",W-10,yG+18);
-  if(drawPts.length>1){ x.strokeStyle="#f3b23c"; x.lineWidth=4; x.lineCap="round"; x.lineJoin="round"; x.beginPath(); drawPts.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])); x.stroke(); }
+  const {x,W,H}=cvSetup(), yG=H*.8, xc=W/2;
+  x.clearRect(0,0,W,H);
+  x.strokeStyle="#0d1440"; x.lineWidth=1.6; x.beginPath(); x.moveTo(0,yG); x.lineTo(W,yG); x.stroke();
+  x.fillStyle="#0d1440"; x.beginPath(); x.arc(xc,yG,6.5,0,7); x.fill();
+  x.fillStyle="#7c8299"; x.font="300 14px Jost, system-ui"; x.textAlign="left"; x.fillText("horizon",12,yG+24); x.textAlign="right"; x.fillText("horizon",W-12,yG+24); x.textAlign="center"; x.fillText("toi",xc,yG+24);
+  if(drawPts.length>1){ x.strokeStyle="#1131b8"; x.lineWidth=3.5; x.lineCap="round"; x.lineJoin="round"; x.beginPath(); drawPts.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])); x.stroke(); }
   return {W,H,yG,xc};
 }
 function drawEval(){
   const {W,yG,xc}=drawScene(), half=W/2;
   if(drawPts.length<8) return null;
   const xs=drawPts.map(p=>p[0]);
-  if(Math.min(...xs)>xc-half*.2||Math.max(...xs)<xc+half*.2) return {err:"Trace d'un bout à l'autre, en passant au-dessus du personnage."};
+  if(Math.min(...xs)>xc-half*.2||Math.max(...xs)<xc+half*.2) return {err:"Trace d'un bout à l'autre, en passant au-dessus du point."};
   let best=null; for(const p of drawPts){ const d=Math.abs(p[0]-xc); if(!best||d<best.d) best={d,y:p[1]}; }
-  const h0=(yG-best.y)/half; if(h0<.02) return {err:"Le trait doit passer au-dessus du personnage."};
+  const h0=(yG-best.y)/half; if(h0<.02) return {err:"Le trait doit passer au-dessus du point."};
   const w=([drawPts[0],drawPts[drawPts.length-1]].map(p=>Math.abs(p[0]-xc)/half)).reduce((a,b)=>a+b)/2;
   const poly=drawPts.filter((p,i)=>i%Math.max(1,Math.floor(drawPts.length/48))===0).map(p=>[+((p[0]-xc)/half).toFixed(3),+((yG-p[1])/half).toFixed(3)]);
   return {h0,w,ratio:w/h0,poly};
@@ -822,29 +849,29 @@ function openDraw(){ drawPts=[]; openFull("drawModal"); $("#drawOk").disabled=tr
 let tacheAns=null;
 function tacheView(v){
   const box=$("#tacheIn");
-  if(v==="intro") box.innerHTML=`<div class="bar"><span style="color:var(--mute)">Expérience · illusion</span><button class="close" id="tNo">Annuler</button></div>
+  if(v==="intro") box.innerHTML=`<div class="bar"><span>Tache, expérience 3 sur 3</span><button class="close" id="tNo">Annuler</button></div>
     <div class="big">La tache dans le ciel</div>
     <div class="hint">Une même tache paraît plus grande là où ton cerveau croit le ciel plus lointain. Il faut du ciel de jour, bleu ou uniformément gris.</div>
     <ol class="steps"><li>Mets la luminosité de l'écran au maximum.</li><li>Fixe le point rouge sans bouger les yeux, pendant 20 secondes.</li><li>Au signal, regarde le ciel juste au-dessus de l'horizon : une tache sombre y flotte.</li><li>Lève aussitôt les yeux haut dans le ciel et compare sa taille.</li></ol>
-    <div class="stack"><button class="btn night" id="tGo">Je suis prêt</button></div>`;
-  if(v==="q") box.innerHTML=`<div class="bar"><span style="color:var(--mute)">Expérience · illusion</span><button class="close" id="tNo">Fermer</button></div>
+    <div class="stack"><button class="btn solid" id="tGo">Je suis prêt</button></div>`;
+  if(v==="q") box.innerHTML=`<div class="bar"><span>Tache, expérience 3 sur 3</span><button class="close" id="tNo">Fermer</button></div>
     <div class="big">Où la tache paraissait-elle la plus grande ?</div>
     <div class="choice"><button data-a="horizon">Près de l'horizon</button><button data-a="pareil">Pareille partout</button><button data-a="haut">En haut du ciel</button><button data-a="rien">Je n'ai pas vu de tache</button></div>
     <div class="stack"><button class="btn ghost" id="tAgain">Recommencer</button></div>`;
-  if(v==="size") box.innerHTML=`<div class="bar"><span style="color:var(--mute)">Expérience · illusion</span><button class="close" id="tNo">Fermer</button></div>
+  if(v==="size") box.innerHTML=`<div class="bar"><span>Tache, expérience 3 sur 3</span><button class="close" id="tNo">Fermer</button></div>
     <div class="big">Combien de fois plus grande ?</div>
     <div class="hint">Fais glisser jusqu'à ce que les deux taches ressemblent à ce que tu as vu.</div>
-    <svg id="cmp" viewBox="0 0 340 180"></svg>
+    <svg id="cmp" viewBox="0 0 340 180" style="overflow:visible"></svg>
     <input type="range" id="tR" min="1.1" max="3" step="0.1" value="1.5">
-    <div class="stack"><button class="btn night" id="tOk">Valider</button><button class="btn ghost" id="tAgain">Recommencer</button></div>`;
+    <div class="stack"><button class="btn solid" id="tOk">Valider</button><button class="btn ghost" id="tAgain">Recommencer</button></div>`;
   const on=(id,f)=>{ const e=$("#"+id); if(e) e.onclick=f; };
   on("tNo",()=>closeFull("tacheModal")); on("tGo",fixation); on("tAgain",()=>tacheView("intro"));
   $$("#tacheIn .choice button").forEach(b=>b.onclick=()=>{ tacheAns=b.dataset.a; if(tacheAns==="pareil") finishTache(1); else if(tacheAns==="rien") finishTache(null); else { tacheView("size"); drawCmp(); } });
   const r=$("#tR"); if(r){ r.oninput=drawCmp; on("tOk",()=>{ const v=+r.value; finishTache(tacheAns==="horizon"?v:1/v); }); }
 }
 function drawCmp(){
-  const v=+$("#tR").value, big=tacheAns==="horizon", base=24, rH=Math.min(big?base*v:base,70), rT=Math.min(big?base:base*v,70);
-  $("#cmp").innerHTML=`<defs><linearGradient id="cg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#cfe0f2"/><stop offset="1" stop-color="#7fa6d6"/></linearGradient></defs><rect width="340" height="180" rx="18" fill="url(#cg)"/><circle cx="88" cy="88" r="${rH}" fill="#24324a" opacity=".78"/><circle cx="252" cy="88" r="${rT}" fill="#24324a" opacity=".78"/><text x="88" y="170" font-size="13" text-anchor="middle" fill="#16223a" font-family="${FONT}">près de l'horizon</text><text x="252" y="170" font-size="13" text-anchor="middle" fill="#16223a" font-family="${FONT}">en haut du ciel</text><text x="170" y="30" font-size="26" font-weight="700" text-anchor="middle" fill="#16223a" font-family="'Barlow Condensed',${FONT}">× ${fmt(v,1)}</text>`;
+  const v=+$("#tR").value, big=tacheAns==="horizon", base=22, rH=Math.min(big?base*v:base,66), rT=Math.min(big?base:base*v,66);
+  $("#cmp").innerHTML=`<line x1="0" y1="150" x2="340" y2="150" stroke="#0d1440" stroke-width="1.5"/><circle cx="85" cy="${150-8-rH}" r="${rH}" fill="#1131b8"/><circle cx="255" cy="${82}" r="${rT}" fill="#1131b8"/><text x="85" y="172" font-size="13" text-anchor="middle" fill="#7c8299" font-family="${FONT}">près de l'horizon</text><text x="255" y="172" font-size="13" text-anchor="middle" fill="#7c8299" font-family="${FONT}">en haut du ciel</text><text x="170" y="40" font-size="30" font-weight="300" text-anchor="middle" fill="#0d1440" font-family="${FONT}">× ${fmt(v,1)}</text>`;
 }
 function openTache(){ initAudio(); openFull("tacheModal"); tacheView("intro"); }
 function fixation(){
@@ -860,6 +887,10 @@ function finishTache(ratio){
 }
 
 /* ---------- liste des repères ---------- */
+function glyph(r){ // quart de cercle : la visée du ciel au-dessus du repère
+  const a=Math.max(0,Math.min(90,r.sky?r.sky.el:0))*D, x=6+40*Math.cos(a), y=46-40*Math.sin(a);
+  return `<svg class="g" viewBox="0 0 52 52" aria-hidden="true"><path d="M46 46A40 40 0 0 0 6 6" fill="none" stroke="#e4e6ee" stroke-width="1.5"/><line x1="6" y1="46" x2="48" y2="46" stroke="#0d1440" stroke-width="1.5"/><line x1="6" y1="46" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#1131b8" stroke-width="2"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" fill="${r.target?"#1131b8":"#fff"}" stroke="#1131b8" stroke-width="1.5"/></svg>`;
+}
 async function render(){
   try{ renderVault(); }catch(e){ console.error(e); }
   const L_=$("#list"), recs=store.recs.slice().reverse();
@@ -869,12 +900,12 @@ async function render(){
     const head=t?`${Math.round(r.y)} m`:`<span class="todo">À identifier</span>`;
     const sub=t?`${tLabel(t)}, à ${km(t.d)}`:`Ciel visé à ${fmt(r.sky.el)}°. Touche pour choisir le repère.`;
     const meta=[r.light, r.photo&&r.photo.cover!=null?"nuages ~"+Math.round(r.photo.cover*100)+" %":null, ENDPOINT&&!(r.synced&&!r.dirty)?"envoi en attente":null].filter(Boolean).join(", ");
-    return `<div class="rec" data-i="${r.i}"><img data-th="${r.i}" alt=""><div class="tx"><b>${head}</b><span>${sub}</span>${meta?`<span style="font-size:13px">${cap(meta)}</span>`:""}</div><button class="x" data-del="${r.i}" aria-label="Supprimer">Supprimer</button></div>`;
+    return `<div class="rec" data-i="${r.i}">${glyph(r)}<div class="tx"><b>${head}</b><span>${sub}</span>${meta?`<span style="font-size:13px">${cap(meta)}</span>`:""}</div><button class="x" data-del="${r.i}" aria-label="Supprimer">Supprimer</button></div>`;
   }).join("");
   $$("#list .rec").forEach(el=>el.onclick=e=>{ if(e.target.closest(".x")) return; const r=store.recs.find(x=>x.i===+el.dataset.i); if(r&&!run) openId(r); });
   $$("#list .x").forEach(b=>b.onclick=()=>{ if(b.dataset.arm){ const i=+b.dataset.del; const was=store.recs.find(x=>x.i===i); store.recs=store.recs.filter(x=>x.i!==i); if(was&&was.synced){ store.delQ.push(i); syncSoon(); } idbDel(i); persist(); render(); } else { b.dataset.arm=1; b.textContent="Confirmer"; b.style.color="#c0392b"; setTimeout(()=>{ if(b.isConnected){ delete b.dataset.arm; b.textContent="Supprimer"; b.style.color=""; } },3000); } });
   syncStatus();
-  for(const img of $$("#list img[data-th]")){ const u=await thumbOf(+img.dataset.th); if(u) img.src=u; else img.replaceWith(Object.assign(document.createElement("div"),{className:"ph"})); }
+
 }
 
 /* ---------- précision ---------- */
@@ -882,7 +913,7 @@ $("#calibBtn").onclick=async()=>{
   if(run) return; askPerm(); initAudio(); wake();
   run={cancel:false}; startMeasure(); const caps=[];
   for(let k=0;k<5;k++){
-    const c=await step({label:`Précision · ${k+1} sur 5`,title:k?"Baisse le bras, puis vise de nouveau l'horizon":"Vise l'horizon",hint:"La ligne d'horizon la plus lointaine, bras tendu.",cond:el=>Math.abs(el)<10,wrong:"Vise l'horizon"});
+    const c=await step({label:`Précision, visée ${k+1} sur 5`,title:k?"Baisse le bras, puis vise de nouveau l'horizon":"Vise l'horizon",hint:"La ligne d'horizon la plus lointaine, bras tendu.",cond:el=>Math.abs(el)<10,wrong:"Vise l'horizon"});
     if(!c) return; caps.push(c);
   }
   run=null; endMeasure(); finale(); vib([120,80,300]);
