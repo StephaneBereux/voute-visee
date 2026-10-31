@@ -149,7 +149,11 @@ requestAnimationFrame(statusTick);
 /* ---------- son, vibration, écran ---------- */
 let AC=null;
 function initAudio(){ try{ if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)(); AC.resume(); }catch(e){} }
-function beep(n=1,f=880){ try{ if(!AC) return; for(let k=0;k<n;k++){ const o=AC.createOscillator(), g=AC.createGain(), t=AC.currentTime+k*.18; o.frequency.value=f+k*220; g.gain.setValueAtTime(.18,t); g.gain.exponentialRampToValueAtTime(.001,t+.14); o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t+.15);} }catch(e){} }
+function tone(f,dur,vol,at=0){ try{ if(!AC) return; if(AC.state!=="running") AC.resume(); const o=AC.createOscillator(), g=AC.createGain(), t=AC.currentTime+.02+at; o.type="square"; o.frequency.value=f; g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0005,t+dur); o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t+dur+.02); }catch(e){} }
+function beep(n=1,f=880){ for(let k=0;k<n;k++) tone(f+k*330,.22,.35,k*.26); }
+const tick=()=>tone(1500,.03,.08);
+const nag=()=>tone(260,.35,.3);
+document.addEventListener("pointerdown",initAudio,{capture:true});
 function vib(p){ try{ navigator.vibrate&&navigator.vibrate(p); }catch(e){} }
 function flash(){ const f=$("#flash"); f.style.opacity=.45; setTimeout(()=>f.style.opacity=0,140); }
 let wl=null;
@@ -211,15 +215,17 @@ function photoPromise(){
 let run=null;
 function waitStill({grace=800,hold=1200,cond=()=>true,rearmFrom=null}){
   return new Promise(res=>{
-    const t0=performance.now(); let armed=rearmFrom==null;
+    const t0=performance.now(); let armed=rearmFrom==null, q=0, lastNag=t0;
     const iv=setInterval(()=>{
       if(!run||run.cancel){ clearInterval(iv); res(null); return; }
       const now=performance.now(), last=buf[buf.length-1]; if(!last||now-last.t>800){ $("#holdBar").style.width="0"; return; }
-      if(!armed){ if(Math.abs(last.el-rearmFrom)>8) armed=true; $("#holdBar").style.width="0"; return; }
-      if(now-t0<grace||!cond(last.el)){ $("#holdBar").style.width="0"; return; }
+      if(now-lastNag>12000&&now-t0>14000){ nag(); vib(60); lastNag=now; }
+      if(!armed){ if(Math.abs(last.el-rearmFrom)>8) armed=true; $("#holdBar").style.width="0"; q=0; return; }
+      if(now-t0<grace||!cond(last.el)){ $("#holdBar").style.width="0"; q=0; return; }
       let lo=last.el, hi=last.el, start=last.t;
       for(let k=buf.length-1;k>=0;k--){ const v=buf[k]; lo=Math.min(lo,v.el); hi=Math.max(hi,v.el); if(hi-lo>1.0||v.t<t0+grace) break; start=v.t; }
       const still=now-start; $("#holdBar").style.width=Math.min(100,still/hold*100)+"%";
+      const nq=Math.min(3,Math.floor(still/hold*4)); if(nq>q) tick(); q=nq;
       if(still>=hold){ const w=buf.filter(v=>v.t>now-hold); const els=w.map(v=>v.el); if(sd(els)<0.35){ clearInterval(iv); res({el:+mean(els).toFixed(3),az:+circMean(w.map(v=>v.az)).toFixed(1),sd:+sd(els).toFixed(3),n:w.length}); } }
     },60);
   });
@@ -241,7 +247,7 @@ $("#newBtn").onclick=async()=>{
   showStep("Étape 1 sur 2","Vise le pied du repère","Bras tendu, bord du haut du téléphone vers le pied. Regarde le paysage : bip quand c'est enregistré.");
   const base=await waitStill({grace:900,hold:1200,cond:el=>Math.abs(el)<25});
   if(!base) return;
-  rec.base=base; beep(1); vib(70); flash();
+  rec.base=base; beep(1); vib(180); flash();
   rec.gps=gps?{...gps}:null;
   rec.candsP=findCands(rec);
   showStep("Étape 2 sur 2","Monte vers le ciel juste au-dessus","Vise le point du ciel à la verticale du repère et tiens immobile : double bip.");
@@ -249,7 +255,7 @@ $("#newBtn").onclick=async()=>{
   if(!sky) return;
   rec.sky=sky; rec.t=new Date().toISOString(); if(!rec.gps&&gps) rec.gps={...gps};
   if(rec.gps){ rec.sun=sunPos(new Date(),rec.gps.lat,rec.gps.lon); rec.light=lightOf(rec.sun.el); }
-  beep(2); vib([70,60,70]); flash();
+  beep(2); vib([180,110,180]); flash();
   const candsP=rec.candsP; delete rec.candsP;
   rec.dirty=true; store.recs.push(rec); persist(); syncSoon(); run=null; hideStep(); render();
   openId(rec,candsP);
@@ -375,9 +381,9 @@ $("#calibBtn").onclick=async()=>{
   for(let k=0;k<5;k++){
     showStep(`Précision ${k+1} sur 5`,k?"Baisse le bras, puis vise de nouveau l'horizon":"Vise l'horizon","La ligne d'horizon la plus lointaine, bras tendu. Tiens immobile : bip.");
     const c=await waitStill({grace:k?200:900,hold:1200,cond:el=>Math.abs(el)<10,rearmFrom:prev});
-    if(!c) return; caps.push(c); prev=c.el; beep(1); vib(70); flash();
+    if(!c) return; caps.push(c); prev=c.el; beep(1); vib(180); flash();
   }
-  run=null; hideStep();
+  run=null; hideStep(); setTimeout(()=>{ beep(3,700); vib([120,80,120,80,300]); },350);
   const els=caps.map(c=>c.el), res={t:new Date().toISOString(),gps:gps?{...gps}:null,els,mean:+mean(els).toFixed(2),sd:+sd(els).toFixed(2)};
   store.calib.push(res); persist(); showCalib(); syncSoon();
 };
