@@ -60,7 +60,9 @@ details summary{color:var(--mut);font-size:14px;margin-top:12px}
       <li>Monte vers le point du ciel qui est juste au-dessus du repère. Tiens immobile : double bip.</li>
       <li>Choisis le repère dans la liste ou sur la carte.</li>
     </ol>
-    <div class="row"><button class="pri" id="introOk">Compris</button></div>
+    <label class="small" style="display:block;margin-top:10px">Ton prénom ou pseudo (pour comparer les participants)</label>
+    <input id="pseudoIn" autocomplete="nickname" style="font:inherit;padding:9px;border:1px solid var(--line);border-radius:8px;width:100%;margin-top:4px">
+    <div class="row"><button class="pri" id="introOk">C'est parti</button></div>
   </section>
 
   <section id="stepPanel" class="card hide">
@@ -96,6 +98,7 @@ details summary{color:var(--mut);font-size:14px;margin-top:12px}
     <details><summary>Plus</summary>
       <div class="row"><button id="calibBtn">Tester ma précision</button><button id="copy">Copier</button><button id="clear">Tout effacer</button></div>
       <div class="small" id="calibRes" style="margin-top:8px"></div>
+      <div class="small" style="margin-top:8px">Participant : <b id="pseudoShow"></b> · <a href="#" id="pseudoEdit">modifier</a></div>
     </details>
   </section>
   <input type="file" id="photoIn" accept="image/*" capture="environment" hidden>
@@ -408,7 +411,7 @@ $("#clear").onclick=()=>{ const b=$("#clear"); if(b.dataset.arm){ store.recs=[];
 // adresse et clé d'envoi : données une fois par un lien d'installation (#setup=...), gardées sur l'appareil
 let CFG={}; try{CFG=JSON.parse(localStorage.getItem("visee.cfg")||"{}")||{}}catch(e){}
 if(location.hash.startsWith("#setup=")){
-  try{ const o=JSON.parse(atob(decodeURIComponent(location.hash.slice(7)))); if(o&&o.e&&o.k){ CFG={e:o.e,k:o.k}; localStorage.setItem("visee.cfg",JSON.stringify(CFG)); setTimeout(()=>toast("Envoi automatique activé.",3500),300); } }catch(e){}
+  try{ const o=JSON.parse(atob(decodeURIComponent(location.hash.slice(7)))); if(o&&o.e&&o.k){ CFG={e:o.e,k:o.k}; localStorage.setItem("visee.cfg",JSON.stringify(CFG)); if(o.p){ store.pseudo=o.p; persist(); } setTimeout(()=>toast("Envoi automatique activé.",3500),300); } }catch(e){}
   try{ history.replaceState(null,"",location.pathname); }catch(e){}
 }
 const ENDPOINT=CFG.e||"", SKEY=CFG.k||"";
@@ -417,7 +420,7 @@ store.delQ=store.delQ||[];
 let syncing=false, syncT=null, lastSyncOk=null;
 function markDirty(r){ r.dirty=true; persist(); syncSoon(); }
 function syncSoon(){ clearTimeout(syncT); syncT=setTimeout(sync,300); }
-async function post(o){ const r=await fetch(ENDPOINT,{method:"POST",body:JSON.stringify({key:SKEY,device:store.device,...o})}); const j=await r.json(); if(!j.ok) throw new Error(j.err||"refus"); return j; }
+async function post(o){ const r=await fetch(ENDPOINT,{method:"POST",body:JSON.stringify({key:SKEY,device:store.device,pseudo:store.pseudo||"",model:store.model||"",...o})}); const j=await r.json(); if(!j.ok) throw new Error(j.err||"refus"); return j; }
 function b64(blob){ return new Promise(res=>{ const fr=new FileReader(); fr.onload=()=>res(String(fr.result).split(",")[1]); fr.onerror=()=>res(null); fr.readAsDataURL(blob); }); }
 async function sync(){
   if(!ENDPOINT||syncing||!navigator.onLine){ syncStatus(); return; } syncing=true;
@@ -441,9 +444,15 @@ function syncStatus(){
 }
 setInterval(sync,20000); window.addEventListener("online",syncSoon);
 
+/* ---------- participant et appareil ---------- */
+(async()=>{ try{ let m=""; if(navigator.userAgentData&&navigator.userAgentData.getHighEntropyValues){ const h=await navigator.userAgentData.getHighEntropyValues(["model","platform","platformVersion"]); m=[h.model,h.platform,h.platformVersion].filter(Boolean).join(" "); } if(!m){ const x=navigator.userAgent.match(/\(([^)]+)\)/); m=x?x[1]:navigator.userAgent.slice(0,60); } if(m!==store.model){ store.model=m; persist(); } }catch(e){} })();
+function showPseudo(){ $("#pseudoShow").textContent=store.pseudo||"anonyme"; }
+$("#pseudoEdit").onclick=e=>{ e.preventDefault(); store.introSeen=false; $("#intro").classList.remove("hide"); $("#pseudoIn").value=store.pseudo||""; $("#intro").scrollIntoView({behavior:"smooth"}); };
+
 /* ---------- démarrage ---------- */
-if(!store.introSeen) $("#intro").classList.remove("hide");
-$("#introOk").onclick=()=>{ store.introSeen=true; persist(); $("#intro").classList.add("hide"); };
+if(!store.introSeen){ $("#intro").classList.remove("hide"); $("#pseudoIn").value=store.pseudo||""; }
+$("#introOk").onclick=()=>{ const v=$("#pseudoIn").value.trim().slice(0,40); if(v) store.pseudo=v; store.introSeen=true; persist(); showPseudo(); $("#intro").classList.add("hide"); };
+showPseudo();
 render(); showCalib();
 </script>
 </body>
