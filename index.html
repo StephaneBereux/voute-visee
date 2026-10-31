@@ -50,7 +50,7 @@ details summary{color:var(--mut);font-size:14px;margin-top:12px}
 <div id="flash"></div><div id="toast"></div>
 <main>
   <h1>Visée de la voûte</h1>
-  <div class="small"><span class="dot" id="dS"></span><span id="sTxt">capteurs…</span> &nbsp; <span class="dot" id="dG"></span><span id="gTxt">GPS…</span></div>
+  <div class="small"><span class="dot" id="dS"></span><span id="sTxt">capteurs…</span> &nbsp; <span class="dot" id="dG"></span><span id="gTxt">GPS…</span> <span id="dWrap" class="hide">&nbsp; <span class="dot" id="dD"></span><span id="dTxt"></span></span></div>
 
   <section id="intro" class="card hide">
     <b>Comment faire</b>
@@ -251,7 +251,7 @@ $("#newBtn").onclick=async()=>{
   if(rec.gps){ rec.sun=sunPos(new Date(),rec.gps.lat,rec.gps.lon); rec.light=lightOf(rec.sun.el); }
   beep(2); vib([70,60,70]); flash();
   const candsP=rec.candsP; delete rec.candsP;
-  store.recs.push(rec); persist(); run=null; hideStep(); render();
+  rec.dirty=true; store.recs.push(rec); persist(); syncSoon(); run=null; hideStep(); render();
   openId(rec,candsP);
 };
 
@@ -315,11 +315,11 @@ function choose(rec,c){
   rec.target={kind:c.kind,name:c.name||"",lat:c.lat,lon:c.lon,d:c.d,src:c.id||"carte",db:c.db??null,h:c.h??null};
   rec.y=+(c.d*(Math.tan(rec.sky.el*D)-Math.tan(rec.base.el*D))).toFixed(1);
   rec.yEye=+(c.d*Math.tan(rec.sky.el*D)+EYE).toFixed(1);
-  delete rec._c; persist(); render();
+  delete rec._c; markDirty(rec); render();
   $("#idPanel").classList.add("hide"); idRec=null;
   toast(`${tLabel(rec.target).replace(/&amp;/g,"&")} à ${km(c.d)} : voûte à ${Math.round(rec.y)} m au-dessus`);
 }
-$$("#aimRow button").forEach(b=>b.onclick=()=>{ if(!idRec) return; idRec.aim=b.dataset.aim; persist(); $$("#aimRow button").forEach(x=>x.classList.toggle("on",x===b)); });
+$$("#aimRow button").forEach(b=>b.onclick=()=>{ if(!idRec) return; idRec.aim=b.dataset.aim; markDirty(idRec); $$("#aimRow button").forEach(x=>x.classList.toggle("on",x===b)); });
 $("#laterBtn").onclick=()=>{ if(idRec) delete idRec._c; persist(); $("#idPanel").classList.add("hide"); idRec=null; render(); };
 function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement("script"); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
 $("#mapBtn").onclick=async()=>{
@@ -359,11 +359,12 @@ async function render(){
     const t=r.target, p=r.photo;
     const title=t?`${tLabel(t)} · ${km(t.d)}`:`<span class="todo">Repère n° ${r.i} à identifier</span>`;
     const h=t?`voûte à ${Math.round(r.y)} m au-dessus`:`ciel visé à ${fmt(r.sky.el)}°`;
-    const extra=[t?fmt(r.sky.el)+"°":null, r.light, p&&p.cover!=null?"nuages ~"+Math.round(p.cover*100)+" %":null, r.aim?"visé : "+(r.aim==="voute"?"voûte":"nuage"):null].filter(Boolean).join(" · ");
+    const extra=[t?fmt(r.sky.el)+"°":null, r.light, p&&p.cover!=null?"nuages ~"+Math.round(p.cover*100)+" %":null, r.aim?"visé : "+(r.aim==="voute"?"voûte":"nuage"):null, ENDPOINT?(r.synced&&!r.dirty?"enregistré ✓":"envoi en attente"):null].filter(Boolean).join(" · ");
     return `<div class="item" data-i="${r.i}"><img data-th="${r.i}" alt=""><div class="tx"><div>${title}</div><div class="h">${h}</div><div class="small">${extra}</div></div><button class="ghost del" data-del="${r.i}">✕</button></div>`;
   }).join("");
   $$("#list .item").forEach(el=>el.onclick=e=>{ if(e.target.closest(".del")) return; const r=store.recs.find(x=>x.i===+el.dataset.i); if(r&&!run) openId(r); });
-  $$("#list .del").forEach(b=>b.onclick=()=>{ if(b.dataset.arm){ const i=+b.dataset.del; store.recs=store.recs.filter(x=>x.i!==i); idbDel(i); persist(); render(); } else { b.dataset.arm=1; b.textContent="Supprimer ?"; setTimeout(()=>{ if(b.isConnected){ delete b.dataset.arm; b.textContent="✕"; } },3000); } });
+  $$("#list .del").forEach(b=>b.onclick=()=>{ if(b.dataset.arm){ const i=+b.dataset.del; const was=store.recs.find(x=>x.i===i); store.recs=store.recs.filter(x=>x.i!==i); if(was&&was.synced){ store.delQ.push(i); syncSoon(); } idbDel(i); persist(); render(); } else { b.dataset.arm=1; b.textContent="Supprimer ?"; setTimeout(()=>{ if(b.isConnected){ delete b.dataset.arm; b.textContent="✕"; } },3000); } });
+  syncStatus();
   for(const img of $$("#list img[data-th]")){ const u=await thumbOf(+img.dataset.th); if(u) img.src=u; else img.style.visibility="hidden"; }
 }
 
@@ -378,12 +379,12 @@ $("#calibBtn").onclick=async()=>{
   }
   run=null; hideStep();
   const els=caps.map(c=>c.el), res={t:new Date().toISOString(),gps:gps?{...gps}:null,els,mean:+mean(els).toFixed(2),sd:+sd(els).toFixed(2)};
-  store.calib.push(res); persist(); showCalib();
+  store.calib.push(res); persist(); showCalib(); syncSoon();
 };
 function showCalib(){ const c=store.calib[store.calib.length-1]; $("#calibRes").textContent=c?`Dernier test : précision ±${fmt(c.sd,2)}°, décalage moyen ${fmt(c.mean,2)}° (5 visées de l'horizon).`:""; }
 
 /* ---------- export ---------- */
-function exportText(){ return JSON.stringify({app:"visee.v2",exportedAt:new Date().toISOString(),dev:{ua:navigator.userAgent},recs:store.recs.map(r=>{const o={...r}; delete o._c; return o;}),calib:store.calib}); }
+function exportText(){ return JSON.stringify({app:"visee.v2",exportedAt:new Date().toISOString(),dev:{ua:navigator.userAgent},recs:store.recs.map(r=>{const o={...r}; delete o._c; delete o.dirty; delete o.photoSent; return o;}),calib:store.calib}); }
 $("#share").onclick=async()=>{
   const t=exportText();
   try{
@@ -396,6 +397,43 @@ $("#share").onclick=async()=>{
 };
 $("#copy").onclick=async()=>{ try{ await navigator.clipboard.writeText(exportText()); toast("Copié."); }catch(e){ toast("Copie refusée."); } };
 $("#clear").onclick=()=>{ const b=$("#clear"); if(b.dataset.arm){ store.recs=[]; store.calib=[]; persist(); idbClear(); render(); showCalib(); b.textContent="Tout effacer"; delete b.dataset.arm; } else { b.dataset.arm=1; b.textContent="Confirmer"; setTimeout(()=>{ delete b.dataset.arm; b.textContent="Tout effacer"; },3000); } };
+
+/* ---------- envoi automatique ---------- */
+// adresse et clé d'envoi : données une fois par un lien d'installation (#setup=...), gardées sur l'appareil
+let CFG={}; try{CFG=JSON.parse(localStorage.getItem("visee.cfg")||"{}")||{}}catch(e){}
+if(location.hash.startsWith("#setup=")){
+  try{ const o=JSON.parse(atob(decodeURIComponent(location.hash.slice(7)))); if(o&&o.e&&o.k){ CFG={e:o.e,k:o.k}; localStorage.setItem("visee.cfg",JSON.stringify(CFG)); setTimeout(()=>toast("Envoi automatique activé.",3500),300); } }catch(e){}
+  try{ history.replaceState(null,"",location.pathname); }catch(e){}
+}
+const ENDPOINT=CFG.e||"", SKEY=CFG.k||"";
+if(!store.device){ store.device=Math.random().toString(36).slice(2,8); persist(); }
+store.delQ=store.delQ||[];
+let syncing=false, syncT=null, lastSyncOk=null;
+function markDirty(r){ r.dirty=true; persist(); syncSoon(); }
+function syncSoon(){ clearTimeout(syncT); syncT=setTimeout(sync,300); }
+async function post(o){ const r=await fetch(ENDPOINT,{method:"POST",body:JSON.stringify({key:SKEY,device:store.device,...o})}); const j=await r.json(); if(!j.ok) throw new Error(j.err||"refus"); return j; }
+function b64(blob){ return new Promise(res=>{ const fr=new FileReader(); fr.onload=()=>res(String(fr.result).split(",")[1]); fr.onerror=()=>res(null); fr.readAsDataURL(blob); }); }
+async function sync(){
+  if(!ENDPOINT||syncing||!navigator.onLine){ syncStatus(); return; } syncing=true;
+  try{
+    for(const i of store.delQ.slice()){ await post({type:"del",i}); store.delQ=store.delQ.filter(x=>x!==i); persist(); }
+    for(const r of store.recs.filter(x=>x.dirty)){
+      let photo=null; if(r.photo&&!r.photoSent){ const b=await idbGet(r.i); if(b) photo=await b64(b); }
+      const clean={...r}; delete clean._c; delete clean.dirty; delete clean.synced; delete clean.photoSent;
+      await post({type:"rec",rec:clean,photo});
+      r.dirty=false; r.synced=true; if(photo) r.photoSent=true; persist();
+    }
+    for(const c of store.calib.filter(x=>!x.synced)){ await post({type:"calib",calib:c}); c.synced=true; persist(); }
+    lastSyncOk=true;
+  }catch(e){ lastSyncOk=false; }
+  syncing=false; render();
+}
+function syncStatus(){
+  if(!ENDPOINT) return; $("#dWrap").classList.remove("hide");
+  const n=store.recs.filter(x=>x.dirty).length+store.calib.filter(x=>!x.synced).length+store.delQ.length;
+  $("#dD").className="dot "+(n?"bad":"ok"); $("#dTxt").textContent=n?(navigator.onLine?n+" à envoyer":"hors ligne, "+n+" à envoyer"):"tout est enregistré";
+}
+setInterval(sync,20000); window.addEventListener("online",syncSoon);
 
 /* ---------- démarrage ---------- */
 if(!store.introSeen) $("#intro").classList.remove("hide");
