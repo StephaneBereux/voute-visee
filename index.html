@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Visée de la voûte</title>
+<style>
+:root{--bg:#f4f3ef;--card:#fcfcfb;--line:#dcdbd5;--ink:#0b0b0b;--mut:#6b6a65;--acc:#2a78d6;--ok:#1baf7a;--warn:#b4560f}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);-webkit-user-select:none;user-select:none}
+main{max-width:520px;margin:0 auto;padding:14px 14px 40px}
+h1{font-size:20px;margin:4px 0 2px}
+.small{font-size:13px;color:var(--mut)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button{font:inherit;border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 12px}
+button.pri{background:var(--acc);color:#fff;border-color:var(--acc)}
+button.big{width:100%;padding:22px;font-size:22px;font-weight:600}
+button:disabled{opacity:.45}
+.seg button{flex:1;padding:8px 6px;font-size:14px}
+.seg button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.live{display:flex;justify-content:space-around;text-align:center}
+.live b{display:block;font-size:40px;font-variant-numeric:tabular-nums;line-height:1.1}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#bbb;margin-right:6px;vertical-align:middle}
+.dot.ok{background:var(--ok)}.dot.bad{background:var(--warn)}
+input{font:inherit;padding:8px;border:1px solid var(--line);border-radius:8px;width:100%}
+label{font-size:13px;color:var(--mut);display:block;margin:6px 0 2px}
+table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+td,th{padding:4px 3px;border-bottom:1px solid var(--line);text-align:right}
+td:first-child,th:first-child{text-align:left}
+.stat{font-size:15px;margin:6px 0}
+.hide{display:none}
+#flash{position:fixed;inset:0;background:var(--ok);opacity:0;pointer-events:none;transition:opacity .4s}
+.state{font-size:15px;min-height:22px;margin-top:8px;text-align:center}
+.pbtn{display:inline-block}
+.btnlike{display:inline-block;font-size:16px;color:#fff;background:var(--acc);border-radius:10px;padding:10px 14px}
+</style>
+</head>
+<body>
+<div id="flash"></div>
+<main>
+  <h1>Visée de la voûte</h1>
+  <div class="small">Le téléphone sert de pointeur : tu vises avec le bord du haut, bras tendu, en regardant le paysage, pas l'écran.</div>
+
+  <div class="card" id="startCard">
+    <button class="big pri" id="start">Activer les capteurs</button>
+    <div class="small" style="margin-top:8px">Autorise la position si on te la demande : elle sert à calculer les distances plus tard.</div>
+  </div>
+
+  <div id="app" class="hide">
+    <div class="card">
+      <div class="small" id="status"><span class="dot" id="sDot"></span>capteurs…</div>
+      <div class="live" style="margin-top:8px">
+        <div><span class="small">élévation</span><b id="lvEl">-</b></div>
+        <div><span class="small">direction</span><b id="lvAz">-</b></div>
+      </div>
+      <div class="row seg" style="margin-top:10px" id="axisSeg">
+        <button data-axis="top" class="on">Bord du haut</button>
+        <button data-axis="cam">Dos du téléphone</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row seg" id="modeSeg">
+        <button data-mode="horizon" class="on">Horizon ×10</button>
+        <button data-mode="cible">Cible ×5</button>
+        <button data-mode="repere">Repère</button>
+        <button data-mode="table">Posé</button>
+      </div>
+      <div class="small" id="modeHelp" style="margin-top:8px"></div>
+      <div id="repFields" class="hide">
+        <label>Nom du repère</label><input id="repName" placeholder="ex. clocher de Lion-sur-Mer">
+        <label>Distance horizontale en mètres (Google Maps, « mesurer la distance »)</label><input id="repDist" inputmode="decimal" placeholder="ex. 1250">
+      </div>
+      <div style="margin-top:10px"><button class="big pri" id="measure">Mesurer</button></div>
+      <div class="state" id="state"></div>
+      <div id="post" class="hide" style="margin-top:8px;border-top:1px solid var(--line);padding-top:10px">
+        <div class="small" id="postTitle">Photo du ciel au-dessus du repère, repère en bas du cadre (facultatif)</div>
+        <div class="row" style="margin-top:6px">
+          <label for="photoIn" class="pbtn" style="margin:0"><span class="btnlike">Prendre une photo</span></label>
+          <input type="file" id="photoIn" accept="image/*" capture="environment" style="display:none">
+          <img id="thumb" class="hide" style="height:56px;border-radius:6px;border:1px solid var(--line)">
+        </div>
+        <div class="small" id="photoInfo" style="margin-top:4px"></div>
+        <div id="aimRow" class="hide">
+          <div class="small" style="margin-top:8px">S'il y avait des nuages, tu as visé :</div>
+          <div class="row seg" id="aimSeg" style="margin-top:4px">
+            <button data-aim="nuage">le nuage</button>
+            <button data-aim="voute">la voûte derrière</button>
+            <button data-aim="aucun">pas de nuage</button>
+          </div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:6px"><button id="undo">Annuler la dernière</button><button id="photoAny">Photo du ciel</button></div>
+    </div>
+
+    <div class="card">
+      <div id="stats"></div>
+      <table id="tbl"><thead><tr><th>#</th><th>série</th><th>élév.</th><th>dir.</th><th>stab.</th></tr></thead><tbody></tbody></table>
+      <div class="row" style="margin-top:10px">
+        <button id="share" class="pri">Partager les résultats</button>
+        <button id="copy">Copier</button>
+        <button id="clear">Tout effacer</button>
+      </div>
+      <div class="small" id="msg" style="margin-top:6px"></div>
+    </div>
+  </div>
+</main>
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const D=Math.PI/180;
+const LSK="visee.v1";
+let store={meas:[],dev:{}}; try{const s=JSON.parse(localStorage.getItem(LSK)||"null"); if(s&&Array.isArray(s.meas)) store=s;}catch(e){}
+const persist=()=>{try{localStorage.setItem(LSK,JSON.stringify(store))}catch(e){}};
+let axis="top", mode="horizon", gps=null, absolute=false, nEv=0, t0Ev=0, rate=0, lastEv=0;
+const buf=[]; // {t,el,az}
+const HELP={
+  horizon:"Vise l'horizon (mer, plaine, ligne la plus lointaine) 10 fois. Baisse le bras entre deux mesures. On mesure ta précision et le décalage du capteur.",
+  cible:"Choisis un point fixe bien visible (haut d'un clocher, d'un pylône) et vise-le 5 fois, en baissant le bras entre deux.",
+  repere:"Vise d'abord le pied du repère, puis le point du ciel juste au-dessus. Deux mesures par repère.",
+  table:"Pose le téléphone à plat sur une table et ne le touche plus : on mesure le bruit du capteur pendant 5 secondes."
+};
+function elevAz(a,b,g){
+  b*=D; g*=D; a*=D;
+  let x,y,z;
+  if(axis==="top"){ x=-Math.cos(b)*Math.sin(a); y=Math.cos(b)*Math.cos(a); z=Math.sin(b); }
+  else { const u=-Math.sin(g), v=Math.cos(g)*Math.sin(b); x=u*Math.cos(a)-v*Math.sin(a); y=u*Math.sin(a)+v*Math.cos(a); z=-Math.cos(b)*Math.cos(g); }
+  const el=Math.asin(Math.max(-1,Math.min(1,z)))/D;
+  let az=Math.atan2(x,y)/D; az=(az+360)%360;
+  return {el,az};
+}
+function onOri(e,isAbs){
+  if(e.beta==null) return;
+  let al=e.alpha||0;
+  if(e.webkitCompassHeading!=null){ al=360-e.webkitCompassHeading; isAbs=true; }
+  if(isAbs) absolute=true; else if(absolute) return; // prefer absolute stream
+  const now=performance.now();
+  if(!t0Ev) t0Ev=now; nEv++; lastEv=now;
+  if(now-t0Ev>1000){ rate=nEv*1000/(now-t0Ev); nEv=0; t0Ev=now; }
+  const r=elevAz(al,e.beta,e.gamma||0);
+  buf.push({t:now,el:r.el,az:r.az}); while(buf.length&&now-buf[0].t>6000) buf.shift();
+}
+function sunPos(date,lat,lon){
+  const n=date.getTime()/86400000+2440587.5-2451545.0;
+  const L=(280.460+0.9856474*n)%360, g=((357.528+0.9856003*n)%360)*D;
+  const lam=(L+1.915*Math.sin(g)+0.020*Math.sin(2*g))*D, eps=(23.439-0.0000004*n)*D;
+  const ra=Math.atan2(Math.cos(eps)*Math.sin(lam),Math.cos(lam)), dec=Math.asin(Math.sin(eps)*Math.sin(lam));
+  const gmst=((18.697374558+24.06570982441908*n)%24+24)%24;
+  const H=(gmst*15+lon)*D-ra, la=lat*D;
+  const el=Math.asin(Math.sin(la)*Math.sin(dec)+Math.cos(la)*Math.cos(dec)*Math.cos(H));
+  const az=Math.atan2(-Math.sin(H),Math.tan(dec)*Math.cos(la)-Math.sin(la)*Math.cos(H));
+  return {el:+(el/D).toFixed(2),az:+(((az/D)+360)%360).toFixed(1)};
+}
+function lightOf(e){ return e==null?null:e>6?"jour":e>0?"soleil bas":e>-6?"crépuscule":e>-12?"crépuscule nautique":"nuit"; }
+function fmt(v,d=1){return v==null||isNaN(v)?"-":v.toFixed(d).replace(".",",")}
+function circMean(a){ let s=0,c=0; a.forEach(v=>{s+=Math.sin(v*D);c+=Math.cos(v*D)}); return ((Math.atan2(s,c)/D)+360)%360; }
+function sd(a){ if(a.length<2) return 0; const m=a.reduce((s,v)=>s+v,0)/a.length; return Math.sqrt(a.reduce((s,v)=>s+(v-m)*(v-m),0)/(a.length-1)); }
+function tick(){
+  const b=buf.slice(-8);
+  if(b.length){ $("#lvEl").textContent=fmt(b.reduce((s,v)=>s+v.el,0)/b.length)+"°"; $("#lvAz").textContent=fmt(circMean(b.map(v=>v.az)),0)+"°"; }
+  const alive=performance.now()-lastEv<1000;
+  $("#sDot").className="dot "+(alive?"ok":"bad");
+  $("#status").lastChild.textContent=alive?`capteurs ok, ${Math.round(rate)} mesures/s, boussole ${absolute?"absolue":"relative"}${gps?`, GPS ±${Math.round(gps.acc)} m`:", GPS en attente"}`:"aucune donnée des capteurs";
+  requestAnimationFrame(tick);
+}
+$("#start").onclick=async()=>{
+  try{ if(typeof DeviceOrientationEvent!=="undefined"&&DeviceOrientationEvent.requestPermission){ await DeviceOrientationEvent.requestPermission(); } }catch(e){}
+  window.addEventListener("deviceorientationabsolute",e=>onOri(e,true));
+  window.addEventListener("deviceorientation",e=>onOri(e,!!e.absolute&&false));
+  try{ if(navigator.wakeLock) await navigator.wakeLock.request("screen"); }catch(e){}
+  try{ navigator.geolocation.watchPosition(p=>{gps={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy,alt:p.coords.altitude}},()=>{}, {enableHighAccuracy:true,maximumAge:5000}); }catch(e){}
+  store.dev={ua:navigator.userAgent,w:screen.width,h:screen.height}; persist();
+  $("#startCard").classList.add("hide"); $("#app").classList.remove("hide");
+  requestAnimationFrame(tick); setMode("horizon"); render();
+  setTimeout(()=>{ if(!lastEv) $("#state").textContent="Aucune donnée : ce navigateur ne donne pas accès aux capteurs d'orientation."; },2500);
+};
+document.addEventListener("visibilitychange",async()=>{ if(document.visibilityState==="visible"){ try{ if(navigator.wakeLock) await navigator.wakeLock.request("screen"); }catch(e){} } });
+$$("#axisSeg button").forEach(b=>b.onclick=()=>{ axis=b.dataset.axis; $$("#axisSeg button").forEach(x=>x.classList.toggle("on",x===b)); buf.length=0; });
+function setMode(m){ mode=m; $$("#modeSeg button").forEach(x=>x.classList.toggle("on",x.dataset.mode===m)); $("#modeHelp").textContent=HELP[m]; $("#repFields").classList.toggle("hide",m!=="repere"); updMeasureLabel(); }
+$$("#modeSeg button").forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
+function pendingBase(){ const l=store.meas[store.meas.length-1]; return l&&l.mode==="repere"&&l.part==="pied"?l:null; }
+function updMeasureLabel(){
+  const btn=$("#measure");
+  if(mode==="repere") btn.textContent=pendingBase()?"Mesurer le ciel au-dessus":"Mesurer le pied";
+  else if(mode==="table") btn.textContent="Lancer 5 s";
+  else btn.textContent="Mesurer";
+}
+let busy=false;
+function beep(){ try{ const c=new (window.AudioContext||window.webkitAudioContext)(); const o=c.createOscillator(), g=c.createGain(); o.frequency.value=880; g.gain.value=.15; o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime+.12); setTimeout(()=>c.close(),300);}catch(e){} }
+function flash(){ const f=$("#flash"); f.style.opacity=.5; setTimeout(()=>f.style.opacity=0,150); }
+$("#measure").onclick=()=>{
+  if(busy) return; busy=true; $("#measure").disabled=true;
+  const tStart=performance.now();
+  if(mode==="table"){
+    $("#state").textContent="Ne touche plus le téléphone…";
+    setTimeout(()=>{ const w=buf.filter(v=>v.t>tStart+800); finish(w,true); },5800);
+    return;
+  }
+  $("#state").textContent="Vise et tiens immobile…";
+  const GRACE=900, WIN=800, MAXT=6000;
+  const iv=setInterval(()=>{
+    const now=performance.now();
+    if(now-tStart<GRACE) return;
+    const w=buf.filter(v=>v.t>now-WIN);
+    const s=sd(w.map(v=>v.el));
+    if(w.length>=5&&s<0.3){ clearInterval(iv); finish(w,true); }
+    else if(now-tStart>MAXT){ clearInterval(iv); finish(w,false); }
+  },60);
+};
+function finish(w,stable){
+  busy=false; $("#measure").disabled=false;
+  if(!w.length){ $("#state").textContent="Pas de données capteurs."; return; }
+  const el=w.reduce((s,v)=>s+v.el,0)/w.length, az=circMean(w.map(v=>v.az)), s=sd(w.map(v=>v.el));
+  const now=new Date(), sun=gps?sunPos(now,gps.lat,gps.lon):null;
+  const m={i:(store.meas.length?store.meas[store.meas.length-1].i:0)+1,t:now.toISOString(),sun,light:sun?lightOf(sun.el):null,mode,axis,el:+el.toFixed(3),az:+az.toFixed(1),sd:+s.toFixed(3),n:w.length,stable,abs:absolute,gps:gps?{...gps}:null};
+  if(mode==="repere"){
+    const pb=pendingBase();
+    if(pb){ m.part="ciel"; m.name=pb.name; m.dist=pb.dist; m.baseEl=pb.el; }
+    else { m.part="pied"; m.name=$("#repName").value.trim()||"repère "+(store.meas.filter(x=>x.part==="pied").length+1); const d=parseFloat(($("#repDist").value||"").replace(",",".")); m.dist=isFinite(d)&&d>0?d:null; }
+  }
+  if(mode==="horizon"||mode==="cible"){ const k=store.meas.filter(x=>x.mode===mode).length; m.serie=mode+"-"+Math.floor(k/(mode==="horizon"?10:5)); }
+  store.meas.push(m); persist();
+  try{navigator.vibrate&&navigator.vibrate(stable?80:[60,60,60]);}catch(e){} beep(); flash();
+  let txt=`${fmt(el,2)}° enregistré`+(stable?"":" (bougé, à refaire ?)");
+  if(m.part==="ciel"&&m.dist){ const y=m.dist*Math.tan(el*D)+1.5; txt+=` · voûte à ${Math.round(y)} m au-dessus de ${m.name}`; }
+  $("#state").textContent=txt;
+  if(m.part==="ciel"){ $("#repName").value=""; $("#repDist").value=""; }
+  updMeasureLabel(); render();
+  if(m.part==="ciel") showPost(m); else hidePost();
+}
+$("#undo").onclick=()=>{ const m=store.meas.pop(); if(m) idbDel(m.i); persist(); hidePost(); updMeasureLabel(); render(); $("#state").textContent="Dernière mesure annulée."; };
+$("#clear").onclick=()=>{ if($("#clear").dataset.arm){ store.meas=[]; persist(); idbClear(); hidePost(); render(); updMeasureLabel(); $("#clear").textContent="Tout effacer"; delete $("#clear").dataset.arm; } else { $("#clear").dataset.arm=1; $("#clear").textContent="Confirmer l'effacement"; setTimeout(()=>{ if($("#clear").dataset.arm){ delete $("#clear").dataset.arm; $("#clear").textContent="Tout effacer"; } },3000); } };
+/* ---------- photos ---------- */
+let idb=null;
+function idbOpen(){ return idb||(idb=new Promise((res,rej)=>{ try{ const r=indexedDB.open("visee",1); r.onupgradeneeded=()=>r.result.createObjectStore("photos"); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error);}catch(e){rej(e)} })); }
+async function idbTx(mode,fn){ const db=await idbOpen(); return new Promise((res,rej)=>{ const tx=db.transaction("photos",mode); const st=tx.objectStore("photos"); const out=fn(st); tx.oncomplete=()=>res(out&&out.result!==undefined?out.result:out); tx.onerror=()=>rej(tx.error); }); }
+const idbPut=(k,v)=>idbTx("readwrite",st=>st.put(v,k)).catch(()=>{});
+const idbDel=k=>idbTx("readwrite",st=>st.delete(k)).catch(()=>{});
+const idbClear=()=>idbTx("readwrite",st=>st.clear()).catch(()=>{});
+async function idbAll(){ try{ const db=await idbOpen(); return await new Promise((res,rej)=>{ const out=[]; const tx=db.transaction("photos","readonly"); const c=tx.objectStore("photos").openCursor(); c.onsuccess=()=>{ const cur=c.result; if(cur){ out.push([cur.key,cur.value]); cur.continue(); } }; tx.oncomplete=()=>res(out); tx.onerror=()=>rej(tx.error); }); }catch(e){ return []; } }
+let postFor=null;
+function showPost(m){
+  postFor=m.i; $("#post").classList.remove("hide"); $("#thumb").classList.add("hide"); $("#photoInfo").textContent=m.light?`Soleil à ${fmt(m.sun.el,0)}° (${m.light}).`:"";
+  $("#postTitle").textContent=m.part==="ciel"?"Photo du ciel au-dessus du repère, repère en bas du cadre (facultatif)":"Photo du ciel (facultatif)";
+  $("#aimRow").classList.toggle("hide",m.part!=="ciel"); $$("#aimSeg button").forEach(b=>b.classList.toggle("on",b.dataset.aim===m.aim));
+}
+function hidePost(){ postFor=null; $("#post").classList.add("hide"); }
+$("#photoAny").onclick=()=>{ const m=store.meas[store.meas.length-1]; if(!m){ $("#state").textContent="Fais d'abord une mesure."; return; } showPost(m); $("#photoIn").click(); };
+$$("#aimSeg button").forEach(b=>b.onclick=()=>{ const m=store.meas.find(x=>x.i===postFor); if(!m) return; m.aim=b.dataset.aim; persist(); $$("#aimSeg button").forEach(x=>x.classList.toggle("on",x===b)); render(); });
+function loadImg(file){ return new Promise((res,rej)=>{ const u=URL.createObjectURL(file); const im=new Image(); im.onload=()=>{res(im)}; im.onerror=rej; im.src=u; }); }
+function skyStats(im){
+  const W=200, H=Math.max(1,Math.round(im.naturalHeight*W/im.naturalWidth));
+  const c=document.createElement("canvas"); c.width=W; c.height=H; const x=c.getContext("2d"); x.drawImage(im,0,0,W,H);
+  const d=x.getImageData(0,0,W,H).data; let L=0,blue=0,cloud=0,top=0;
+  for(let y=0;y<H;y++) for(let i=0;i<W;i++){ const k=(y*W+i)*4, r=d[k],g=d[k+1],b=d[k+2]; const lum=.2126*r+.7152*g+.0722*b; L+=lum;
+    if(y<H/2){ top++; const mx=Math.max(r,g,b), mn=Math.min(r,g,b), sat=mx?(mx-mn)/mx:0;
+      if(b>r+20&&b>=g&&sat>.18) blue++; else if(sat<.18&&lum>90) cloud++; } }
+  const sky=(blue+cloud)/top;
+  return {lum:+(L/(W*H)/255).toFixed(3), sky:+sky.toFixed(2), cover:sky>.2?+(cloud/(blue+cloud)).toFixed(2):null};
+}
+$("#photoIn").onchange=async e=>{
+  const f=e.target.files&&e.target.files[0]; e.target.value=""; if(!f||postFor==null) return;
+  const m=store.meas.find(x=>x.i===postFor); if(!m) return;
+  try{
+    const im=await loadImg(f); const s=Math.min(1,1280/Math.max(im.naturalWidth,im.naturalHeight));
+    const c=document.createElement("canvas"); c.width=Math.round(im.naturalWidth*s); c.height=Math.round(im.naturalHeight*s);
+    c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+    const blob=await new Promise(r=>c.toBlob(r,"image/jpeg",.82));
+    await idbPut(m.i,blob);
+    m.photo={...skyStats(im),w:c.width,h:c.height,kb:Math.round(blob.size/1024),t:new Date().toISOString()};
+    persist(); render();
+    const t=$("#thumb"); t.src=URL.createObjectURL(blob); t.classList.remove("hide");
+    const p=m.photo; $("#photoInfo").textContent=(m.light?`Soleil à ${fmt(m.sun.el,0)}° (${m.light}). `:"")+(p.cover!=null?`Nuages estimés : ${Math.round(p.cover*100)} % du ciel visible.`:"Peu de ciel détecté sur la photo.");
+  }catch(err){ $("#photoInfo").textContent="Photo illisible."; }
+};
+function render(){
+  const tb=$("#tbl tbody"); tb.innerHTML="";
+  store.meas.slice().reverse().forEach(m=>{
+    const lab=m.mode==="repere"?`${m.name} (${m.part})`:m.mode==="table"?"posé":m.mode;
+    tb.insertAdjacentHTML("beforeend",`<tr><td>${m.i}</td><td>${lab}</td><td>${fmt(m.el,2)}°</td><td>${fmt(m.az,0)}°</td><td>${m.stable?fmt(m.sd,2):"bougé"}${m.photo?" · photo":""}${m.aim?" · "+m.aim:""}</td></tr>`);
+  });
+  let h="";
+  for(const md of ["horizon","cible","table"]){
+    const a=store.meas.filter(m=>m.mode===md);
+    if(a.length<2&&md!=="table") continue; if(!a.length) continue;
+    const els=a.map(m=>m.el);
+    const mean=els.reduce((s,v)=>s+v,0)/els.length;
+    if(md==="table") h+=`<div class="stat"><b>Posé</b> : bruit du capteur ${fmt(a[a.length-1].sd,2)}° (élévation ${fmt(a[a.length-1].el,2)}°)</div>`;
+    else h+=`<div class="stat"><b>${md==="horizon"?"Horizon":"Cible"}</b> (${a.length}) : moyenne ${fmt(mean,2)}°, écart type <b>${fmt(sd(els),2)}°</b>, de ${fmt(Math.min(...els),1)} à ${fmt(Math.max(...els),1)}° · direction ±${fmt(sd(a.map(m=>((m.az-circMean(a.map(x=>x.az))+540)%360)-180)),0)}°</div>`;
+  }
+  const sk=store.meas.filter(m=>m.part==="ciel");
+  if(sk.length) h+=`<div class="stat"><b>Repères</b> : `+sk.map(m=>`${m.name} ${m.dist?Math.round(m.dist*Math.tan(m.el*D)+1.5)+" m":fmt(m.el,1)+"°"}`).join(", ")+`</div>`;
+  $("#stats").innerHTML=h||'<div class="small">Les statistiques apparaissent après deux mesures.</div>';
+}
+function exportText(){ return JSON.stringify({app:"visee.v1",exportedAt:new Date().toISOString(),dev:store.dev,meas:store.meas}); }
+$("#share").onclick=async()=>{ const t=exportText();
+  try{
+    const ph=await idbAll(); const files=[new File([t],"visee-"+new Date().toISOString().slice(0,16).replace(/[:T]/g,"-")+".json",{type:"application/json"})].concat(ph.map(([k,b])=>new File([b],"visee-mesure-"+k+".jpg",{type:"image/jpeg"})));
+    if(navigator.canShare&&navigator.canShare({files})){ await navigator.share({title:"Visée de la voûte",files}); $("#msg").textContent=`Partagé (${ph.length} photo${ph.length>1?"s":""}).`; return; }
+    if(navigator.share){ await navigator.share({title:"Visée de la voûte",text:t}); $("#msg").textContent="Partagé (texte seul)."; return; }
+  }catch(e){ if(e&&e.name==="AbortError") return; } try{ await navigator.clipboard.writeText(t); $("#msg").textContent="Partage indisponible : résultats copiés, colle-les dans le chat."; }catch(e){ $("#msg").textContent="Partage et copie indisponibles."; } };
+$("#copy").onclick=async()=>{ try{ await navigator.clipboard.writeText(exportText()); $("#msg").textContent="Copié : colle-le dans le chat."; }catch(e){ $("#msg").textContent="Copie refusée par le navigateur."; } };
+render();
+</script>
+</body>
+</html>
