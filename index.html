@@ -18,6 +18,17 @@
   --s:"Newsreader",Georgia,"Times New Roman",serif;
   color-scheme:dark;
 }
+html[data-theme="light"]{
+  --bg:#f5f5f2; --s1:#ebeae5; --s2:#ffffff;
+  --ink:#121418; --mut:#5f636b; --faint:#9a9ea6;
+  --line:rgba(18,20,24,.12); --line2:rgba(18,20,24,.28);
+  --brass:#93783d;
+  color-scheme:light;
+}
+html[data-theme="light"] #map .dark-tiles{filter:grayscale(.7) contrast(.95)}
+.ln{stroke:var(--ink)} .acc{fill:var(--brass)} .fi{fill:var(--ink)} .bgs{stroke:var(--bg)} .bgf{fill:var(--bg)}
+.themeBtn{background:none;border:0;padding:6px 0 6px 12px;color:var(--mut);display:flex}
+html,body{transition:background-color .3s}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg)}
 body{font:400 16px/1.5 var(--f);color:var(--ink);-webkit-user-select:none;user-select:none;-webkit-font-smoothing:antialiased;font-variant-numeric:lining-nums}
@@ -157,7 +168,7 @@ input[type=range]{width:100%;margin-top:20px;accent-color:var(--ink)}
 <div id="flash"></div><div id="toast" role="status"></div>
 
 <!-- accueil -->
-<header class="wrap top"><span class="brand">Visée de la voûte</span><span class="status"><i id="dS" title="capteurs"></i><i id="dG" title="GPS"></i><span id="gTxt"></span></span></header>
+<header class="wrap top"><span class="brand">Visée de la voûte</span><span class="status"><i id="dS" title="capteurs"></i><i id="dG" title="GPS"></i><span id="gTxt"></span><button class="themeBtn" id="themeBtn" aria-label="Passer en affichage clair ou sombre"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M9 1.5A7.5 7.5 0 0 1 9 16.5Z" fill="currentColor"/></svg></button></span></header>
 <section class="wrap hero">
   <div id="vaultHdr"></div>
   <div id="hdrLine"></div>
@@ -165,14 +176,14 @@ input[type=range]{width:100%;margin-top:20px;accent-color:var(--ink)}
 </section>
 
 <main class="wrap">
-  <button class="go" id="newBtn"><span><b>Viser un repère</b><small>Éolienne, clocher, château d'eau…</small></span><svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="15.5" fill="none" stroke="#0d0f13" stroke-width="1.2"/><line x1="17" y1="1" x2="17" y2="9" stroke="#0d0f13" stroke-width="1.2"/><line x1="17" y1="25" x2="17" y2="33" stroke="#0d0f13" stroke-width="1.2"/><line x1="1" y1="17" x2="9" y2="17" stroke="#0d0f13" stroke-width="1.2"/><line x1="25" y1="17" x2="33" y2="17" stroke="#0d0f13" stroke-width="1.2"/><circle cx="17" cy="17" r="2.4" fill="#0d0f13"/></svg></button>
+  <button class="go" id="newBtn"><span><b>Viser un repère</b><small>Éolienne, clocher, château d'eau…</small></span><svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle class="bgs" cx="17" cy="17" r="15.5" fill="none" stroke-width="1.2"/><line class="bgs" x1="17" y1="1" x2="17" y2="9" stroke-width="1.2"/><line class="bgs" x1="17" y1="25" x2="17" y2="33" stroke-width="1.2"/><line class="bgs" x1="1" y1="17" x2="9" y2="17" stroke-width="1.2"/><line class="bgs" x1="25" y1="17" x2="33" y2="17" stroke-width="1.2"/><circle class="bgf" cx="17" cy="17" r="2.4"/></svg></button>
   <label class="switch"><input type="checkbox" id="photoChk" checked>Commencer par une photo</label>
 
   <h2>Expériences</h2>
   <div class="tiles">
-    <button class="tile xp" data-xp="dessin"><svg viewBox="0 0 44 44" aria-hidden="true"><line x1="2" y1="36" x2="42" y2="36" stroke="#ecebe6" stroke-opacity=".45" stroke-width="1"/><path d="M5 36C7 20 14 13 22 13s15 7 17 23" fill="none" stroke="#ecebe6" stroke-width="1.3"/><circle cx="22" cy="36" r="2.4" fill="#c4ad7c"/></svg><span><b>Dessiner son ciel</b><small>Trace la forme que tu vois</small></span><span class="st" id="st-dessin">À faire</span></button>
-    <button class="tile xp" data-xp="partage"><svg viewBox="0 0 44 44" aria-hidden="true"><line x1="2" y1="36" x2="42" y2="36" stroke="#ecebe6" stroke-opacity=".45" stroke-width="1"/><path d="M6 36A16 16 0 0 1 38 36" fill="none" stroke="#ecebe6" stroke-opacity=".45" stroke-width="1"/><path d="M22 36L11.4 24M22 36L22 20M22 36L32.6 24" stroke="#ecebe6" stroke-width="1.3"/><circle cx="22" cy="36" r="2.4" fill="#c4ad7c"/></svg><span><b>Partager le ciel</b><small>Trois visées, trois parts égales</small></span><span class="st" id="st-partage">À faire</span></button>
-    <button class="tile xp" data-xp="tache"><svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="16" fill="none" stroke="#ecebe6" stroke-width="1.3"/><circle cx="22" cy="22" r="9" fill="none" stroke="#ecebe6" stroke-opacity=".45" stroke-width="1"/><circle cx="22" cy="22" r="2.4" fill="#c4ad7c"/></svg><span><b>La tache dans le ciel</b><small>Une image qui reste dans l’œil</small></span><span class="st" id="st-tache">À faire</span></button>
+    <button class="tile xp" data-xp="dessin"><svg viewBox="0 0 44 44" aria-hidden="true"><line class="ln" x1="2" y1="36" x2="42" y2="36" stroke-opacity=".45" stroke-width="1"/><path class="ln" d="M5 36C7 20 14 13 22 13s15 7 17 23" fill="none" stroke-width="1.3"/><circle class="acc" cx="22" cy="36" r="2.4"/></svg><span><b>Dessiner son ciel</b><small>Trace la forme que tu vois</small></span><span class="st" id="st-dessin">À faire</span></button>
+    <button class="tile xp" data-xp="partage"><svg viewBox="0 0 44 44" aria-hidden="true"><line class="ln" x1="2" y1="36" x2="42" y2="36" stroke-opacity=".45" stroke-width="1"/><path class="ln" d="M6 36A16 16 0 0 1 38 36" fill="none" stroke-opacity=".45" stroke-width="1"/><path class="ln" d="M22 36L11.4 24M22 36L22 20M22 36L32.6 24" stroke-width="1.3"/><circle class="acc" cx="22" cy="36" r="2.4"/></svg><span><b>Partager le ciel</b><small>Trois visées, trois parts égales</small></span><span class="st" id="st-partage">À faire</span></button>
+    <button class="tile xp" data-xp="tache"><svg viewBox="0 0 44 44" aria-hidden="true"><circle class="ln" cx="22" cy="22" r="16" fill="none" stroke-width="1.3"/><circle class="ln" cx="22" cy="22" r="9" fill="none" stroke-opacity=".45" stroke-width="1"/><circle class="acc" cx="22" cy="22" r="2.4"/></svg><span><b>La tache dans le ciel</b><small>Une image qui reste dans l’œil</small></span><span class="st" id="st-tache">À faire</span></button>
   </div>
   <div class="order">Trois façons de vérifier ta voûte autrement. Commence par le dessin.</div>
 
@@ -189,6 +200,7 @@ input[type=range]{width:100%;margin-top:20px;accent-color:var(--ink)}
 
   <details class="set"><summary>Réglages</summary><div class="in">
     <div>Participant : <b id="pseudoShow"></b> · <a href="#" id="pseudoEdit">changer</a></div>
+    <div><div class="sub">Affichage. Auto : clair le jour, sombre la nuit.</div><div class="seg" id="themeSeg"><button data-t="auto">Auto</button><button data-t="light">Clair</button><button data-t="dark">Sombre</button></div></div>
     <label class="switch" style="margin:0"><input type="checkbox" id="voiceChk" checked>Consignes à voix haute</label>
     <div id="syncTxt" class="sub"></div>
     <div class="acts"><button class="btn2 small" id="calibBtn">Tester ma précision</button><button class="btn2 small" id="copy">Copier les données</button><button class="btn2 small" id="clear">Tout effacer</button></div>
@@ -200,7 +212,7 @@ input[type=range]{width:100%;margin-top:20px;accent-color:var(--ink)}
 <!-- premier lancement -->
 <section id="intro" class="full blue hide"><div class="in">
   <div class="brand">Visée de la voûte</div>
-  <svg viewBox="0 0 340 200" style="width:100%;margin-top:auto" aria-hidden="true"><path d="M20 176A150 150 0 0 1 320 176" fill="none" stroke="#ecebe6" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 6"/><path d="M20 176C64 118 116 104 170 104S276 118 320 176Z" fill="#ecebe6" fill-opacity=".06" stroke="#ecebe6" stroke-width="1.2"/><line x1="0" y1="176" x2="340" y2="176" stroke="#ecebe6" stroke-opacity=".5" stroke-width="1"/><line x1="170" y1="176" x2="170" y2="104" stroke="#ecebe6" stroke-opacity=".3" stroke-width="1"/><line x1="170" y1="176" x2="320" y2="176" stroke="#ecebe6" stroke-opacity=".3" stroke-width="1"/><circle cx="170" cy="104" r="2.6" fill="#ecebe6"/><circle cx="320" cy="176" r="2.6" fill="#ecebe6"/><circle cx="170" cy="176" r="4" fill="#c4ad7c"/><text x="178" y="142" font-size="11" fill="#ecebe6" fill-opacity=".55" font-family="Geist,system-ui">au-dessus de toi</text><text x="245" y="194" font-size="11" fill="#ecebe6" fill-opacity=".55" font-family="Geist,system-ui" text-anchor="middle">jusqu’à l’horizon</text></svg>
+  <svg viewBox="0 0 340 200" style="width:100%;margin-top:auto" aria-hidden="true"><path class="ln" d="M20 176A150 150 0 0 1 320 176" fill="none" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 6"/><path class="ln fi" d="M20 176C64 118 116 104 170 104S276 118 320 176Z" fill-opacity=".06" stroke-width="1.2"/><line class="ln" x1="0" y1="176" x2="340" y2="176" stroke-opacity=".5" stroke-width="1"/><line class="ln" x1="170" y1="176" x2="170" y2="104" stroke-opacity=".3" stroke-width="1"/><line class="ln" x1="170" y1="176" x2="320" y2="176" stroke-opacity=".3" stroke-width="1"/><circle class="fi" cx="170" cy="104" r="2.6"/><circle class="fi" cx="320" cy="176" r="2.6"/><circle class="acc" cx="170" cy="176" r="4"/><text class="fi" x="178" y="142" font-size="11" fill-opacity=".55" font-family="Geist,system-ui">au-dessus de toi</text><text class="fi" x="245" y="194" font-size="11" fill-opacity=".55" font-family="Geist,system-ui" text-anchor="middle">jusqu’à l’horizon</text></svg>
   <div class="big" style="font-size:48px;margin-top:28px">Ton ciel a une forme.</div>
   <div class="hint">On croit voir une coupole parfaite. Pourtant, le ciel paraît plus loin vers l'horizon qu'au-dessus de nos têtes. Mesure le tien : pointe le ciel avec ton téléphone, bras tendu.</div>
   <label class="hint" style="margin-top:24px;display:block">Ton prénom<input class="txt" id="pseudoIn" autocomplete="given-name" placeholder="Pour comparer avec tes amis"></label>
@@ -327,6 +339,7 @@ const Vault=(()=>{
     geo:{flat:true,bg:"none",gl:"#0d1440",fill:"#1131b8",stroke:"#0d1440",txt:"#0d1440",halo2:"#ffffff",mut:"#7c8299",foot:"#7c8299",person:"#0d1440",dot:"#ffffff",dotS:"#1131b8",cmp:"#0d1440",sw:1.6},
     geoInv:{flat:true,bg:"none",gl:"#ffffff",fill:"#ffffff",fillOp:.92,stroke:"#ffffff",txt:"#ffffff",halo2:"#1131b8",mut:"rgba(255,255,255,.7)",foot:"rgba(255,255,255,.6)",person:"#ffffff",dot:"#1131b8",dotS:"#ffffff",cmp:"#ffffff",sw:1.6},
     ink:{flat:true,bg:"none",gl:"rgba(236,235,230,.5)",fill:"#ecebe6",fillOp:.06,stroke:"#ecebe6",txt:"#ecebe6",halo2:"#0d0f13",mut:"#8d919a",foot:"#8d919a",person:"#c4ad7c",dot:"#0d0f13",dotS:"#ecebe6",vl:"#ecebe6",cmp:"#ecebe6",sw:1.2,lw:400,pin:"#ecebe6",grid:true},
+    paper:{flat:true,bg:"none",gl:"rgba(18,20,24,.5)",fill:"#121418",fillOp:.05,stroke:"#121418",txt:"#121418",halo2:"#f5f5f2",mut:"#5f636b",foot:"#5f636b",person:"#93783d",dot:"#f5f5f2",dotS:"#121418",vl:"#121418",cmp:"#121418",sw:1.2,lw:500,pin:"#121418",grid:true},
     night:{bg:"none",g0:"#1b2a4a",g1:"#0e1830",gl:"#4a5d84",s0:"#5d86c4",s1:"#2f4f86",s2:"#1a2d52",halo:"#f3b23c",stroke:"#f3b23c",txt:"#eef3fa",halo2:"#0f1b33",mut:"#93a6c4",foot:"#7f93b3",person:"#eef3fa",dot:"#eef3fa",cmp:"#bfd6ee"}
   };
   function svg(M,opt={}){
@@ -485,7 +498,9 @@ ${T.flat?"":`<rect x="0" y="${yG}" width="${W}" height="${H-yG}" fill="url(#${id
 </script><!--/VAULT-->
 <script>
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const D=Math.PI/180, R_E=6371000, EYE=1.5, LSK="visee.v2", FONT="'Geist',system-ui,sans-serif", SERIF="'Newsreader',Georgia,serif", INK="#ecebe6", BRASS="#c4ad7c", BG="#0d0f13";
+const D=Math.PI/180, R_E=6371000, EYE=1.5, LSK="visee.v2", FONT="'Geist',system-ui,sans-serif", SERIF="'Newsreader',Georgia,serif";
+const PAL={dark:{INK:"#ecebe6",BRASS:"#c4ad7c",BG:"#0d0f13",MUT:"#8d919a",GROUND:"rgba(236,235,230,.5)",vault:"ink"},light:{INK:"#121418",BRASS:"#93783d",BG:"#f5f5f2",MUT:"#5f636b",GROUND:"rgba(18,20,24,.5)",vault:"paper"}};
+let THEME="dark", INK=PAL.dark.INK, BRASS=PAL.dark.BRASS, BG=PAL.dark.BG, MUT=PAL.dark.MUT, GROUND=PAL.dark.GROUND;
 let store={recs:[],calib:[],tasks:[],introSeen:false};
 try{const s=JSON.parse(localStorage.getItem(LSK)||"null"); if(s&&Array.isArray(s.recs)) store={...store,...s};}catch(e){}
 store.tasks=store.tasks||[]; store.calib=store.calib||[];
@@ -735,10 +750,13 @@ function choose(rec,c){
   rec.yEye=+(c.d*Math.tan(rec.sky.el*D)+EYE).toFixed(1);
   delete rec._c; markDirty(rec); idRec=null; closeFull("ident"); render(); showResult(rec);
 }
-function showResult(rec){
+let lastShown=null;
+function showResult(rec,redraw){
+  lastShown=rec;
   $("#resNum").innerHTML=`${Math.round(rec.y)}<small>m</small>`;
   $("#resLab").innerHTML=`C'est la hauteur où tu places le ciel, à la verticale de <b>${tLabel(rec.target)}</b>, à ${km(rec.target.d)} de toi.`;
-  const M=vaultModel(); $("#resVault").innerHTML=M&&M.ok?Vault.svg(M,{theme:"ink",font:FONT,foot:false,fs:1.7})+`<p class="hint" style="margin:12px 10px 0">${M.title}, ${M.line}</p>`:emptyDome(true)+`<p class="hint" style="margin:12px 10px 0">${encore()}, proches et lointains, pour dessiner ta voûte.</p>`;
+  const M=vaultModel(); $("#resVault").innerHTML=M&&M.ok?Vault.svg(M,{theme:PAL[THEME].vault,font:FONT,foot:false,fs:1.7})+`<p class="hint" style="margin:12px 10px 0">${M.title}, ${M.line}</p>`:emptyDome(true)+`<p class="hint" style="margin:12px 10px 0">${encore()}, proches et lointains, pour dessiner ta voûte.</p>`;
+  if(redraw) return;
   openFull("result"); finale(); vib([80,60,80]);
 }
 $("#rClose").onclick=()=>closeFull("result");
@@ -788,7 +806,7 @@ function encore(){ const n=Math.max(1,3-pointsFor().length); return n>1?`Encore 
 const curly=t=>t.replace(/(\w)'(\w)/g,"$1’$2");
 function renderVault(){
   const M=vaultModel(), ok=M&&M.ok;
-  $("#vaultHdr").innerHTML=ok?Vault.svg(M,{theme:"ink",font:FONT,real:realProp,foot:false,fs:1.6}):emptyDome();
+  $("#vaultHdr").innerHTML=ok?Vault.svg(M,{theme:PAL[THEME].vault,font:FONT,real:realProp,foot:false,fs:1.6}):emptyDome();
   $("#propBtn").classList.toggle("hide",!ok); $("#propBtn").textContent=realProp?"Revenir à la forme":"Voir les vraies proportions";
   const r=Vault.ratioOfModel(M);
   $("#hdrLine").innerHTML=curly(ok?(r?`Ton ciel est <b>${fmt(r,r<10?1:0)} fois plus loin</b> à l'horizon qu'au-dessus de toi.`:`${M.title}, ${M.line}`):(store.recs.length?`${encore()} à identifier, proches et lointains, pour dessiner <b>ta voûte</b>.`:`Vise trois repères, proches et lointains : <b>ta voûte</b> se dessinera ici.`));
@@ -828,9 +846,9 @@ function cvSetup(){ const cv=$("#drawCv"), r=cv.getBoundingClientRect(), dpr=win
 function drawScene(){
   const {x,W,H}=cvSetup(), yG=H*.8, xc=W/2;
   x.clearRect(0,0,W,H);
-  x.strokeStyle="rgba(236,235,230,.5)"; x.lineWidth=1; x.beginPath(); x.moveTo(0,yG); x.lineTo(W,yG); x.stroke();
+  x.strokeStyle=GROUND; x.lineWidth=1; x.beginPath(); x.moveTo(0,yG); x.lineTo(W,yG); x.stroke();
   x.fillStyle=BRASS; x.beginPath(); x.arc(xc,yG,5,0,7); x.fill();
-  x.fillStyle="#8d919a"; x.font="400 13px Geist, system-ui"; x.textAlign="left"; x.fillText("horizon",12,yG+24); x.textAlign="right"; x.fillText("horizon",W-12,yG+24); x.textAlign="center"; x.fillText("toi",xc,yG+24);
+  x.fillStyle=MUT; x.font="400 13px Geist, system-ui"; x.textAlign="left"; x.fillText("horizon",12,yG+24); x.textAlign="right"; x.fillText("horizon",W-12,yG+24); x.textAlign="center"; x.fillText("toi",xc,yG+24);
   if(drawPts.length>1){ x.strokeStyle=INK; x.lineWidth=2.2; x.lineCap="round"; x.lineJoin="round"; x.beginPath(); drawPts.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])); x.stroke(); }
   return {W,H,yG,xc};
 }
@@ -883,7 +901,7 @@ function tacheView(v){
 }
 function drawCmp(){
   const v=+$("#tR").value, big=tacheAns==="horizon", base=22, rH=Math.min(big?base*v:base,66), rT=Math.min(big?base:base*v,66);
-  $("#cmp").innerHTML=`<line x1="0" y1="150" x2="340" y2="150" stroke="${INK}" stroke-opacity=".5" stroke-width="1"/><circle cx="85" cy="${150-8-rH}" r="${rH}" fill="${INK}"/><circle cx="255" cy="${82}" r="${rT}" fill="${INK}"/><text x="85" y="172" font-size="13" text-anchor="middle" fill="#8d919a" font-family="${FONT}">près de l'horizon</text><text x="255" y="172" font-size="13" text-anchor="middle" fill="#8d919a" font-family="${FONT}">en haut du ciel</text><text x="170" y="44" font-size="38" font-weight="200" text-anchor="middle" fill="${INK}" font-family="${SERIF}">×${fmt(v,1)}</text>`;
+  $("#cmp").innerHTML=`<line x1="0" y1="150" x2="340" y2="150" stroke="${INK}" stroke-opacity=".5" stroke-width="1"/><circle cx="85" cy="${150-8-rH}" r="${rH}" fill="${INK}"/><circle cx="255" cy="${82}" r="${rT}" fill="${INK}"/><text x="85" y="172" font-size="13" text-anchor="middle" fill="${MUT}" font-family="${FONT}">près de l'horizon</text><text x="255" y="172" font-size="13" text-anchor="middle" fill="${MUT}" font-family="${FONT}">en haut du ciel</text><text x="170" y="44" font-size="38" font-weight="200" text-anchor="middle" fill="${INK}" font-family="${SERIF}">×${fmt(v,1)}</text>`;
 }
 function openTache(){ initAudio(); openFull("tacheModal"); tacheView("intro"); }
 function fixation(){
@@ -989,6 +1007,25 @@ setInterval(sync,20000); window.addEventListener("online",syncSoon);
 function showPseudo(){ $("#pseudoShow").textContent=store.pseudo||"anonyme"; }
 $("#pseudoEdit").onclick=e=>{ e.preventDefault(); $("#pseudoIn").value=store.pseudo||""; openFull("intro"); };
 $("#introOk").onclick=()=>{ const v=$("#pseudoIn").value.trim().slice(0,40); if(v) store.pseudo=v; store.introSeen=true; persist(); showPseudo(); closeFull("intro"); initAudio(); };
+/* ---------- affichage clair / sombre ---------- */
+function autoTheme(){ const now=new Date(); if(gps){ try{ return sunPos(now,gps.lat,gps.lon).el>-3?"light":"dark"; }catch(e){} } const h=now.getHours(); return h>=7&&h<19?"light":"dark"; }
+function applyTheme(){
+  const pref=store.theme||"auto", t=pref==="auto"?autoTheme():pref;
+  $$("#themeSeg button").forEach(b=>b.classList.toggle("on",b.dataset.t===pref));
+  if(t===THEME&&document.documentElement.dataset.theme===t) return;
+  THEME=t; ({INK,BRASS,BG,MUT,GROUND}=PAL[t]);
+  document.documentElement.dataset.theme=t;
+  const m=document.querySelector('meta[name="theme-color"]'); if(m) m.content=BG;
+  try{ render(); }catch(e){}
+  if(gaugeOn){ const l=buf[buf.length-1]; drawGauge(l?l.el:null); }
+  if(!$("#drawModal").classList.contains("hide")) try{ drawScene(); }catch(e){}
+  if($("#tR")) try{ drawCmp(); }catch(e){}
+  if(!$("#result").classList.contains("hide")&&lastShown) try{ showResult(lastShown,true); }catch(e){}
+}
+$$("#themeSeg button").forEach(b=>b.onclick=()=>{ store.theme=b.dataset.t; persist(); applyTheme(); });
+$("#themeBtn").onclick=()=>{ store.theme=THEME==="dark"?"light":"dark"; persist(); applyTheme(); toast((store.theme==="light"?"Affichage clair.":"Affichage sombre.")+" Retour à l'automatique dans les réglages."); };
+setInterval(()=>{ if((store.theme||"auto")==="auto") applyTheme(); },60000);
+applyTheme();
 $("#voiceChk").checked=store.voice!==false; $("#voiceChk").onchange=e=>{ store.voice=e.target.checked; persist(); };
 if(!store.introSeen){ $("#pseudoIn").value=store.pseudo||""; openFull("intro"); }
 showPseudo(); render(); showCalib();
