@@ -203,8 +203,8 @@ input[type=range]{width:100%;margin-top:20px;accent-color:var(--ink)}
     <div><div class="sub">Affichage. Auto : clair le jour, sombre la nuit.</div><div class="seg" id="themeSeg"><button data-t="auto">Auto</button><button data-t="light">Clair</button><button data-t="dark">Sombre</button></div></div>
     <label class="switch" style="margin:0"><input type="checkbox" id="voiceChk" checked>Consignes à voix haute</label>
     <div id="syncTxt" class="sub"></div>
-    <div class="acts"><button class="btn2 small" id="calibBtn">Tester ma précision</button><button class="btn2 small" id="copy">Copier les données</button><button class="btn2 small" id="clear">Tout effacer</button></div>
-    <div id="calibRes" class="sub"></div>
+    <div class="acts"><button class="btn2 small" id="vibBtn">Tester la vibration</button><button class="btn2 small" id="calibBtn">Tester ma précision</button><button class="btn2 small" id="copy">Copier les données</button><button class="btn2 small" id="clear">Tout effacer</button></div>
+    <div id="vibRes" class="sub"></div><div id="calibRes" class="sub"></div>
   </div></details>
 </main>
 <input type="file" id="photoIn" accept="image/*" capture="environment" hidden>
@@ -555,7 +555,8 @@ const chime=()=>{ tone(880,.3,.35,0,"triangle"); tone(1320,.45,.3,.12,"triangle"
 const finale=()=>{ [784,988,1175].forEach((f,i)=>tone(f,.4,.3,i*.13,"triangle")); };
 const nag=()=>tone(260,.35,.3);
 document.addEventListener("pointerdown",initAudio,{capture:true});
-function vib(p){ try{ navigator.vibrate&&navigator.vibrate(p); }catch(e){} }
+let vibRes=null;
+function vib(p){ try{ vibRes=navigator.vibrate?navigator.vibrate(p):"absent"; }catch(e){ vibRes="erreur"; } return vibRes; }
 function flash(){ const f=$("#flash"); f.style.opacity=.35; setTimeout(()=>f.style.opacity=0,140); }
 function say(t){ try{ if(store.voice===false||!window.speechSynthesis) return; speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang="fr-FR"; u.rate=1.04; speechSynthesis.speak(u); }catch(e){} }
 let wl=null;
@@ -671,7 +672,7 @@ $("#mClose").onclick=()=>{ if(run){ run.cancel=true; if(run.rec) idbDel(run.rec.
 /* ---------- viser un repère ---------- */
 const nextId=()=>store.recs.reduce((m,r)=>Math.max(m,r.i),0)+1;
 async function newLandmark(){
-  if(run) return; askPerm(); initAudio(); wake();
+  if(run) return; askPerm(); initAudio(); wake(); vib(30);
   const rec={i:nextId(),t:new Date().toISOString()};
   run={rec,cancel:false};
   let pp=null;
@@ -681,6 +682,7 @@ async function newLandmark(){
   const base=await step({label:"Étape 1 sur 2",title:"Vise le pied du repère",hint:"Bras tendu, le bord du haut du téléphone pointé vers le bas du repère, là où il touche le sol.",cond:el=>Math.abs(el)<25,wrong:"Baisse le téléphone vers le pied du repère"});
   if(!base) return;
   rec.base=base; rec.gps=gps?{...gps}:null; rec.candsP=findCands(rec);
+  rec.diag={vib:vibRes,nav:(navigator.userAgent.match(/(SamsungBrowser|MiuiBrowser|EdgA|OPR|Firefox|Chrome|Version)\/[\d.]+/)||[""])[0]+(/; wv\)/.test(navigator.userAgent)?" webview":"")};
   const sky=await step({label:"Étape 2 sur 2",title:"Monte vers le ciel juste au-dessus",hint:"Lève le bras et vise le point du ciel qui est exactement à la verticale du repère.",cond:el=>el>base.el+3,wrong:"Plus haut, dans le ciel au-dessus du repère"});
   if(!sky) return;
   rec.sky=sky; rec.t=new Date().toISOString(); if(!rec.gps&&gps) rec.gps={...gps};
@@ -702,24 +704,40 @@ const KIND=t=>{
   if(t.natural==="peak") return "sommet"; if(t.historic==="castle") return "château"; return "repère";
 };
 const tLabel=t=>t.name?(t.name.toLowerCase().includes(t.kind.split(" ")[0].toLowerCase())?esc(t.name):esc(t.name)+" ("+t.kind+")"):cap(t.kind);
-async function findCands(rec){
-  if(!rec.gps||!rec.base) return [];
-  const {lat,lon}=rec.gps, b=rec.base.az, RMAX=12000, HW=20;
-  const pts=[[lat,lon]]; for(let a=b-HW;a<=b+HW+.1;a+=5) pts.push(dest(lat,lon,a,RMAX));
-  const poly=pts.map(p=>p[0].toFixed(5)+" "+p[1].toFixed(5)).join(" "), P=`(poly:"${poly}")`;
-  const q=`[out:json][timeout:25];(nwr${P}["generator:source"="wind"];nwr${P}["man_made"~"^(tower|water_tower|mast|chimney|lighthouse|communications_tower|silo)$"];nwr${P}["amenity"="place_of_worship"];nwr${P}["building"~"^(church|cathedral|chapel)$"];node${P}["natural"="peak"];nwr${P}["historic"="castle"];);out center tags 400;`;
-  try{
-    const r=await fetch("https://overpass-api.de/api/interpreter",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"data="+encodeURIComponent(q)});
-    const j=await r.json(); const seen=new Set(), out=[];
-    for(const e of j.elements||[]){
-      const la=e.lat??(e.center&&e.center.lat), lo=e.lon??(e.center&&e.center.lon); if(la==null) continue;
-      const t=e.tags||{}, {d,brg}=distBrg(lat,lon,la,lo); if(d<40) continue;
-      const key=e.type+e.id; if(seen.has(key)) continue; seen.add(key);
-      out.push({id:key,kind:KIND(t),name:t.name||"",lat:la,lon:lo,d:Math.round(d),brg:+brg.toFixed(1),db:+dAng(brg,b).toFixed(1),h:t.height?parseFloat(t.height):null});
-    }
-    const merged=[]; for(const c of out.sort((a,b2)=>Math.abs(a.db)-Math.abs(b2.db))){ if(!merged.some(m=>m.kind===c.kind&&distBrg(m.lat,m.lon,c.lat,c.lon).d<80)) merged.push(c); }
-    return merged;
-  }catch(e){ return null; }
+const OVERPASS=["https://overpass-api.de/api/interpreter","https://overpass.private.coffee/api/interpreter","https://maps.mail.ru/osm/tools/overpass/api/interpreter","https://overpass.kumi.systems/api/interpreter"];
+async function overpass(q){
+  const errs=[];
+  for(const u of OVERPASS){
+    const ac=new AbortController(), to=setTimeout(()=>ac.abort(),14000);
+    try{
+      const r=await fetch(u,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"data="+encodeURIComponent(q),signal:ac.signal});
+      clearTimeout(to);
+      if(!r.ok){ errs.push(u.split("/")[2]+" "+r.status); continue; }
+      const j=await r.json(); if(j&&Array.isArray(j.elements)) return {j,src:u.split("/")[2],errs};
+      errs.push(u.split("/")[2]+" json");
+    }catch(e){ clearTimeout(to); errs.push(u.split("/")[2]+" "+(e.name==="AbortError"?"délai":"réseau")); }
+  }
+  const e=new Error("overpass"); e.errs=errs; throw e;
+}
+async function findCands(rec){ // {list} ou {err:"gps"|"reseau", detail}
+  if(!rec.base) return {err:"gps"};
+  if(!rec.gps){ if(gps) rec.gps={...gps}; else return {err:"gps"}; }
+  const {lat,lon}=rec.gps, b=rec.base.az, RMAX=12000, HW=20, HW2=40;
+  const pts=[[lat,lon]]; for(let a=b-HW2;a<=b+HW2+.1;a+=5) pts.push(dest(lat,lon,a,RMAX));
+  const la=pts.map(p=>p[0]), lo=pts.map(p=>p[1]);
+  const bb=[Math.min(...la),Math.min(...lo),Math.max(...la),Math.max(...lo)].map(v=>v.toFixed(4)).join(",");
+  const q=`[out:json][timeout:20][bbox:${bb}];(nwr["generator:source"="wind"];nwr["man_made"~"^(tower|water_tower|mast|chimney|lighthouse|communications_tower|silo)$"];nwr["amenity"="place_of_worship"];nwr["building"~"^(church|cathedral|chapel)$"];node["natural"="peak"];nwr["historic"="castle"];);out center tags 1500;`;
+  let res; try{ res=await overpass(q); }catch(e){ return {err:"reseau",detail:(e.errs||[]).join(", ")}; }
+  const seen=new Set(), out=[];
+  for(const e of res.j.elements){
+    const la_=e.lat??(e.center&&e.center.lat), lo_=e.lon??(e.center&&e.center.lon); if(la_==null) continue;
+    const t=e.tags||{}, {d,brg}=distBrg(lat,lon,la_,lo_); if(d<40||d>RMAX) continue;
+    const db=dAng(brg,b); if(Math.abs(db)>HW2) continue;
+    const key=e.type+e.id; if(seen.has(key)) continue; seen.add(key);
+    out.push({id:key,kind:KIND(t),name:t.name||"",lat:la_,lon:lo_,d:Math.round(d),brg:+brg.toFixed(1),db:+db.toFixed(1),h:t.height?parseFloat(t.height):null});
+  }
+  const merged=[]; for(const c of out.sort((a,b2)=>Math.abs(a.db)-Math.abs(b2.db))){ if(!merged.some(m=>m.kind===c.kind&&distBrg(m.lat,m.lon,c.lat,c.lon).d<80)) merged.push(c); }
+  return {list:merged,src:res.src};
 }
 let idRec=null, map=null, mapLayers=null, pickMarker=null;
 async function openId(rec,candsP){
@@ -735,13 +753,22 @@ async function openId(rec,candsP){
   $("#mapBtn").onclick=()=>openMap(rec);
   const box=$("#cands");
   if(!rec.gps){ box.innerHTML=`<p class="hint">Pas de position GPS pour cette visée : il faudra l'identifier plus tard.</p>`; return; }
-  box.innerHTML=`<p class="hint">Recherche des repères…</p>`;
-  const cands=await (candsP||(rec._c?Promise.resolve(rec._c):findCands(rec))); if(idRec!==rec) return;
-  rec._c=cands;
-  if(cands==null){ box.innerHTML=`<p class="hint">Pas de réseau pour chercher les repères. Place-le sur la carte, ou plus tard.</p>`; return; }
-  if(!cands.length){ box.innerHTML=`<p class="hint">Aucun repère connu dans cette direction. Place-le sur la carte.</p>`; return; }
-  box.innerHTML=cands.slice(0,5).map((c,k)=>`<button class="cand" data-k="${k}"><span class="dot"></span><span class="tx"><b>${tLabel(c)}</b><span>${Math.abs(c.db)<3?"pile dans ta direction":fmt(Math.abs(c.db),0)+"° "+(c.db>0?"à droite":"à gauche")}</span></span><span class="d">${km(c.d)}</span></button>`).join("");
-  $$("#cands .cand").forEach(b=>b.onclick=()=>choose(rec,cands[+b.dataset.k]));
+  showCands(rec,candsP||(rec._c?Promise.resolve(rec._c):findCands(rec)));
+}
+async function showCands(rec,p){
+  const box=$("#cands"); box.innerHTML=`<p class="hint">Recherche des repères dans ta direction…</p>`;
+  const t0=performance.now(), slow=setTimeout(()=>{ if(idRec===rec&&box.querySelector(".hint")) box.innerHTML=`<p class="hint">La recherche prend du temps, j'essaie un autre serveur…</p>`; },6000);
+  const r=await p; clearTimeout(slow); if(idRec!==rec) return;
+  const prevOsm=rec.diag&&rec.diag.osm; if(prevOsm&&/^reseau/.test(prevOsm)) rec.diag.osmAvant=prevOsm;
+  rec.diag={...(rec.diag||{}),osm:r.err?r.err+(r.detail?" ("+r.detail+")":""):"ok "+r.list.length+" via "+r.src,osmMs:Math.round(performance.now()-t0)};
+  if(r.err==="gps"){ box.innerHTML=`<p class="hint">Pas de position GPS au moment de la visée. Autorise la localisation pour cette page, ou place le repère sur la carte.</p>`; return; }
+  if(r.err){ box.innerHTML=`<p class="hint">Impossible de joindre la base des repères (OpenStreetMap). Vérifie le réseau et réessaie, ou place le repère sur la carte.</p><button class="btn2 wide" id="retryBtn" style="margin-top:10px">Réessayer</button>`; $("#retryBtn").onclick=()=>showCands(rec,findCands(rec)); return; }
+  rec._c=r;
+  const cands=r.list;
+  if(!cands.length){ box.innerHTML=`<p class="hint">Rien de connu dans cette direction. Touche le repère sur la carte.</p>`; openMap(rec); return; }
+  const near=cands.filter(c=>Math.abs(c.db)<=20), list=(near.length?near:cands).slice(0,6);
+  box.innerHTML=(near.length?"":`<p class="hint">Rien pile dans ta direction. Voici les repères les plus proches de ta visée :</p>`)+list.map((c,k)=>`<button class="cand" data-k="${k}"><span class="dot"></span><span class="tx"><b>${tLabel(c)}</b><span>${Math.abs(c.db)<3?"pile dans ta direction":fmt(Math.abs(c.db),0)+"° "+(c.db>0?"à droite":"à gauche")}</span></span><span class="d">${km(c.d)}</span></button>`).join("");
+  $$("#cands .cand").forEach(b=>b.onclick=()=>choose(rec,list[+b.dataset.k]));
 }
 $("#iClose").onclick=()=>{ idRec=null; closeFull("ident"); render(); };
 function choose(rec,c){
@@ -778,7 +805,7 @@ async function openMap(rec){
   L.circleMarker([lat,lon],{radius:6,color:BRASS,fillColor:BRASS,fillOpacity:1}).addTo(mapLayers);
   L.polyline([[lat,lon],dest(lat,lon,b,12000)],{color:INK,weight:1.2,dashArray:"4 6"}).addTo(mapLayers);
   L.polygon([[lat,lon],dest(lat,lon,b-15,12000),dest(lat,lon,b+15,12000)],{color:INK,weight:0,fillOpacity:.07}).addTo(mapLayers);
-  (rec._c||[]).forEach(c=>L.circleMarker([c.lat,c.lon],{radius:7,color:BG,weight:2,fillColor:INK,fillOpacity:1}).bindTooltip(tLabel(c)).on("click",ev=>{ L.DomEvent.stopPropagation(ev); choose(rec,c); }).addTo(mapLayers));
+  ((rec._c&&rec._c.list)||[]).forEach(c=>L.circleMarker([c.lat,c.lon],{radius:7,color:BG,weight:2,fillColor:INK,fillOpacity:1}).bindTooltip(tLabel(c)).on("click",ev=>{ L.DomEvent.stopPropagation(ev); choose(rec,c); }).addTo(mapLayers));
   setTimeout(()=>{ map.invalidateSize(); map.fitBounds(L.latLngBounds([[lat,lon],dest(lat,lon,b,4000)]).pad(.4)); el.scrollIntoView({behavior:"smooth",block:"center"}); },60);
   $("#mapPick").innerHTML=`<p class="hint" style="margin-top:8px">Touche la carte à l'endroit du repère.</p>`;
 }
@@ -939,6 +966,13 @@ async function render(){
 }
 
 /* ---------- précision ---------- */
+$("#vibBtn").onclick=()=>{
+  const r=vib([300,150,300]), wv=/; wv\)/.test(navigator.userAgent);
+  $("#vibRes").textContent=r===true?"Le navigateur a envoyé la vibration. Si tu n'as rien senti, c'est le téléphone qui la coupe : mode silencieux, Ne pas déranger, économie de batterie, ou vibrations au toucher désactivées (Réglages, Son et vibration)."
+    :wv?"Cette page est ouverte dans le navigateur intégré d'une application, qui bloque les vibrations. Ouvre-la dans Chrome."
+    :r==="absent"?"Ce navigateur ne sait pas faire vibrer le téléphone. Ouvre la page dans Chrome."
+    :"Le navigateur a refusé la vibration. Ouvre la page dans Chrome et touche l'écran une fois avant de réessayer.";
+};
 $("#calibBtn").onclick=async()=>{
   if(run) return; askPerm(); initAudio(); wake();
   run={cancel:false}; startMeasure(); const caps=[];
