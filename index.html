@@ -3,144 +3,153 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#0d0f13">
 <title>Visée de la voûte</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500&family=Newsreader:opsz,wght@6..72,200;6..72,300;6..72,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
 :root{
-  --blue:#1131b8; --ink:#0d1440; --grey:#7c8299; --line:#e4e6ee; --soft:#f3f4f8; --white:#ffffff; --sun:#ffd23f; --ok:#1131b8;
-  --f:"Jost","Futura","Century Gothic",system-ui,sans-serif;
+  --bg:#0d0f13; --s1:#14171c; --s2:#1b1f26;
+  --ink:#ecebe6; --mut:#8d919a; --faint:#585d67;
+  --line:rgba(236,235,230,.12); --line2:rgba(236,235,230,.26);
+  --brass:#c4ad7c;
+  --f:"Geist",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --s:"Newsreader",Georgia,"Times New Roman",serif;
+  color-scheme:dark;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--white)}
-body{font:400 17px/1.5 var(--f);color:var(--ink);-webkit-user-select:none;user-select:none;-webkit-font-smoothing:antialiased}
+html,body{margin:0;background:var(--bg)}
+body{font:400 16px/1.5 var(--f);color:var(--ink);-webkit-user-select:none;user-select:none;-webkit-font-smoothing:antialiased;font-variant-numeric:lining-nums}
 button{font:inherit;color:inherit;cursor:pointer}
-button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:1.5px solid var(--ink);outline-offset:3px}
 .hide{display:none!important}
 .wrap{max-width:540px;margin:0 auto;padding:0 22px}
+.num{font-family:var(--s);font-weight:300;font-variant-numeric:lining-nums tabular-nums}
 
 /* ---------- accueil ---------- */
-.top{display:flex;justify-content:space-between;align-items:center;padding-top:calc(18px + env(safe-area-inset-top));padding-bottom:6px}
-.brand{font-weight:500;font-size:16px;letter-spacing:.02em}
-.status{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--grey)}
-.status i{display:inline-block;width:8px;height:8px;border-radius:50%;border:1.5px solid var(--grey)}
-.status i.ok{background:var(--blue);border-color:var(--blue)}
-.hero{padding-top:8px}
+.top{display:flex;justify-content:space-between;align-items:center;padding-top:calc(18px + env(safe-area-inset-top));padding-bottom:10px;border-bottom:1px solid var(--line)}
+.brand{font-weight:500;font-size:14px;letter-spacing:.01em}
+.status{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--mut);font-variant-numeric:tabular-nums}
+.status i{display:inline-block;width:7px;height:7px;border-radius:50%;border:1px solid var(--mut)}
+.status i.ok{background:var(--ink);border-color:var(--ink)}
+.hero{padding-top:18px}
 #vaultHdr{margin:0 -10px}
 #vaultHdr svg{display:block}
-#hdrLine{font-weight:300;font-size:25px;line-height:1.25;margin:4px 0 0;letter-spacing:-.005em}
-#hdrLine b{font-weight:500;color:var(--blue)}
-.link{background:none;border:0;padding:8px 0;color:var(--blue);font-size:15px;font-weight:500}
-.go{display:flex;align-items:center;gap:18px;width:100%;margin-top:22px;border:0;border-radius:999px;background:var(--blue);color:#fff;padding:12px 26px 12px 12px;text-align:left}
-.go .c{flex:none;width:58px;height:58px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center}
-.go b{display:block;font-weight:500;font-size:21px;line-height:1.15}
-.go small{display:block;font-size:14px;opacity:.75;font-weight:300}
-.switch{display:flex;align-items:center;gap:12px;margin:14px 0 0 6px;font-size:15px;color:var(--grey)}
-.switch input{appearance:none;width:40px;height:22px;border-radius:11px;border:1.5px solid var(--grey);position:relative;margin:0;flex:none}
-.switch input::after{content:"";position:absolute;top:3px;left:3px;width:13px;height:13px;border-radius:50%;background:var(--grey);transition:left .2s,background .2s}
-.switch input:checked{border-color:var(--blue)}.switch input:checked::after{left:20px;background:var(--blue)}
-h2{font-weight:500;font-size:14px;letter-spacing:.06em;color:var(--grey);margin:42px 0 14px}
-.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.tile{position:relative;aspect-ratio:1/1.12;border:1.5px solid var(--line);background:#fff;border-radius:22px;padding:14px 10px 12px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;text-align:center}
-.tile svg{width:54px;height:54px;margin-top:6px}
-.tile b{font-weight:400;font-size:15px;line-height:1.2}
-.tile .st{position:absolute;top:10px;right:10px;width:10px;height:10px;border-radius:50%;border:1.5px solid var(--line)}
-.tile.done{border-color:var(--blue)}.tile.done .st{background:var(--blue);border-color:var(--blue)}
-.order{font-size:14px;color:var(--grey);margin:10px 2px 0;font-weight:300}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:18px 20px}
-.stats span{display:block;font-size:14px;color:var(--grey);font-weight:300}
-.stats b{display:block;font-weight:300;font-size:34px;line-height:1.05;letter-spacing:-.02em;margin-top:4px}
-.stats small{display:block;font-size:14px;color:var(--grey);font-weight:300;margin-top:2px}
+#hdrLine{font-family:var(--s);font-weight:300;font-size:31px;line-height:1.16;margin:14px 0 0;letter-spacing:-.012em}
+#hdrLine b{font-weight:inherit}
+.link{background:none;border:0;padding:10px 0 4px;color:var(--mut);font-size:14px;text-decoration:underline;text-decoration-color:var(--line2);text-underline-offset:4px}
+.go{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;margin-top:28px;border:0;border-radius:6px;background:var(--ink);color:var(--bg);padding:17px 18px 17px 20px;text-align:left}
+.go b{display:block;font-weight:500;font-size:17px;line-height:1.2}
+.go small{display:block;font-size:13.5px;opacity:.62;margin-top:1px}
+.go svg{flex:none}
+.switch{display:flex;align-items:center;gap:12px;margin:16px 0 0;font-size:14.5px;color:var(--mut)}
+.switch input{appearance:none;width:34px;height:20px;border-radius:10px;border:1px solid var(--line2);position:relative;margin:0;flex:none}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:12px;height:12px;border-radius:50%;background:var(--faint);transition:left .2s,background .2s}
+.switch input:checked{border-color:var(--ink)}.switch input:checked::after{left:17px;background:var(--ink)}
+h2{font-weight:500;font-size:13px;letter-spacing:.01em;color:var(--mut);margin:46px 0 0;padding-top:16px;border-top:1px solid var(--line)}
+.tiles{display:flex;flex-direction:column;margin-top:4px}
+.tile{display:grid;grid-template-columns:44px 1fr auto;gap:16px;align-items:center;width:100%;background:none;border:0;border-bottom:1px solid var(--line);padding:16px 0;text-align:left}
+.tile:last-child{border-bottom:0}
+.tile svg{width:44px;height:44px;display:block}
+.tile b{display:block;font-family:var(--s);font-weight:400;font-size:21px;line-height:1.15}
+.tile small{display:block;color:var(--mut);font-size:13.5px;margin-top:3px}
+.tile .st{font-size:13.5px;color:var(--mut);white-space:nowrap;font-variant-numeric:tabular-nums}
+.tile.done .st{color:var(--brass)}
+.order{font-size:13.5px;color:var(--mut);margin:6px 0 0}
+.stats{display:grid;grid-template-columns:1fr 1fr;margin-top:6px}
+.stats div{padding:16px 0 16px;border-bottom:1px solid var(--line)}
+.stats div:nth-child(odd){border-right:1px solid var(--line);padding-right:16px}
+.stats div:nth-child(even){padding-left:18px}
+.stats span{display:block;font-size:13px;color:var(--mut)}
+.stats b{display:block;font-family:var(--s);font-weight:300;font-size:38px;line-height:1.05;letter-spacing:-.015em;margin-top:8px;font-variant-numeric:lining-nums tabular-nums}
+.stats small{display:block;font-size:13px;color:var(--mut);margin-top:3px}
 .ruler{margin-top:30px}
-.ruler .q{font-weight:300;font-size:21px;line-height:1.25;margin-bottom:16px}
-.rl{display:grid;grid-template-columns:96px 1fr 50px;align-items:center;gap:12px;height:40px}
-.rl .k{font-size:15px}
-.rl .v{text-align:right;font-weight:500;font-size:17px;color:var(--blue)}
-.rl .v.no{color:var(--grey);font-weight:300;font-size:14px}
+.ruler .q{font-family:var(--s);font-weight:300;font-size:22px;line-height:1.22;margin-bottom:14px}
+.rl{display:grid;grid-template-columns:84px 1fr 54px;align-items:center;gap:12px;height:40px}
+.rl .k{font-size:14.5px}
+.rl .v{text-align:right;font-weight:500;font-size:15px;font-variant-numeric:tabular-nums}
+.rl .v.no{color:var(--faint);font-weight:400;font-size:13px}
 .track{position:relative;height:22px}
 .track i{position:absolute;display:block}
-.track .tk{top:7px;width:1px;height:8px;background:#c9ccd8;transform:translateX(-.5px)}
-.track:before{content:"";position:absolute;left:0;right:0;top:10px;height:2px;background:var(--line)}
-.track .bar{left:0;top:10px;height:2px;background:var(--blue)}
-.track .pt{top:4px;width:14px;height:14px;border-radius:50%;background:var(--blue);transform:translateX(-7px)}
+.track .tk{top:7px;width:1px;height:8px;background:var(--faint);transform:translateX(-.5px)}
+.track:before{content:"";position:absolute;left:0;right:0;top:10.5px;height:1px;background:var(--line2)}
+.track .fill{left:0;top:10px;height:2px;background:var(--ink)}
+.track .pt{top:5px;width:12px;height:12px;border-radius:50%;background:var(--brass);transform:translateX(-6px)}
 .track .pt.over{border-radius:0;clip-path:polygon(0 0,100% 50%,0 100%)}
-.scale{display:grid;grid-template-columns:96px 1fr 50px;gap:12px;font-size:12px;color:var(--grey);margin-top:2px}
+.scale{display:grid;grid-template-columns:84px 1fr 54px;gap:12px;font-size:11.5px;color:var(--faint);margin-top:2px;font-variant-numeric:tabular-nums}
 .scale div{position:relative;height:16px}
 .scale div span{position:absolute;transform:translateX(-50%);white-space:nowrap}
-.note{font-size:14px;color:var(--grey);font-weight:300;margin-top:10px}
-.rec{display:flex;gap:16px;align-items:center;padding:14px 0;border-bottom:1.5px solid var(--soft)}
+.note{font-size:13.5px;color:var(--mut);margin-top:12px}
+.rec{display:flex;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
 .rec:last-child{border-bottom:0}
-.rec .g{flex:none;width:52px;height:52px}
+.rec .g{flex:none;width:46px;height:46px}
 .rec .tx{flex:1;min-width:0}
-.rec .tx b{display:block;font-weight:300;font-size:27px;line-height:1.1}
-.rec .tx span{display:block;font-size:14.5px;color:var(--grey)}
-.rec .todo{color:var(--blue)!important;font-weight:500}
-.rec img{width:52px;height:52px;border-radius:50%;object-fit:cover;flex:none}
-.rec .x{background:none;border:0;color:var(--grey);font-size:13.5px;padding:8px 0 8px 8px}
-.empty{color:var(--grey);font-weight:300}
-.btn2{border:1.5px solid var(--ink);background:#fff;border-radius:999px;padding:13px 20px;font-weight:500;font-size:16px}
+.rec .tx b{display:block;font-family:var(--s);font-weight:300;font-size:28px;line-height:1.1;font-variant-numeric:lining-nums tabular-nums}
+.rec .tx span{display:block;font-size:13.5px;color:var(--mut)}
+.rec .todo{font-family:var(--f);font-size:16px!important;color:var(--brass)!important;font-weight:500}
+.rec img{width:46px;height:46px;border-radius:50%;object-fit:cover;flex:none;filter:grayscale(.3)}
+.rec .x{background:none;border:0;color:var(--faint);font-size:13px;padding:8px 0 8px 8px}
+.empty{color:var(--mut);padding:14px 0;font-size:15px}
+#list{margin-top:4px}
+.btn2{border:1px solid var(--line2);background:none;border-radius:6px;padding:14px 18px;font-weight:500;font-size:15px}
 .btn2.wide{width:100%}
-.btn2.small{padding:9px 14px;font-size:14px;border-color:var(--line)}
-details.set{margin:28px 0 calc(40px + env(safe-area-inset-bottom))}
-details.set summary{list-style:none;cursor:pointer;color:var(--grey);font-size:15px}
+.btn2.small{padding:9px 13px;font-size:13.5px}
+details.set{margin:30px 0 calc(40px + env(safe-area-inset-bottom));border-top:1px solid var(--line);padding-top:16px}
+details.set summary{list-style:none;cursor:pointer;color:var(--mut);font-size:14px}
 details.set summary::-webkit-details-marker{display:none}
-details.set .in{display:flex;flex-direction:column;gap:14px;margin-top:14px;font-size:15px}
+details.set .in{display:flex;flex-direction:column;gap:14px;margin-top:14px;font-size:14.5px}
 details.set .acts{display:flex;gap:8px;flex-wrap:wrap}
-details.set a{color:var(--blue)}
-.sub{font-size:14.5px;color:var(--grey);font-weight:300}
+details.set a{color:var(--ink);text-underline-offset:3px}
+.sub{font-size:13.5px;color:var(--mut)}
 
 /* ---------- écrans plein cadre ---------- */
-.full{position:fixed;inset:0;z-index:20;overflow:auto;display:flex;flex-direction:column;background:#fff}
-.full .in{max-width:540px;width:100%;margin:0 auto;padding:calc(18px + env(safe-area-inset-top)) 22px calc(26px + env(safe-area-inset-bottom));flex:1;display:flex;flex-direction:column}
-.full.blue{background:var(--blue);color:#fff}
-.bar{display:flex;justify-content:space-between;align-items:center;font-size:14.5px;color:var(--grey)}
-.blue .bar{color:rgba(255,255,255,.75)}
-.close{background:none;border:0;font-size:15px;padding:8px 0 8px 14px;color:inherit}
-.big{font-weight:300;font-size:36px;line-height:1.1;letter-spacing:-.01em;margin:22px 0 10px}
-.hint{font-weight:300;font-size:17.5px;line-height:1.45;color:var(--grey);max-width:30em}
-.blue .hint{color:rgba(255,255,255,.82)}
+.full{position:fixed;inset:0;z-index:20;overflow:auto;display:flex;flex-direction:column;background:var(--bg)}
+.full .in{max-width:540px;width:100%;margin:0 auto;padding:calc(18px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom));flex:1;display:flex;flex-direction:column}
+.bar{display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:var(--mut);padding-bottom:12px;border-bottom:1px solid var(--line)}
+.close{background:none;border:0;font-size:14px;padding:6px 0 6px 14px;color:var(--ink)}
+.big{font-family:var(--s);font-weight:300;font-size:38px;line-height:1.08;letter-spacing:-.018em;margin:26px 0 12px}
+.hint{font-size:16px;line-height:1.5;color:var(--mut);max-width:30em}
 #gauge{width:100%;max-width:400px;margin:auto;display:block}
-#mState{text-align:center;font-weight:400;font-size:19px;min-height:26px;margin:6px 0 4px}
-.hold{height:3px;background:rgba(255,255,255,.25);margin:12px auto 0;max-width:400px;width:100%}
-.hold i{display:block;height:100%;width:0;background:#fff;transition:width .08s linear}
-.foot{text-align:center;color:rgba(255,255,255,.7);font-size:14px;font-weight:300;margin-top:16px}
-.btn{border:0;border-radius:999px;padding:17px 20px;font-weight:500;font-size:17px}
-.btn.solid{background:var(--blue);color:#fff}
-.btn.white{background:#fff;color:var(--blue)}
-.btn.ghost{background:none;color:var(--grey)}
-.blue .btn.ghost{color:rgba(255,255,255,.8)}
-.btn:disabled{opacity:.35}
-.stack{display:flex;flex-direction:column;gap:8px;margin-top:auto;padding-top:20px}
-.cand{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:#fff;border:0;border-bottom:1.5px solid var(--soft);padding:16px 2px}
-.cand .dot{flex:none;width:14px;height:14px;border-radius:50%;border:1.5px solid var(--blue)}
-.cand .tx{flex:1}.cand .tx b{display:block;font-weight:500;font-size:17px}.cand .tx span{font-size:14px;color:var(--grey)}
-.cand .d{font-weight:300;font-size:24px;white-space:nowrap}
-.seg{display:flex;gap:8px;margin-top:10px}.seg button{flex:1;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:11px 6px;font-size:15px}
-.seg button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
-#map{height:300px;border-radius:22px;margin-top:14px}
-.resnum{font-weight:200;font-size:96px;line-height:1;letter-spacing:-.03em;margin:34px 0 8px}
-.resnum small{font-size:34px;font-weight:300;margin-left:6px;letter-spacing:0}
-.reslab{font-weight:300;font-size:19px;line-height:1.4;color:rgba(255,255,255,.85)}
-.reslab b{font-weight:500;color:#fff}
-#resVault{margin:22px -10px 0}
-input.txt{font:inherit;font-weight:300;width:100%;padding:15px 20px;border-radius:999px;border:1.5px solid rgba(255,255,255,.5);background:transparent;color:#fff;margin-top:10px;font-size:18px}
-input.txt::placeholder{color:rgba(255,255,255,.55)}
-#drawCv{width:100%;aspect-ratio:4/3;display:block;margin-top:16px;touch-action:none;border-radius:22px;background:var(--soft)}
-.steps{margin:18px 0 0;padding:0;list-style:none;counter-reset:s}
-.steps li{counter-increment:s;display:flex;gap:14px;margin:14px 0;font-weight:300;font-size:17px;align-items:flex-start}
-.steps li::before{content:counter(s);flex:none;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--blue);color:var(--blue);font-weight:500;font-size:15px;line-height:27px;text-align:center}
-.choice{display:flex;flex-direction:column;gap:10px;margin-top:18px}
-.choice button{text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:16px 22px;font-size:17px}
+#mState{text-align:center;font-weight:500;font-size:16px;min-height:24px;margin:6px 0 4px}
+.hold{height:1px;background:var(--line2);margin:12px auto 0;max-width:400px;width:100%}
+.hold i{display:block;height:2px;margin-top:-.5px;width:0;background:var(--ink);transition:width .08s linear}
+.foot{text-align:center;color:var(--faint);font-size:13px;margin-top:16px}
+.btn{border:0;border-radius:6px;padding:17px 20px;font-weight:500;font-size:16px}
+.btn.solid,.btn.white{background:var(--ink);color:var(--bg)}
+.btn.ghost{background:none;color:var(--mut)}
+.btn:disabled{opacity:.3}
+.stack{display:flex;flex-direction:column;gap:6px;margin-top:auto;padding-top:20px}
+.cand{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:16px 0}
+.cand .dot{flex:none;width:12px;height:12px;border-radius:50%;border:1px solid var(--ink)}
+.cand .tx{flex:1}.cand .tx b{display:block;font-weight:500;font-size:16.5px}.cand .tx span{font-size:13.5px;color:var(--mut)}
+.cand .d{font-family:var(--s);font-weight:300;font-size:26px;white-space:nowrap;font-variant-numeric:lining-nums tabular-nums}
+.seg{display:flex;gap:8px;margin-top:10px}.seg button{flex:1;border:1px solid var(--line2);background:none;border-radius:6px;padding:11px 6px;font-size:14.5px}
+.seg button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+#map{height:300px;border-radius:6px;margin-top:14px;border:1px solid var(--line);background:var(--s1)}
+#map .dark-tiles{filter:invert(1) hue-rotate(180deg) brightness(.82) contrast(.92) saturate(.25)}
+.leaflet-container{font-family:var(--f)!important}
+.resnum{font-family:var(--s);font-weight:200;font-size:108px;line-height:1;letter-spacing:-.035em;margin:36px 0 10px;font-variant-numeric:lining-nums}
+.resnum small{font-size:32px;font-weight:300;margin-left:8px;letter-spacing:0;color:var(--mut)}
+.reslab{font-size:17px;line-height:1.5;color:var(--mut)}
+.reslab b{font-weight:500;color:var(--ink)}
+#resVault{margin:24px -10px 0}
+input.txt{font:inherit;width:100%;padding:15px 16px;border-radius:6px;border:1px solid var(--line2);background:transparent;color:var(--ink);margin-top:10px;font-size:17px}
+input.txt::placeholder{color:var(--faint)}
+#drawCv{width:100%;aspect-ratio:4/3;display:block;margin-top:18px;touch-action:none;border-radius:6px;background:var(--s1);border:1px solid var(--line)}
+.steps{margin:20px 0 0;padding:0;list-style:none;counter-reset:s}
+.steps li{counter-increment:s;display:flex;gap:16px;padding:14px 0;border-top:1px solid var(--line);font-size:16px;align-items:baseline}
+.steps li::before{content:counter(s);flex:none;width:18px;font-family:var(--s);font-size:22px;font-weight:300;color:var(--mut)}
+.choice{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.choice button{text-align:left;background:none;border:1px solid var(--line2);border-radius:6px;padding:16px 18px;font-size:16px}
 #cmp{width:100%;height:auto;margin-top:18px}
-input[type=range]{width:100%;margin-top:20px;accent-color:var(--blue)}
+input[type=range]{width:100%;margin-top:20px;accent-color:var(--ink)}
 #fix{position:fixed;inset:0;background:#000;z-index:40;display:flex;align-items:center;justify-content:center;flex-direction:column}
 #fix .disc{width:62vmin;height:62vmin;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center}
 #fix .disc i{width:10px;height:10px;border-radius:50%;background:#e01b1b}
-#fix .cnt{color:#888;font-weight:300;font-size:18px;margin-top:28px}
-#toast{position:fixed;left:50%;top:calc(16px + env(safe-area-inset-top));transform:translateX(-50%);background:var(--ink);color:#fff;padding:13px 20px;border-radius:22px;font-size:15.5px;font-weight:300;opacity:0;transition:opacity .3s;pointer-events:none;z-index:60;max-width:88vw;text-align:center}
-#flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .35s;z-index:50}
+#fix .cnt{color:#888;font-size:16px;margin-top:28px;font-variant-numeric:tabular-nums}
+#toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top));transform:translateX(-50%);background:var(--s2);border:1px solid var(--line2);color:var(--ink);padding:12px 18px;border-radius:6px;font-size:14.5px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:60;max-width:88vw;text-align:center}
+#flash{position:fixed;inset:0;background:var(--ink);opacity:0;pointer-events:none;transition:opacity .35s;z-index:50}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -156,14 +165,14 @@ input[type=range]{width:100%;margin-top:20px;accent-color:var(--blue)}
 </section>
 
 <main class="wrap">
-  <button class="go" id="newBtn"><span class="c"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="13" fill="none" stroke="#1131b8" stroke-width="1.6"/><circle cx="15" cy="15" r="3.4" fill="#1131b8"/></svg></span><span><b>Viser un repère</b><small>Éolienne, clocher, château d'eau…</small></span></button>
+  <button class="go" id="newBtn"><span><b>Viser un repère</b><small>Éolienne, clocher, château d'eau…</small></span><svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="15.5" fill="none" stroke="#0d0f13" stroke-width="1.2"/><line x1="17" y1="1" x2="17" y2="9" stroke="#0d0f13" stroke-width="1.2"/><line x1="17" y1="25" x2="17" y2="33" stroke="#0d0f13" stroke-width="1.2"/><line x1="1" y1="17" x2="9" y2="17" stroke="#0d0f13" stroke-width="1.2"/><line x1="25" y1="17" x2="33" y2="17" stroke="#0d0f13" stroke-width="1.2"/><circle cx="17" cy="17" r="2.4" fill="#0d0f13"/></svg></button>
   <label class="switch"><input type="checkbox" id="photoChk" checked>Commencer par une photo</label>
 
   <h2>Expériences</h2>
   <div class="tiles">
-    <button class="tile xp" data-xp="dessin"><span class="st" id="st-dessin"></span><svg viewBox="0 0 54 54"><path d="M5 44C9 22 18 14 27 14s18 8 22 30" fill="none" stroke="#1131b8" stroke-width="2.2" stroke-linecap="round"/><line x1="3" y1="45" x2="51" y2="45" stroke="#0d1440" stroke-width="1.5"/><circle cx="27" cy="45" r="2.6" fill="#0d1440"/></svg><b>Dessiner<br>son ciel</b></button>
-    <button class="tile xp" data-xp="partage"><span class="st" id="st-partage"></span><svg viewBox="0 0 54 54"><path d="M8 45A19 19 0 0 1 46 45" fill="none" stroke="#0d1440" stroke-width="1.5"/><path d="M27 45L14.5 30.5M27 45V26M27 45l12.5-14.5" stroke="#1131b8" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="45" x2="51" y2="45" stroke="#0d1440" stroke-width="1.5"/></svg><b>Partager<br>le ciel</b></button>
-    <button class="tile xp" data-xp="tache"><span class="st" id="st-tache"></span><svg viewBox="0 0 54 54"><circle cx="27" cy="27" r="20" fill="#1131b8"/><circle cx="27" cy="27" r="10" fill="#fff"/><circle cx="27" cy="27" r="2.6" fill="#e01b1b"/></svg><b>La tache<br>dans le ciel</b></button>
+    <button class="tile xp" data-xp="dessin"><svg viewBox="0 0 44 44" aria-hidden="true"><line x1="2" y1="36" x2="42" y2="36" stroke="#ecebe6" stroke-opacity=".45" stroke-width="1"/><path d="M5 36C7 20 14 13 22 13s15 7 17 23" fill="none" stroke="#ecebe6" stroke-width="1.3"/><circle cx="22" cy="36" r="2.4" fill="#c4ad7c"/></svg><span><b>Dessiner son ciel</b><small>Trace la forme que tu vois</small></span><span class="st" id="st-dessin">À faire</span></button>
+    <button class="tile xp" data-xp="partage"><svg viewBox="0 0 44 44" aria-hidden="true"><line x1="2" y1="36" x2="42" y2="36" stroke="#ecebe6" stroke-opacity=".45" stroke-width="1"/><path d="M6 36A16 16 0 0 1 38 36" fill="none" stroke="#ecebe6" stroke-opacity=".45" stroke-width="1"/><path d="M22 36L11.4 24M22 36L22 20M22 36L32.6 24" stroke="#ecebe6" stroke-width="1.3"/><circle cx="22" cy="36" r="2.4" fill="#c4ad7c"/></svg><span><b>Partager le ciel</b><small>Trois visées, trois parts égales</small></span><span class="st" id="st-partage">À faire</span></button>
+    <button class="tile xp" data-xp="tache"><svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="16" fill="none" stroke="#ecebe6" stroke-width="1.3"/><circle cx="22" cy="22" r="9" fill="none" stroke="#ecebe6" stroke-opacity=".45" stroke-width="1"/><circle cx="22" cy="22" r="2.4" fill="#c4ad7c"/></svg><span><b>La tache dans le ciel</b><small>Une image qui reste dans l’œil</small></span><span class="st" id="st-tache">À faire</span></button>
   </div>
   <div class="order">Trois façons de vérifier ta voûte autrement. Commence par le dessin.</div>
 
@@ -191,8 +200,8 @@ input[type=range]{width:100%;margin-top:20px;accent-color:var(--blue)}
 <!-- premier lancement -->
 <section id="intro" class="full blue hide"><div class="in">
   <div class="brand">Visée de la voûte</div>
-  <svg viewBox="0 0 340 190" style="width:100%;margin-top:auto" aria-hidden="true"><path d="M20 170A150 150 0 0 1 320 170" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1.5"/><path d="M20 170C70 110 120 96 170 96S270 110 320 170Z" fill="#fff"/><line x1="0" y1="170" x2="340" y2="170" stroke="#fff" stroke-width="1.5"/><circle cx="170" cy="170" r="5" fill="#1131b8" stroke="#fff" stroke-width="1.5"/></svg>
-  <div class="big" style="font-size:46px;margin-top:26px">Ton ciel a une forme.</div>
+  <svg viewBox="0 0 340 200" style="width:100%;margin-top:auto" aria-hidden="true"><path d="M20 176A150 150 0 0 1 320 176" fill="none" stroke="#ecebe6" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 6"/><path d="M20 176C64 118 116 104 170 104S276 118 320 176Z" fill="#ecebe6" fill-opacity=".06" stroke="#ecebe6" stroke-width="1.2"/><line x1="0" y1="176" x2="340" y2="176" stroke="#ecebe6" stroke-opacity=".5" stroke-width="1"/><line x1="170" y1="176" x2="170" y2="104" stroke="#ecebe6" stroke-opacity=".3" stroke-width="1"/><line x1="170" y1="176" x2="320" y2="176" stroke="#ecebe6" stroke-opacity=".3" stroke-width="1"/><circle cx="170" cy="104" r="2.6" fill="#ecebe6"/><circle cx="320" cy="176" r="2.6" fill="#ecebe6"/><circle cx="170" cy="176" r="4" fill="#c4ad7c"/><text x="178" y="142" font-size="11" fill="#ecebe6" fill-opacity=".55" font-family="Geist,system-ui">au-dessus de toi</text><text x="245" y="194" font-size="11" fill="#ecebe6" fill-opacity=".55" font-family="Geist,system-ui" text-anchor="middle">jusqu’à l’horizon</text></svg>
+  <div class="big" style="font-size:48px;margin-top:28px">Ton ciel a une forme.</div>
   <div class="hint">On croit voir une coupole parfaite. Pourtant, le ciel paraît plus loin vers l'horizon qu'au-dessus de nos têtes. Mesure le tien : pointe le ciel avec ton téléphone, bras tendu.</div>
   <label class="hint" style="margin-top:24px;display:block">Ton prénom<input class="txt" id="pseudoIn" autocomplete="given-name" placeholder="Pour comparer avec tes amis"></label>
   <div class="stack"><button class="btn white" id="introOk">Commencer</button></div>
@@ -317,6 +326,7 @@ const Vault=(()=>{
     day:{bg:"#f4f3ef",g0:"#d8d1ba",g1:"#f2efe6",gl:"#8e8a7c",s0:"#173a80",s1:"#477fcb",s2:"#d3e6f7",halo:"#fff3cf",stroke:"#10306c",txt:"#0b0b0b",halo2:"#f4f3ef",mut:"#6b6a65",foot:"#76756f",person:"#0b0b0b",dot:"#fff",cmp:"#0b0b0b"},
     geo:{flat:true,bg:"none",gl:"#0d1440",fill:"#1131b8",stroke:"#0d1440",txt:"#0d1440",halo2:"#ffffff",mut:"#7c8299",foot:"#7c8299",person:"#0d1440",dot:"#ffffff",dotS:"#1131b8",cmp:"#0d1440",sw:1.6},
     geoInv:{flat:true,bg:"none",gl:"#ffffff",fill:"#ffffff",fillOp:.92,stroke:"#ffffff",txt:"#ffffff",halo2:"#1131b8",mut:"rgba(255,255,255,.7)",foot:"rgba(255,255,255,.6)",person:"#ffffff",dot:"#1131b8",dotS:"#ffffff",cmp:"#ffffff",sw:1.6},
+    ink:{flat:true,bg:"none",gl:"rgba(236,235,230,.5)",fill:"#ecebe6",fillOp:.06,stroke:"#ecebe6",txt:"#ecebe6",halo2:"#0d0f13",mut:"#8d919a",foot:"#8d919a",person:"#c4ad7c",dot:"#0d0f13",dotS:"#ecebe6",vl:"#ecebe6",cmp:"#ecebe6",sw:1.2,lw:400,pin:"#ecebe6",grid:true},
     night:{bg:"none",g0:"#1b2a4a",g1:"#0e1830",gl:"#4a5d84",s0:"#5d86c4",s1:"#2f4f86",s2:"#1a2d52",halo:"#f3b23c",stroke:"#f3b23c",txt:"#eef3fa",halo2:"#0f1b33",mut:"#93a6c4",foot:"#7f93b3",person:"#eef3fa",dot:"#eef3fa",cmp:"#bfd6ee"}
   };
   function svg(M,opt={}){
@@ -355,11 +365,11 @@ ${T.flat?"":`<rect x="0" y="${yG}" width="${W}" height="${H-yG}" fill="url(#${id
     const stroke=`stroke="${T.stroke}" stroke-width="${T.sw||2.6}" fill="none" stroke-linecap="round" stroke-linejoin="round"`;
     for(const d of [solid,mir(solid)]) if(d) s+=`<path d="${d}" ${stroke}/>`;
     for(const d of [dashA,mir(dashA),dashB,mir(dashB)]) if(d) s+=`<path d="${d}" ${stroke} stroke-dasharray="1.5 6" stroke-opacity=".7"/>`;
-    s+=`<line x1="0" x2="${W}" y1="${yG}" y2="${yG}" stroke="${T.gl}" stroke-width="${T.flat?1.6:1}"/>`;
+    s+=`<line x1="0" x2="${W}" y1="${yG}" y2="${yG}" stroke="${T.gl}" stroke-width="${T.grid?1:T.flat?1.6:1}"/>`;
     // repères mesurés, côté droit
     const many=M.pts.length>12;
     for(const p of M.pts){ if(p.x>X) continue; const u=px(p.x), v=Math.max(56,py(Math.min(p.y,top*1.8)));
-      if(!many) s+=`<line x1="${u.toFixed(1)}" x2="${u.toFixed(1)}" y1="${yG}" y2="${v.toFixed(1)}" stroke="${T.dot}" stroke-opacity=".35"/>`;
+      if(!many) s+=`<line x1="${u.toFixed(1)}" x2="${u.toFixed(1)}" y1="${yG}" y2="${v.toFixed(1)}" stroke="${T.vl||T.dot}" stroke-opacity="${T.vl?.22:.35}"/>`;
       s+=`<circle cx="${u.toFixed(1)}" cy="${v.toFixed(1)}" r="${many?2.3:3.2}" fill="${T.dot}" stroke="${T.dotS||(opt.theme==="night"?"#0f1b33":"#10306c")}" stroke-width="1" opacity="${many?.75:.95}"/>`; }
     if(O){
       const OC="#e2622b", xo=[]; for(let k=0;k<=N;k++) xo.push(O.xEnd*k/N);
@@ -374,19 +384,20 @@ ${T.flat?"":`<rect x="0" y="${yG}" width="${W}" height="${H-yG}" fill="url(#${id
       s+=`<text x="${W-12}" y="21" font-size="11" fill="#6b6a65" text-anchor="end">points bleus à droite, orange à gauche</text>`;
     }
     // observateur
-    s+=T.flat?`<circle cx="${xC}" cy="${yG}" r="6.5" fill="${T.person}"/>`:`<g transform="translate(${xC},${yG})" fill="${T.person}"><circle cx="0" cy="-17" r="3.6"/><path d="M-3.4,-12.5h6.8l1.2,8h-2.2l-.8,4.5h-3.2l-.8-4.5h-2.2z"/></g>`;
+    s+=T.flat?`<circle cx="${xC}" cy="${yG}" r="${T.grid?5:6.5}" fill="${T.person}"/>`:`<g transform="translate(${xC},${yG})" fill="${T.person}"><circle cx="0" cy="-17" r="3.6"/><path d="M-3.4,-12.5h6.8l1.2,8h-2.2l-.8,4.5h-3.2l-.8-4.5h-2.2z"/></g>`;
     // échelle au sol
     const ticks=[100,200,500,1000,2000,5000,10000,20000,50000].filter(t=>t<X*.97&&t*sx>30);
     const tk=ticks.filter((t,i)=>i===ticks.length-1||px(ticks[i+1])-px(t)>44*K);
+    if(T.grid) for(const t of tk){ const u=px(t); s=s.replace("<!--LEAD-->",`<line x1="${u}" x2="${u}" y1="${yG}" y2="${Math.max(14,py(top*1.08))}" stroke="${T.txt}" stroke-opacity=".07"/><line x1="${2*xC-u}" x2="${2*xC-u}" y1="${yG}" y2="${Math.max(14,py(top*1.08))}" stroke="${T.txt}" stroke-opacity=".07"/><!--LEAD-->`); }
     for(const t of tk){ const u=px(t); s+=`<line x1="${u}" x2="${u}" y1="${yG}" y2="${yG+5}" stroke="${T.gl}"/><text x="${u}" y="${yG+8+10*K}" font-size="${11*K}" fill="${T.mut}" text-anchor="middle">${dist(t)}</text>`; }
     // étiquettes sur des rangées fixes, reliées par un fil
-    const lab=(x,y,t,a="middle")=>`<text x="${x.toFixed(1)}" y="${y}" font-size="${13*K}" font-weight="${T.flat?500:650}" fill="${T.txt}" text-anchor="${a}" paint-order="stroke" stroke="${T.halo2}" stroke-width="4" stroke-linejoin="round">${t}</text>`;
+    const lab=(x,y,t,a="middle")=>`<text x="${x.toFixed(1)}" y="${y}" font-size="${13*K}" font-weight="${T.lw||(T.flat?500:650)}" fill="${T.txt}" text-anchor="${a}" paint-order="stroke" stroke="${T.halo2}" stroke-width="4" stroke-linejoin="round">${t}</text>`;
     const lead=(x1,y1,x2,y2)=>`<path d="M${x1.toFixed(1)},${y1.toFixed(1)}L${x2.toFixed(1)},${y2.toFixed(1)}" stroke="${T.txt}" stroke-opacity=".45" stroke-width="1"/><circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="2.6" fill="${T.txt}"/>`;
     const rowA=Math.round(18*K), rowB=Math.round(38*K), inside=topY-14>rowA+8;
     const fitX=(x,t)=>{ const w=t.length*13*K*.56; return Math.max(w/2+8,Math.min(W-w/2-8,x)); };
     if(!O&&T.flat){
       // style géométrique : fils sous l'aplat, étiquettes courtes, points posés sur le bord
-      const pin=(x,y)=>`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${3.4}" fill="${T.txt}"/>`;
+      const pin=(x,y)=>`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${T.grid?2.8:3.4}" fill="${T.pin||T.txt}"/>`;
       const wire=(x1,y1,x2,y2)=>`<path d="M${x1.toFixed(1)},${y1.toFixed(1)}L${x2.toFixed(1)},${y2.toFixed(1)}" stroke="${T.txt}" stroke-opacity=".5" stroke-width="1"/>`;
       let under="", over="";
       const zt=hgt(M.zen); over+=pin(xC,topY)+lab(xC,topY-14,zt);
@@ -474,7 +485,7 @@ ${T.flat?"":`<rect x="0" y="${yG}" width="${W}" height="${H-yG}" fill="url(#${id
 </script><!--/VAULT-->
 <script>
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const D=Math.PI/180, R_E=6371000, EYE=1.5, LSK="visee.v2", FONT="'Jost',system-ui,sans-serif";
+const D=Math.PI/180, R_E=6371000, EYE=1.5, LSK="visee.v2", FONT="'Geist',system-ui,sans-serif", SERIF="'Newsreader',Georgia,serif", INK="#ecebe6", BRASS="#c4ad7c", BG="#0d0f13";
 let store={recs:[],calib:[],tasks:[],introSeen:false};
 try{const s=JSON.parse(localStorage.getItem(LSK)||"null"); if(s&&Array.isArray(s.recs)) store={...store,...s};}catch(e){}
 store.tasks=store.tasks||[]; store.calib=store.calib||[];
@@ -589,18 +600,18 @@ let gaugeOn=false, gMarks=[], gCount=null, gHold=0;
 const GX=48, GY=262, GR=232;
 function gpt(a,r){ return [GX+r*Math.cos(a*D), GY-r*Math.sin(a*D)]; }
 function drawGauge(el){
-  const e=Math.max(-12,Math.min(98,el==null?0:el)), W="#ffffff";
+  const e=Math.max(-12,Math.min(98,el==null?0:el)), W=INK;
   const [ax,ay]=gpt(0,GR), [bx,by]=gpt(90,GR);
-  let s=`<path d="M${ax},${ay}A${GR},${GR} 0 0 0 ${bx},${by}" fill="none" stroke="${W}" stroke-opacity=".9" stroke-width="1.5"/>`;
+  let s=`<path d="M${ax},${ay}A${GR},${GR} 0 0 0 ${bx},${by}" fill="none" stroke="${W}" stroke-opacity=".85" stroke-width="1"/>`;
   s+=`<path d="M${gpt(0,GR*.62)[0]},${gpt(0,GR*.62)[1]}A${GR*.62},${GR*.62} 0 0 0 ${gpt(90,GR*.62)[0]},${gpt(90,GR*.62)[1]}" fill="none" stroke="${W}" stroke-opacity=".25" stroke-width="1"/>`;
-  s+=`<line x1="${GX}" y1="${GY}" x2="${ax+10}" y2="${GY}" stroke="${W}" stroke-width="1.5"/><line x1="${GX}" y1="${GY}" x2="${GX}" y2="${by-10}" stroke="${W}" stroke-opacity=".4" stroke-width="1"/>`;
-  for(let a=0;a<=90;a+=5){ const L=a%45===0?14:a%15===0?9:5, [x1,y1]=gpt(a,GR), [x2,y2]=gpt(a,GR+L); s+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${W}" stroke-opacity="${a%45===0?1:.55}" stroke-width="${a%45===0?1.8:1}"/>`; }
+  s+=`<line x1="${GX}" y1="${GY}" x2="${ax+10}" y2="${GY}" stroke="${W}" stroke-opacity=".6" stroke-width="1"/><line x1="${GX}" y1="${GY}" x2="${GX}" y2="${by-10}" stroke="${W}" stroke-opacity=".4" stroke-width="1"/>`;
+  for(let a=0;a<=90;a+=5){ const L=a%45===0?14:a%15===0?9:5, [x1,y1]=gpt(a,GR), [x2,y2]=gpt(a,GR+L); s+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${W}" stroke-opacity="${a%45===0?.9:.4}" stroke-width="1"/>`; }
   s+=`<text x="${ax+2}" y="${GY+24}" font-size="13" fill="${W}" fill-opacity=".7" text-anchor="end" font-family="${FONT}">horizon</text><text x="${GX+12}" y="${by-14}" font-size="13" fill="${W}" fill-opacity=".7" font-family="${FONT}">au-dessus de toi</text><text x="${gpt(45,GR+28)[0]}" y="${gpt(45,GR+28)[1]}" font-size="13" fill="${W}" fill-opacity=".7" text-anchor="middle" font-family="${FONT}">45°</text>`;
-  for(const m of gMarks){ const [x,y]=gpt(m,GR); s+=`<line x1="${GX}" y1="${GY}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#ffd23f" stroke-width="1.2"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="7" fill="#ffd23f"/>`; }
+  for(const m of gMarks){ const [x,y]=gpt(m,GR); s+=`<line x1="${GX}" y1="${GY}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="${BRASS}" stroke-width="1"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5.5" fill="${BRASS}"/>`; }
   const [nx,ny]=gpt(e,GR);
-  s+=`<line x1="${GX}" y1="${GY}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="${W}" stroke-width="2.2"/><circle cx="${GX}" cy="${GY}" r="6" fill="${W}"/><circle cx="${nx.toFixed(1)}" cy="${ny.toFixed(1)}" r="11" fill="none" stroke="${W}" stroke-width="2"/><circle cx="${nx.toFixed(1)}" cy="${ny.toFixed(1)}" r="3.5" fill="${W}"/>`;
-  if(gCount!=null){ s+=`<circle cx="200" cy="168" r="62" fill="none" stroke="${W}" stroke-opacity=".35" stroke-width="1.5"/><text x="200" y="198" font-size="88" font-weight="200" fill="${W}" text-anchor="middle" font-family="${FONT}">${gCount}</text>`; }
-  else s+=`<text x="200" y="196" font-size="62" font-weight="300" fill="${W}" text-anchor="middle" font-family="${FONT}" letter-spacing="-1">${fmt(el==null?0:el,1)}°</text>`;
+  s+=`<line x1="${GX}" y1="${GY}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="${W}" stroke-width="1.4"/><circle cx="${GX}" cy="${GY}" r="4.5" fill="${BRASS}"/><circle cx="${nx.toFixed(1)}" cy="${ny.toFixed(1)}" r="11" fill="${BG}" stroke="${W}" stroke-width="1.2"/><circle cx="${nx.toFixed(1)}" cy="${ny.toFixed(1)}" r="2.6" fill="${W}"/>`;
+  if(gCount!=null){ s+=`<circle cx="200" cy="168" r="60" fill="${BG}" stroke="${W}" stroke-opacity=".3" stroke-width="1"/><text x="200" y="199" font-size="92" font-weight="200" fill="${W}" text-anchor="middle" font-family="${SERIF}">${gCount}</text>`; }
+  else s+=`<text x="200" y="196" font-size="64" font-weight="200" fill="${W}" text-anchor="middle" font-family="${SERIF}" letter-spacing="-1">${fmt(el==null?0:el,1)}°</text>`;
   $("#gauge").innerHTML=s;
 }
 function setHold(p){ gHold=p; $("#holdBar").style.width=Math.round(Math.max(0,Math.min(1,p))*100)+"%"; }
@@ -627,7 +638,7 @@ function waitStill({hold=1300,cond=()=>true}){
 }
 // une étape : consigne, compte à rebours, visée, confirmation
 async function step({label,title,hint,cond,wrong,hold=1300}){
-  $("#mStep").textContent=label; $("#mTitle").textContent=title; $("#mHint").textContent=hint;
+  $("#mStep").textContent=label; $("#mTitle").textContent=curly(title); $("#mHint").textContent=hint;
   setHold(0); setState(""); run.wrongMsg=wrong;
   say(title);
   gCount=null; if(!await waitFor(1400)) return null;
@@ -727,7 +738,7 @@ function choose(rec,c){
 function showResult(rec){
   $("#resNum").innerHTML=`${Math.round(rec.y)}<small>m</small>`;
   $("#resLab").innerHTML=`C'est la hauteur où tu places le ciel, à la verticale de <b>${tLabel(rec.target)}</b>, à ${km(rec.target.d)} de toi.`;
-  const M=vaultModel(); $("#resVault").innerHTML=M&&M.ok?Vault.svg(M,{theme:"geoInv",font:FONT,foot:false,fs:1.7})+`<p class="hint" style="margin:12px 10px 0">${M.title}, ${M.line}</p>`:emptyDome(true)+`<p class="hint" style="margin:12px 10px 0">${encore()}, proches et lointains, pour dessiner ta voûte.</p>`;
+  const M=vaultModel(); $("#resVault").innerHTML=M&&M.ok?Vault.svg(M,{theme:"ink",font:FONT,foot:false,fs:1.7})+`<p class="hint" style="margin:12px 10px 0">${M.title}, ${M.line}</p>`:emptyDome(true)+`<p class="hint" style="margin:12px 10px 0">${encore()}, proches et lointains, pour dessiner ta voûte.</p>`;
   openFull("result"); finale(); vib([80,60,80]);
 }
 $("#rClose").onclick=()=>closeFull("result");
@@ -740,16 +751,16 @@ async function openMap(rec){
   const el=$("#map"); el.classList.remove("hide");
   if(map){ map.remove(); map=null; }
   map=L.map(el,{zoomControl:true,attributionControl:true});
-  const osm=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"});
+  const osm=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap",className:"dark-tiles"});
   const sat=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,attribution:"Esri"});
   osm.addTo(map); L.control.layers({"Plan":osm,"Satellite":sat},null,{position:"topright"}).addTo(map);
   mapLayers=L.layerGroup().addTo(map); pickMarker=null;
   map.on("click",e=>pickAt(rec,e.latlng.lat,e.latlng.lng));
   const {lat,lon}=rec.gps, b=rec.base.az;
-  L.circleMarker([lat,lon],{radius:7,color:"#0d1440",fillOpacity:1}).addTo(mapLayers);
-  L.polyline([[lat,lon],dest(lat,lon,b,12000)],{color:"#1131b8",weight:2,dashArray:"6 6"}).addTo(mapLayers);
-  L.polygon([[lat,lon],dest(lat,lon,b-15,12000),dest(lat,lon,b+15,12000)],{color:"#1131b8",weight:0,fillOpacity:.08}).addTo(mapLayers);
-  (rec._c||[]).forEach(c=>L.circleMarker([c.lat,c.lon],{radius:7,color:"#ffffff",weight:2,fillColor:"#1131b8",fillOpacity:1}).bindTooltip(tLabel(c)).on("click",ev=>{ L.DomEvent.stopPropagation(ev); choose(rec,c); }).addTo(mapLayers));
+  L.circleMarker([lat,lon],{radius:6,color:BRASS,fillColor:BRASS,fillOpacity:1}).addTo(mapLayers);
+  L.polyline([[lat,lon],dest(lat,lon,b,12000)],{color:INK,weight:1.2,dashArray:"4 6"}).addTo(mapLayers);
+  L.polygon([[lat,lon],dest(lat,lon,b-15,12000),dest(lat,lon,b+15,12000)],{color:INK,weight:0,fillOpacity:.07}).addTo(mapLayers);
+  (rec._c||[]).forEach(c=>L.circleMarker([c.lat,c.lon],{radius:7,color:BG,weight:2,fillColor:INK,fillOpacity:1}).bindTooltip(tLabel(c)).on("click",ev=>{ L.DomEvent.stopPropagation(ev); choose(rec,c); }).addTo(mapLayers));
   setTimeout(()=>{ map.invalidateSize(); map.fitBounds(L.latLngBounds([[lat,lon],dest(lat,lon,b,4000)]).pad(.4)); el.scrollIntoView({behavior:"smooth",block:"center"}); },60);
   $("#mapPick").innerHTML=`<p class="hint" style="margin-top:8px">Touche la carte à l'endroit du repère.</p>`;
 }
@@ -766,27 +777,28 @@ const lastTask=k=>{ const a=store.tasks.filter(t=>t.kind===k); return a[a.length
 const pointsFor=()=>store.recs.filter(r=>r.target&&r.y>0).map(r=>({x:r.target.d,y:r.y}));
 const vaultModel=()=>Vault.model(pointsFor());
 let realProp=false;
-function emptyDome(inv){ const c=inv?"#ffffff":"#0d1440", f=inv?"#1131b8":"#ffffff"; return `<svg viewBox="0 0 680 250" style="display:block;width:100%;height:auto" aria-hidden="true"><path d="M60 214A280 280 0 0 1 620 214" fill="none" stroke="${c}" stroke-opacity=".35" stroke-width="1.6" stroke-dasharray="2 8" stroke-linecap="round"/><path d="M60 214A280 175 0 0 1 620 214" fill="none" stroke="${c}" stroke-opacity=".6" stroke-width="1.6" stroke-dasharray="2 8" stroke-linecap="round"/><line x1="0" x2="680" y1="214" y2="214" stroke="${c}" stroke-width="1.6"/><circle cx="340" cy="214" r="6.5" fill="${c}"/></svg>`; }
+function emptyDome(){ return `<svg viewBox="0 0 680 250" style="display:block;width:100%;height:auto" aria-hidden="true"><path d="M60 214A280 280 0 0 1 620 214" fill="none" stroke="${INK}" stroke-opacity=".28" stroke-width="1" stroke-dasharray="2 7"/><path d="M60 214A280 150 0 0 1 620 214" fill="${INK}" fill-opacity=".04" stroke="${INK}" stroke-opacity=".55" stroke-width="1" stroke-dasharray="2 7"/><line x1="0" x2="680" y1="214" y2="214" stroke="${INK}" stroke-opacity=".5" stroke-width="1"/><circle cx="340" cy="214" r="5" fill="${BRASS}"/></svg>`; }
 function ratioSvg(r){ // une ligne graduée ×1 à ×16, échelle logarithmique
   const X=v=>Math.log(Math.max(1,Math.min(v,16)))/Math.log(16)*100;
   let t=[1,2,4,8,16].map(v=>`<i class="tk" style="left:${X(v)}%"></i>`).join("");
-  if(r!=null) t+=`<i class="bar" style="width:${X(r)}%"></i><i class="pt${r>16?" over":""}" style="left:${X(r)}%"></i>`;
+  if(r!=null) t+=`<i class="fill" style="width:${X(r)}%"></i><i class="pt${r>16?" over":""}" style="left:${X(r)}%"></i>`;
   return `<div class="track">${t}</div>`;
 }
 function encore(){ const n=Math.max(1,3-pointsFor().length); return n>1?`Encore ${n} repères`:"Encore un repère"; }
+const curly=t=>t.replace(/(\w)'(\w)/g,"$1’$2");
 function renderVault(){
   const M=vaultModel(), ok=M&&M.ok;
-  $("#vaultHdr").innerHTML=ok?Vault.svg(M,{theme:"geo",font:FONT,real:realProp,foot:false,fs:1.6}):emptyDome();
+  $("#vaultHdr").innerHTML=ok?Vault.svg(M,{theme:"ink",font:FONT,real:realProp,foot:false,fs:1.6}):emptyDome();
   $("#propBtn").classList.toggle("hide",!ok); $("#propBtn").textContent=realProp?"Revenir à la forme":"Voir les vraies proportions";
   const r=Vault.ratioOfModel(M);
-  $("#hdrLine").innerHTML=ok?(r?`Ton ciel est <b>${fmt(r,r<10?1:0)} fois plus loin</b> à l'horizon qu'au-dessus de toi.`:`${M.title}, ${M.line}`):(store.recs.length?`${encore()} à identifier, proches et lointains, pour dessiner <b>ta voûte</b>.`:`Vise trois repères, proches et lointains : <b>ta voûte</b> se dessinera ici.`);
+  $("#hdrLine").innerHTML=curly(ok?(r?`Ton ciel est <b>${fmt(r,r<10?1:0)} fois plus loin</b> à l'horizon qu'au-dessus de toi.`:`${M.title}, ${M.line}`):(store.recs.length?`${encore()} à identifier, proches et lointains, pour dessiner <b>ta voûte</b>.`:`Vise trois repères, proches et lointains : <b>ta voûte</b> se dessinera ici.`));
   const tp=lastTask("partage"), td=lastTask("dessin"), tt=lastTask("tache");
   const anyX=ok||tp||td||tt;
   $("#skySec").classList.toggle("hide",!anyX);
   $("#stats").innerHTML=ok?Vault.stats(M).map(t=>`<div><span>${t.k}</span><b>${t.big||t.v}</b>${t.sub?`<small>${t.sub}</small>`:""}</div>`).join(""):"";
   const rows=[["Repères",r,ok?"∞":"à venir"],["Dessin",td?td.ratio:null,"à faire"],["Partage",tp?tp.ratio:null,"à faire"],["Tache",tt?tt.ratio:null,tt&&tt.ratio==null?"pas vue":"à faire"]];
-  $("#crossBox").innerHTML=`<div class="q">Combien de fois plus loin à l'horizon qu'au-dessus de toi, selon chaque mesure</div>`+rows.map(([k,v,no])=>`<div class="rl"><span class="k">${k}</span>${ratioSvg(v)}<span class="v${v==null?" no":""}">${v!=null?"×"+fmt(v,v<10?1:0):no}</span></div>`).join("")+`<div class="scale"><span></span><div>${[1,2,4,8,16].map(v=>`<span style="left:${Math.log(v)/Math.log(16)*100}%">×${v}</span>`).join("")}</div><span></span></div><div class="note">×1, c'est une coupole parfaite. Plus le chiffre est grand, plus ton ciel est aplati.</div>`;
-  for(const k of ["partage","dessin","tache"]){ const t=lastTask(k); $(`.tile[data-xp="${k}"]`).classList.toggle("done",!!t); }
+  $("#crossBox").innerHTML=`<div class="q">Combien de fois plus loin à l’horizon qu’au-dessus de toi, selon chaque mesure</div>`+rows.map(([k,v,no])=>`<div class="rl"><span class="k">${k}</span>${ratioSvg(v)}<span class="v${v==null?" no":""}">${v!=null?"×"+fmt(v,v<10?1:0):no}</span></div>`).join("")+`<div class="scale"><span></span><div>${[1,2,4,8,16].map(v=>`<span style="left:${Math.log(v)/Math.log(16)*100}%">×${v}</span>`).join("")}</div><span></span></div><div class="note">×1, c'est une coupole parfaite. Plus le chiffre est grand, plus ton ciel est aplati.</div>`;
+  for(const k of ["partage","dessin","tache"]){ const t=lastTask(k); $(`.tile[data-xp="${k}"]`).classList.toggle("done",!!t); $("#st-"+k).textContent=!t?"À faire":t.ratio!=null?"×"+fmt(t.ratio,t.ratio<10?1:0):"Fait"; }
 }
 $("#propBtn").onclick=()=>{ realProp=!realProp; renderVault(); };
 
@@ -816,10 +828,10 @@ function cvSetup(){ const cv=$("#drawCv"), r=cv.getBoundingClientRect(), dpr=win
 function drawScene(){
   const {x,W,H}=cvSetup(), yG=H*.8, xc=W/2;
   x.clearRect(0,0,W,H);
-  x.strokeStyle="#0d1440"; x.lineWidth=1.6; x.beginPath(); x.moveTo(0,yG); x.lineTo(W,yG); x.stroke();
-  x.fillStyle="#0d1440"; x.beginPath(); x.arc(xc,yG,6.5,0,7); x.fill();
-  x.fillStyle="#7c8299"; x.font="300 14px Jost, system-ui"; x.textAlign="left"; x.fillText("horizon",12,yG+24); x.textAlign="right"; x.fillText("horizon",W-12,yG+24); x.textAlign="center"; x.fillText("toi",xc,yG+24);
-  if(drawPts.length>1){ x.strokeStyle="#1131b8"; x.lineWidth=3.5; x.lineCap="round"; x.lineJoin="round"; x.beginPath(); drawPts.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])); x.stroke(); }
+  x.strokeStyle="rgba(236,235,230,.5)"; x.lineWidth=1; x.beginPath(); x.moveTo(0,yG); x.lineTo(W,yG); x.stroke();
+  x.fillStyle=BRASS; x.beginPath(); x.arc(xc,yG,5,0,7); x.fill();
+  x.fillStyle="#8d919a"; x.font="400 13px Geist, system-ui"; x.textAlign="left"; x.fillText("horizon",12,yG+24); x.textAlign="right"; x.fillText("horizon",W-12,yG+24); x.textAlign="center"; x.fillText("toi",xc,yG+24);
+  if(drawPts.length>1){ x.strokeStyle=INK; x.lineWidth=2.2; x.lineCap="round"; x.lineJoin="round"; x.beginPath(); drawPts.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])); x.stroke(); }
   return {W,H,yG,xc};
 }
 function drawEval(){
@@ -871,7 +883,7 @@ function tacheView(v){
 }
 function drawCmp(){
   const v=+$("#tR").value, big=tacheAns==="horizon", base=22, rH=Math.min(big?base*v:base,66), rT=Math.min(big?base:base*v,66);
-  $("#cmp").innerHTML=`<line x1="0" y1="150" x2="340" y2="150" stroke="#0d1440" stroke-width="1.5"/><circle cx="85" cy="${150-8-rH}" r="${rH}" fill="#1131b8"/><circle cx="255" cy="${82}" r="${rT}" fill="#1131b8"/><text x="85" y="172" font-size="13" text-anchor="middle" fill="#7c8299" font-family="${FONT}">près de l'horizon</text><text x="255" y="172" font-size="13" text-anchor="middle" fill="#7c8299" font-family="${FONT}">en haut du ciel</text><text x="170" y="40" font-size="30" font-weight="300" text-anchor="middle" fill="#0d1440" font-family="${FONT}">× ${fmt(v,1)}</text>`;
+  $("#cmp").innerHTML=`<line x1="0" y1="150" x2="340" y2="150" stroke="${INK}" stroke-opacity=".5" stroke-width="1"/><circle cx="85" cy="${150-8-rH}" r="${rH}" fill="${INK}"/><circle cx="255" cy="${82}" r="${rT}" fill="${INK}"/><text x="85" y="172" font-size="13" text-anchor="middle" fill="#8d919a" font-family="${FONT}">près de l'horizon</text><text x="255" y="172" font-size="13" text-anchor="middle" fill="#8d919a" font-family="${FONT}">en haut du ciel</text><text x="170" y="44" font-size="38" font-weight="200" text-anchor="middle" fill="${INK}" font-family="${SERIF}">×${fmt(v,1)}</text>`;
 }
 function openTache(){ initAudio(); openFull("tacheModal"); tacheView("intro"); }
 function fixation(){
@@ -888,8 +900,8 @@ function finishTache(ratio){
 
 /* ---------- liste des repères ---------- */
 function glyph(r){ // quart de cercle : la visée du ciel au-dessus du repère
-  const a=Math.max(0,Math.min(90,r.sky?r.sky.el:0))*D, x=6+40*Math.cos(a), y=46-40*Math.sin(a);
-  return `<svg class="g" viewBox="0 0 52 52" aria-hidden="true"><path d="M46 46A40 40 0 0 0 6 6" fill="none" stroke="#e4e6ee" stroke-width="1.5"/><line x1="6" y1="46" x2="48" y2="46" stroke="#0d1440" stroke-width="1.5"/><line x1="6" y1="46" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#1131b8" stroke-width="2"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" fill="${r.target?"#1131b8":"#fff"}" stroke="#1131b8" stroke-width="1.5"/></svg>`;
+  const a=Math.max(0,Math.min(90,r.sky?r.sky.el:0))*D, x=5+36*Math.cos(a), y=41-36*Math.sin(a);
+  return `<svg class="g" viewBox="0 0 46 46" aria-hidden="true"><path d="M41 41A36 36 0 0 0 5 5" fill="none" stroke="${INK}" stroke-opacity=".22" stroke-width="1"/><line x1="5" y1="41" x2="43" y2="41" stroke="${INK}" stroke-opacity=".45" stroke-width="1"/><line x1="5" y1="41" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="${INK}" stroke-width="1.2"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.2" fill="${r.target?BRASS:BG}" stroke="${r.target?BRASS:INK}" stroke-width="1"/></svg>`;
 }
 async function render(){
   try{ renderVault(); }catch(e){ console.error(e); }
